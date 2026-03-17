@@ -3,58 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Общий Календарь 2026</title>
+    <title>Pro Calendar 2026</title>
     <style>
-        :root { --primary: #4A90E2; --bg: #F0F4F8; --card: #FFFFFF; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        :root { --primary: #2d3436; --accent: #0984e3; --bg: #dfe6e9; --card: #ffffff; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0; color: #2d3436; }
         .hidden { display: none !important; }
         
-        /* Сетка */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; width: 100%; max-width: 1200px; }
-        .month-tile { background: var(--card); padding: 30px; border-radius: 15px; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-bottom: 5px solid var(--primary); transition: 0.2s; }
-        .month-tile:hover { transform: translateY(-3px); background: var(--primary); color: white; }
+        /* Главный контейнер */
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        .day-card { background: var(--card); padding: 10px; border-radius: 10px; min-height: 100px; display: flex; flex-direction: column; border: 1px solid #ddd; }
-        .day-number { font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+        /* Дизайн плиток года */
+        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .month-tile { 
+            background: var(--card); 
+            aspect-ratio: 1 / 1; /* Делает плитку квадратной */
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 12px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: all 0.2s ease; border: 1px solid #eee;
+        }
+        .month-tile:hover { transform: scale(1.02); border-color: var(--accent); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .month-tile i { font-size: 2rem; margin-bottom: 10px; }
+        .month-tile h3 { margin: 0; font-size: 1.1rem; }
+
+        /* Макет месяца с боковой панелью */
+        .month-layout { display: flex; gap: 20px; align-items: flex-start; }
+        .calendar-main { flex: 3; }
+        .notes-sidebar { 
+            flex: 1; background: var(--card); border-radius: 15px; 
+            padding: 20px; height: 80vh; overflow-y: auto; 
+            position: sticky; top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Сетка дней */
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        .day-card { background: var(--card); padding: 8px; border-radius: 8px; border: 1px solid #eee; min-height: 80px; }
+        .day-num { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; color: #636e72; }
         
-        textarea { flex-grow: 1; border: 1px solid #eee; border-radius: 5px; padding: 5px; font-size: 13px; resize: none; }
-        textarea:disabled { background: #f9f9f9; color: #666; cursor: not-allowed; border: 1px dashed #ccc; }
-        
-        .author-tag { font-size: 10px; color: #999; margin-top: 3px; font-style: italic; }
-        
-        header { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        button { padding: 10px 20px; border-radius: 8px; border: none; background: var(--primary); color: white; cursor: pointer; }
+        textarea { 
+            width: 100%; border: none; background: #f9f9f9; border-radius: 4px; 
+            resize: none; font-size: 12px; padding: 4px; box-sizing: border-box;
+        }
+        textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Список заметок справа */
+        .sidebar-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 0.9rem; }
+        .sidebar-item b { color: var(--accent); }
+        .author-name { font-size: 10px; color: #b2bec3; display: block; }
+
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        .btn-back { background: #636e72; }
     </style>
 </head>
 <body>
 
-    <div id="auth-page">
-        <div style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center;">
-            <h2>Войти в общий календарь</h2>
-            <input type="text" id="username" placeholder="Ваше имя" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-            <button onclick="login()" style="width: 100%;">Войти</button>
+    <div id="auth-page" class="container" style="text-align: center; margin-top: 10vh;">
+        <div style="background: white; padding: 40px; border-radius: 20px; display: inline-block; width: 300px;">
+            <h2>📅 Вход</h2>
+            <input type="text" id="username" placeholder="Ваше имя" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #ddd;">
+            <button class="btn" onclick="login()" style="width: 100%;">Войти</button>
         </div>
     </div>
 
-    <div id="year-page" class="hidden">
+    <div id="year-page" class="hidden container">
         <header>
-            <h1 id="user-title">Календарь 2026</h1>
-            <button onclick="location.reload()">Выйти</button>
+            <h1 id="welcome">2026</h1>
+            <button class="btn" onclick="location.reload()">Выйти</button>
         </header>
-        <div class="grid" id="year-grid"></div>
+        <div class="year-grid" id="year-grid"></div>
     </div>
 
-    <div id="month-page" class="hidden">
+    <div id="month-page" class="hidden container">
         <header>
-            <button onclick="showYear()" style="background: #607D8B;">← Назад</button>
+            <button class="btn btn-back" onclick="showYear()">← Назад</button>
             <h1 id="month-title">Месяц</h1>
-            <div></div>
+            <div style="width: 100px;"></div>
         </header>
-        <div class="grid" id="days-grid" style="grid-template-columns: repeat(7, 1fr);"></div>
+        
+        <div class="month-layout">
+            <div class="calendar-main">
+                <div class="days-grid" id="days-grid"></div>
+            </div>
+            <div class="notes-sidebar" id="notes-sidebar">
+                <h3>🔔 Все заметки</h3>
+                <div id="sidebar-list"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const months = [
+            {n: "Январь", i: "❄️"}, {n: "Февраль", i: "🌨️"}, {n: "Март", i: "🌱"},
+            {n: "Апрель", i: "☔"}, {n: "Май", i: "🌸"}, {n: "Июнь", i: "☀️"},
+            {n: "Июль", i: "🌊"}, {n: "Август", i: "🍎"}, {n: "Сентябрь", i: "🍂"},
+            {n: "Октябрь", i: "🎃"}, {n: "Ноябрь", i: "☁️"}, {n: "Декабрь", i: "🎄"}
+        ];
         let currentUser = "";
 
         function login() {
@@ -63,63 +106,69 @@
             currentUser = name;
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('year-page').classList.remove('hidden');
-            document.getElementById('user-title').innerText = `Привет, ${name}!`;
-            initYear();
+            document.getElementById('welcome').innerText = `Календарь ${name} | 2026`;
+            renderYear();
         }
 
-        function initYear() {
-            const container = document.getElementById('year-grid');
-            container.innerHTML = '';
-            months.forEach((m, i) => {
-                const div = document.createElement('div');
-                div.className = 'month-tile';
-                div.innerHTML = `<h3>${m}</h3>`;
-                div.onclick = () => openMonth(i);
-                container.appendChild(div);
+        function renderYear() {
+            const grid = document.getElementById('year-grid');
+            grid.innerHTML = '';
+            months.forEach((m, idx) => {
+                const tile = document.createElement('div');
+                tile.className = 'month-tile';
+                tile.innerHTML = `<i>${m.i}</i><h3>${m.n}</h3>`;
+                tile.onclick = () => openMonth(idx);
+                grid.appendChild(tile);
             });
         }
 
         function openMonth(mIdx) {
             document.getElementById('year-page').classList.add('hidden');
             document.getElementById('month-page').classList.remove('hidden');
-            document.getElementById('month-title').innerText = months[mIdx];
-            
+            document.getElementById('month-title').innerText = months[mIdx].n;
+            updateDays(mIdx);
+        }
+
+        function updateDays(mIdx) {
             const grid = document.getElementById('days-grid');
+            const sidebar = document.getElementById('sidebar-list');
             grid.innerHTML = '';
+            sidebar.innerHTML = '';
 
             for (let d = 1; d <= 31; d++) {
-                const dayId = `shared_day_${mIdx}_${d}`;
+                const dayId = `shared_2026_${mIdx}_${d}`;
                 const data = JSON.parse(localStorage.getItem(dayId)) || { text: "", author: "" };
 
+                // Отрисовка дня в сетке
+                const canEdit = data.author === "" || data.author === currentUser;
                 const dayCard = document.createElement('div');
                 dayCard.className = 'day-card';
-                
-                // Проверка: можно ли редактировать? (если пусто или если ты автор)
-                const canEdit = data.author === "" || data.author === currentUser;
-
                 dayCard.innerHTML = `
-                    <div class="day-number">${d}</div>
+                    <div class="day-num">${d}</div>
                     <textarea 
-                        id="input-${dayId}" 
                         ${canEdit ? "" : "disabled"} 
-                        placeholder="${canEdit ? "Напишите что-то..." : "Занято другим..."}"
-                        onchange="saveData('${dayId}', this.value)"
+                        onchange="saveData('${dayId}', this.value, ${mIdx})"
                     >${data.text}</textarea>
-                    <div class="author-tag">${data.author ? "Автор: " + data.author : "Свободно"}</div>
                 `;
                 grid.appendChild(dayCard);
+
+                // Добавление в боковую панель (если есть текст)
+                if (data.text.trim() !== "") {
+                    const item = document.createElement('div');
+                    item.className = 'sidebar-item';
+                    item.innerHTML = `<b>${d} ${months[mIdx].n}:</b> ${data.text} <span class="author-name">👤 ${data.author}</span>`;
+                    sidebar.appendChild(item);
+                }
             }
         }
 
-        function saveData(id, val) {
+        function saveData(id, val, mIdx) {
             const data = {
                 text: val,
-                author: val.trim() === "" ? "" : currentUser // Если текст удален, ячейка освобождается
+                author: val.trim() === "" ? "" : currentUser
             };
             localStorage.setItem(id, JSON.stringify(data));
-            // Перерисовываем, чтобы обновить подпись автора
-            const mTitle = document.getElementById('month-title').innerText;
-            openMonth(months.indexOf(mTitle));
+            updateDays(mIdx); // Обновляем всё, чтобы синхронизировать боковую панель
         }
 
         function showYear() {
