@@ -3,62 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Общий Облачный Календарь</title>
+    <title>Общий Облачный Календарь 2026</title>
     <style>
         :root { --primary: #2d3436; --accent: #0984e3; --bg: #dfe6e9; --card: #ffffff; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; }
         .hidden { display: none !important; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        /* Плитки года */
-        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        /* Год: Квадратные плитки */
+        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .month-tile { 
             background: var(--card); aspect-ratio: 1/1; border-radius: 12px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; transition: 0.2s; border: 1px solid #eee;
+            cursor: pointer; transition: 0.2s; border: 1px solid #eee; text-align: center;
         }
-        .month-tile:hover { transform: scale(1.02); border-color: var(--accent); }
+        .month-tile:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .month-tile span { font-size: 2.5rem; margin-bottom: 10px; }
+        .month-tile h3 { margin: 0; font-size: 1.1rem; color: var(--primary); }
 
         /* Месяц и Сайдбар */
-        .month-layout { display: flex; gap: 20px; }
+        .month-layout { display: flex; gap: 20px; margin-top: 20px; }
         .calendar-main { flex: 3; }
-        .notes-sidebar { flex: 1; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; position: sticky; top: 20px; }
+        .notes-sidebar { flex: 1.2; background: var(--card); padding: 20px; border-radius: 15px; height: 75vh; overflow-y: auto; position: sticky; top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-card { background: var(--card); padding: 8px; border-radius: 8px; min-height: 80px; border: 1px solid #eee; }
-        textarea { width: 100%; height: 50px; border: none; background: #f1f2f6; border-radius: 4px; resize: none; font-size: 12px; }
+        .day-card { background: var(--card); padding: 8px; border-radius: 8px; min-height: 90px; border: 1px solid #eee; display: flex; flex-direction: column; }
+        .day-num { font-weight: bold; margin-bottom: 5px; color: #636e72; }
         
-        .sidebar-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 0.9rem; }
-        .author { font-size: 10px; color: #0984e3; font-weight: bold; }
+        textarea { width: 100%; flex-grow: 1; border: none; background: #f1f2f6; border-radius: 4px; resize: none; font-size: 12px; padding: 5px; box-sizing: border-box; }
+        textarea:disabled { opacity: 0.5; cursor: not-allowed; background: #dfe6e9; }
         
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; }
+        /* Список активности справа */
+        .sidebar-item { border-bottom: 1px solid #f1f2f6; padding: 12px 0; font-size: 0.9rem; line-height: 1.4; }
+        .sidebar-item b { color: var(--accent); display: block; margin-bottom: 2px; }
+        .author-tag { font-size: 11px; color: #b2bec3; font-weight: bold; text-transform: uppercase; }
+        
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="auth-page" class="container" style="text-align: center; margin-top: 10vh;">
-        <div style="background: white; padding: 40px; border-radius: 20px; display: inline-block; width: 300px;">
-            <h2>📅 Вход в Общий Календарь</h2>
-            <input type="text" id="username" placeholder="Ваше имя" style="width: 100%; padding: 10px; margin-bottom: 15px;">
-            <button class="btn" onclick="window.login()" style="width: 100%;">Войти</button>
+    <div id="auth-page" class="container" style="text-align: center; margin-top: 15vh;">
+        <div style="background: white; padding: 40px; border-radius: 20px; display: inline-block; width: 320px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);">
+            <h2 style="margin-bottom: 25px;">📅 Общий Календарь</h2>
+            <input type="text" id="username" placeholder="Ваше имя" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+            <button class="btn" onclick="window.login()" style="width: 100%;">Войти в систему</button>
         </div>
     </div>
 
     <div id="year-page" class="hidden container">
-        <header><h1>2026</h1></header>
+        <header>
+            <h1 style="margin:0">2026</h1>
+            <button class="btn" style="background:#636e72" onclick="location.reload()">Выйти</button>
+        </header>
         <div class="year-grid" id="year-grid"></div>
     </div>
 
     <div id="month-page" class="hidden container">
         <header>
-            <button class="btn" onclick="location.reload()">← Назад</button>
-            <h1 id="month-title"></h1>
+            <button class="btn" style="background:#636e72" onclick="showYear()">← К году</button>
+            <h1 id="month-title" style="margin:0"></h1>
+            <div style="width:80px"></div>
         </header>
         <div class="month-layout">
             <div class="calendar-main"><div class="days-grid" id="days-grid"></div></div>
             <div class="notes-sidebar">
-                <h3>🔔 Активность</h3>
+                <h3 style="margin-top:0; border-bottom: 2px solid var(--accent); padding-bottom: 10px;">🔔 Активность</h3>
                 <div id="sidebar-list"></div>
             </div>
         </div>
@@ -68,14 +79,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // !!! ВСТАВЬ СВОЙ КОНФИГ ТУТ !!!
         const firebaseConfig = {
-            apiKey: "твой_ключ",
-            authDomain: "твой_проект.firebaseapp.com",
-            projectId: "твой_проект",
-            storageBucket: "твой_проект.appspot.com",
-            messagingSenderId: "...",
-            appId: "..."
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0",
+            measurementId: "G-D2G4YVN8V4"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -87,7 +98,7 @@
 
         window.login = () => {
             user = document.getElementById('username').value.trim();
-            if(!user) return alert("Имя!");
+            if(!user) return alert("Пожалуйста, введите ваше имя!");
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('year-page').classList.remove('hidden');
             renderYear();
@@ -110,7 +121,7 @@
             document.getElementById('month-page').classList.remove('hidden');
             document.getElementById('month-title').innerText = months[mIdx];
             
-            // СЛУШАЕМ ОБЛАКО В РЕАЛЬНОМ ВРЕМЕНИ
+            // Подписка на обновления облака
             onSnapshot(doc(db, "data", `month_${mIdx}`), (docSnap) => {
                 const monthData = docSnap.exists() ? docSnap.data() : {};
                 renderDays(mIdx, monthData);
@@ -128,15 +139,21 @@
 
                 const card = document.createElement('div');
                 card.className = 'day-card';
-                card.innerHTML = `<b>${d}</b><textarea id="day-${d}" ${canEdit ? "" : "disabled"}>${dayData.text}</textarea>`;
+                card.innerHTML = `
+                    <div class="day-num">${d}</div>
+                    <textarea id="input-${d}" ${canEdit ? "" : "disabled"} placeholder="${canEdit ? "..." : "Занято"}">${dayData.text}</textarea>
+                `;
                 grid.appendChild(card);
 
-                // Если кто-то написал — добавляем в правую колонку
                 if(dayData.text) {
-                    sidebar.innerHTML += `<div class="sidebar-item"><b>${d} ${months[mIdx]}:</b> ${dayData.text} <br> <span class="author">👤 ${dayData.author}</span></div>`;
+                    sidebar.innerHTML += `
+                        <div class="sidebar-item">
+                            <b>${d} ${months[mIdx]}</b>
+                            ${dayData.text}
+                            <div class="author-tag">👤 ${dayData.author}</div>
+                        </div>`;
                 }
 
-                // Сохранение в облако
                 const area = card.querySelector('textarea');
                 area.onchange = async () => {
                     data[d] = { text: area.value, author: area.value ? user : "" };
@@ -144,6 +161,11 @@
                 };
             }
         }
+
+        window.showYear = () => {
+            document.getElementById('month-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+        };
     </script>
 </body>
 </html>
