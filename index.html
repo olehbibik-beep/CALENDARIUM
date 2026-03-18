@@ -9,32 +9,42 @@
         body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
         .hidden { display: none !important; }
 
-        /* --- ВХОД --- */
-        #auth-page { display: flex; height: 100vh; width: 100vw; background: white; position: fixed; top: 0; left: 0; z-index: 1000; }
-        .auth-left { flex: 1; background: #ced4da url('https://images.unsplash.com/photo-1506784365847-bbad939e9335?q=80&w=2068&auto=format&fit=crop') center/cover; display: flex; align-items: center; justify-content: center; position: relative; }
-        .auth-left::after { content: ""; position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.3); }
-        .auth-left h1 { color: white; z-index: 1; font-size: 4rem; text-shadow: 2px 2px 15px rgba(0,0,0,0.5); }
-        .auth-right { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; }
-        .auth-form-card { width: 100%; max-width: 350px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        #pattern-canvas { background: #f8f9fa; border-radius: 15px; cursor: crosshair; margin: 20px 0; touch-action: none; border: 1px solid #eee; }
-        .toggle-auth { color: var(--accent); cursor: pointer; font-size: 14px; text-decoration: underline; margin-top: 15px; }
+        /* --- НОВЫЙ МИНИМАЛИСТИЧНЫЙ ВХОД (твоя идея) --- */
+        #auth-page { 
+            display: flex; height: 100vh; width: 100vw; background: white; 
+            position: fixed; top: 0; left: 0; z-index: 1000; 
+            flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding-top: 5vh; box-sizing: border-box; 
+        }
+        #auth-page h2 { margin-bottom: 5px; font-weight: 400; font-size: 1.2rem; color: #2d3436; }
+        #auth-username { 
+            width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
+            border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; 
+            text-align: center; font-family: inherit; 
+        }
+        #pattern-canvas { background: transparent; border-radius: 15px; cursor: crosshair; touch-action: none; margin-bottom: 20px; }
+        .auth-hint { font-size: 11px; color: #636e72; margin-top: -15px; margin-bottom: 20px; }
 
-        /* --- ИНТЕРФЕЙС --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        /* --- БЛОК СЕРОЙ ИНФОРМАЦИИ (твоя идея) --- */
+        #site-info-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 50px; 
+            background: #dfe6e9; display: flex; align-items: center; justify-content: center; 
+            color: #636e72; font-size: 12px; z-index: 1002;
+        }
+
+        /* --- ИНТЕРФЕЙС И КАЛЕНДАРЬ --- */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; padding-bottom: 70px; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .month-tile { background: var(--card); aspect-ratio: 1/1; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
         .month-tile:hover { transform: translateY(-5px); border-color: var(--accent); }
         .month-tile span { font-size: 2.5rem; }
 
-        /* --- КАЛЕНДАРЬ И БОКОВАЯ ПАНЕЛЬ --- */
         .month-layout { display: flex; gap: 20px; align-items: flex-start; }
         .calendar-main { flex: 2; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day-card { background: var(--card); padding: 10px; border-radius: 8px; min-height: 80px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative; }
         .day-card:hover { border-color: var(--accent); background: #f0f7ff; }
-        .day-card b { font-size: 1.1rem; }
         .day-preview { font-size: 10px; color: #636e72; margin-top: 5px; line-height: 1.2; overflow: hidden; }
 
         .notes-sidebar { flex: 1; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -42,26 +52,19 @@
         
         .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; margin-bottom: 5px; border-radius: 6px; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
-        .btn:disabled { background: #b2bec3; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
     <div id="auth-page">
-        <div class="auth-left"><h1>Plan 2026</h1></div>
-        <div class="auth-right">
-            <div class="auth-form-card">
-                <h2>Добро пожаловать</h2>
-                <input type="text" id="username" placeholder="Ваше имя">
-                <div id="password-mode"><input type="password" id="pass" placeholder="Пароль"></div>
-                <div id="pattern-mode" class="hidden">
-                    <p style="font-size:12px">Проведите линию через 3+ точки:</p>
-                    <canvas id="pattern-canvas" width="260" height="260"></canvas>
-                </div>
-                <button class="btn" onclick="handleAuthSubmit()" style="width: 100%; margin-top: 10px;">Войти</button>
-                <div class="toggle-auth" onclick="toggleAuthMode()">Использовать графический ключ</div>
-            </div>
-        </div>
+        <h2>Добро пожаловать</h2>
+        <input type="text" id="auth-username" placeholder="Ваше имя">
+        <canvas id="pattern-canvas" width="260" height="260"></canvas>
+        <p class="auth-hint">Проведите графический ключ (3+ точки)</p>
+    </div>
+
+    <div id="site-info-bar">
+        © 2026 Твой Личный Облачный Планировщик | Для регистрации напиши админу.
     </div>
 
     <div id="year-page" class="hidden container">
@@ -79,10 +82,7 @@
             <div style="width:80px"></div>
         </header>
         <div class="month-layout">
-            <div class="calendar-main">
-                <div class="days-grid" id="days-grid"></div>
-            </div>
-            
+            <div class="calendar-main"><div class="days-grid" id="days-grid"></div></div>
             <div class="notes-sidebar">
                 <div id="editor-section" class="hidden">
                     <h3 id="selected-day-label" style="margin-top:0">Выбери день</h3>
@@ -108,7 +108,7 @@
             <div id="requests-list"></div>
         </div>
     </div>
-    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:20px; right:20px; background:#d63031; z-index:1001;">⚙️ Управление</button>
+    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:70px; right:20px; background:#d63031; z-index:1001; opacity:0.8;">⚙️ Управление</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -130,58 +130,59 @@
         const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const icons = ["❄️","🌨️","🌱","☔","🌸","☀️","🌊","🍎","🍂","🎃","☁️","🎄"];
         let user = "";
-        let authMode = 'password';
         let patternResult = "";
         let currentMonthIdx = null;
         let currentDay = null;
         let currentMonthData = {};
 
         // --- ВХОД И ЗАЯВКИ ---
-        window.handleAuthSubmit = async () => {
-            user = document.getElementById('username').value.trim().toLowerCase();
-            const passInput = document.getElementById('pass').value;
-            if(!user) return alert("Введите имя!");
+        // Запускаем проверку ключа сразу после того, как друг «отпустит палец»
+        function handleKeyDrawEnd() {
+            window.handleAuthSubmit();
+        }
 
-            let secret = (authMode === 'password') ? passInput : patternResult;
-            if(!secret || (authMode === 'pattern' && secret.length < 3)) return alert("Введите пароль!");
+        window.handleAuthSubmit = async () => {
+            user = document.getElementById('auth-username').value.trim().toLowerCase();
+            
+            if(!user) { alert("Сначала введите Ваше имя."); return; }
+            if(!patternResult || patternResult.length < 3) { alert("Нарисуйте ключ (минимум 3 точки)."); return; }
 
             const userRef = doc(db, "users", user);
             const userSnap = await getDoc(userRef);
 
+            // 1. Проверяем основную базу
             if (userSnap.exists()) {
-                if (userSnap.data().password === secret) loginSuccess();
-                else alert("Неверный пароль!");
+                if (userSnap.data().password === patternResult) loginSuccess();
+                else alert("Неверный ключ!");
                 return;
             }
 
+            // 2. Если пользователя нет, проверяем Requests
             const reqRef = doc(db, "requests", user);
             const reqSnap = await getDoc(reqRef);
-            if (reqSnap.exists()) alert("Подождите одобрения админом.");
-            else if(confirm("Отправить запрос на регистрацию админу?")) {
-                await setDoc(reqRef, { password: secret, mode: authMode });
-                alert("Запрос отправлен!");
+            if (reqSnap.exists()) alert("Подождите одобрения администратором.");
+            else if(confirm("Отправить Ваш ключ администратору на регистрацию?")) {
+                await setDoc(reqRef, { password: patternResult, mode: 'pattern', date: new Date().toISOString() });
+                alert("Ключ отправлен!");
             }
         };
 
         function loginSuccess() {
             document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('site-info-bar').classList.add('hidden'); // Убираем серую полосу
             document.getElementById('year-page').classList.remove('hidden');
             document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
             if (user === 'admin') {
                 document.getElementById('admin-btn').classList.remove('hidden');
-                onSnapshot(collection(db, "requests"), (snap) => {
-                    document.getElementById('admin-btn').style.boxShadow = !snap.empty ? "0 0 15px #ff7675" : "none";
-                });
             }
             renderYear();
         }
 
-        // --- КАЛЕНДАРЬ ---
+        // --- КАЛЕНДАРЬ (без изменений) ---
         function renderYear() {
             const grid = document.getElementById('year-grid');
             grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
         }
-
         window.openMonth = (mIdx) => {
             currentMonthIdx = mIdx;
             document.getElementById('year-page').classList.add('hidden');
@@ -193,128 +194,56 @@
                 renderDays(mIdx, currentMonthData);
             });
         };
-
         function renderDays(mIdx, data) {
             const grid = document.getElementById('days-grid');
             const sidebar = document.getElementById('sidebar-list');
             grid.innerHTML = ''; sidebar.innerHTML = '';
-
             for (let d = 1; d <= 31; d++) {
                 const dayData = data[d] || { text: "", author: "" };
                 const card = document.createElement('div');
                 card.className = 'day-card';
-                
-                if(dayData.author === 'admin') {
-                    card.style.border = "2px solid var(--admin-gold)";
-                    card.style.background = "#fffdf0";
-                }
-
+                if(dayData.author === 'admin') { card.style.border = "2px solid var(--admin-gold)"; card.style.background = "#fffdf0"; }
                 card.innerHTML = `<b>${d}</b><div class="day-preview">${dayData.text.substring(0,30)}${dayData.text.length > 30 ? '...' : ''}</div>`;
                 card.onclick = () => selectDay(d);
                 grid.appendChild(card);
-
-                if(dayData.text) {
-                    const isAdm = dayData.author === 'admin';
-                    sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold); background:#fffef5;' : ''}">
-                        <b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`;
-                }
+                if(dayData.text) { const isAdm = dayData.author === 'admin'; sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold); background:#fffef5;' : ''}"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`; }
             }
         }
-
         window.selectDay = (d) => {
-            currentDay = d;
-            const dayData = currentMonthData[d] || { text: "", author: "" };
-            document.getElementById('editor-section').classList.remove('hidden');
-            document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`;
-            
-            const input = document.getElementById('day-input');
-            const delBtn = document.getElementById('delete-btn');
-            const saveBtn = document.getElementById('save-btn');
-            
-            input.value = dayData.text;
-            
-            if (!dayData.author || dayData.author === user) {
-                input.disabled = false;
-                saveBtn.disabled = false;
-                delBtn.style.display = dayData.text ? 'block' : 'none';
-            } else {
-                input.disabled = true;
-                saveBtn.disabled = true;
-                delBtn.style.display = 'none';
-            }
+            currentDay = d; const dayData = currentMonthData[d] || { text: "", author: "" }; document.getElementById('editor-section').classList.remove('hidden'); document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`; const input = document.getElementById('day-input'); const delBtn = document.getElementById('delete-btn'); const saveBtn = document.getElementById('save-btn'); input.value = dayData.text;
+            if (!dayData.author || dayData.author === user) { input.disabled = false; saveBtn.disabled = false; delBtn.style.display = dayData.text ? 'block' : 'none'; } else { input.disabled = true; saveBtn.disabled = true; delBtn.style.display = 'none'; }
         };
+        window.saveDayData = async () => { const text = document.getElementById('day-input').value.trim(); currentMonthData[currentDay] = { text: text, author: text ? user : "" }; await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData); };
+        window.deleteDayData = async () => { if(confirm("Удалить вашу запись?")) { document.getElementById('day-input').value = ""; await saveDayData(); } };
+        window.openAdminPanel = async () => { document.getElementById('admin-modal').classList.remove('hidden'); const listDiv = document.getElementById('requests-list'); listDiv.innerHTML = "Загрузка..."; const snap = await getDocs(collection(db, "requests")); listDiv.innerHTML = snap.empty ? "Заявок нет" : ""; snap.forEach((d) => { const item = document.createElement('div'); item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"; item.innerHTML = `<span>${d.id}</span><div><button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button><button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`; listDiv.appendChild(item); }); };
+        window.approveUser = async (name, pass, mode) => { await setDoc(doc(db, "users", name), { password: pass, mode: mode }); await deleteDoc(doc(db, "requests", name)); openAdminPanel(); };
+        window.rejectUser = async (name) => { await deleteDoc(doc(db, "requests", name)); openAdminPanel(); };
 
-        window.saveDayData = async () => {
-            const text = document.getElementById('day-input').value.trim();
-            currentMonthData[currentDay] = { text: text, author: text ? user : "" };
-            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
-            alert("Сохранено!");
-        };
-
-        window.deleteDayData = async () => {
-            if(confirm("Удалить вашу запись?")) {
-                document.getElementById('day-input').value = "";
-                await saveDayData();
-            }
-        };
-
-        // --- АДМИНКА ---
-        window.openAdminPanel = async () => {
-            document.getElementById('admin-modal').classList.remove('hidden');
-            const listDiv = document.getElementById('requests-list');
-            listDiv.innerHTML = "Загрузка...";
-            const snap = await getDocs(collection(db, "requests"));
-            listDiv.innerHTML = snap.empty ? "Заявок нет" : "";
-            snap.forEach((d) => {
-                const item = document.createElement('div');
-                item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
-                item.innerHTML = `<span>${d.id}</span><div>
-                    <button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button>
-                    <button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`;
-                listDiv.appendChild(item);
-            });
-        };
-
-        window.approveUser = async (name, pass, mode) => {
-            await setDoc(doc(db, "users", name), { password: pass, mode: mode });
-            await deleteDoc(doc(db, "requests", name));
-            openAdminPanel();
-        };
-
-        window.rejectUser = async (name) => {
-            await deleteDoc(doc(db, "requests", name));
-            openAdminPanel();
-        };
-
-        // --- ГРАФИЧЕСКИЙ КЛЮЧ ---
-        window.toggleAuthMode = () => {
-            authMode = (authMode === 'password') ? 'pattern' : 'password';
-            document.getElementById('password-mode').classList.toggle('hidden');
-            document.getElementById('pattern-mode').classList.toggle('hidden');
-            if(authMode === 'pattern') setTimeout(initPattern, 100);
-        };
-
-        function initPattern() {
+        // --- ИНИЦИАЛИЗАЦИЯ КЛЮЧА (всегда включен) ---
+        (function initPattern() {
             const canvas = document.getElementById('pattern-canvas');
             const ctx = canvas.getContext('2d');
             let drawing = false;
-            patternResult = ""; 
             const dots = [];
+            // Рисуем сетку 3x3 из твоего рисунка (чуть шире для удобства)
             for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
 
             const draw = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // 1. Рисуем линии
                 if (patternResult.length > 0) {
-                    ctx.beginPath(); ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; ctx.lineWidth = 8; ctx.lineJoin = "round";
+                    ctx.beginPath(); ctx.strokeStyle = "rgba(100, 100, 100, 0.4)"; ctx.lineWidth = 10; ctx.lineJoin = "round";
                     for(let k=0; k < patternResult.length; k+=2) {
                         const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
                         if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
                     }
                     ctx.stroke();
                 }
+                // 2. Рисуем точки (серые, как у тебя)
                 dots.forEach(d => {
-                    ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
-                    ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
+                    ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
+                    ctx.fillStyle = d.hit ? "#7f8c8d" : "#95a5a6"; // Светло-серые, если не нажаты
+                    ctx.fill(); ctx.closePath();
                 });
             };
 
@@ -324,23 +253,19 @@
                 const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
                 const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
                 dots.forEach(d => {
-                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) {
+                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 28 && !d.hit) {
                         d.hit = true; patternResult += d.id; draw();
                     }
                 });
             };
 
-            canvas.onmousedown = (e) => { drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); handleInput(e); };
-            canvas.ontouchstart = (e) => { drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); handleInput(e); };
-            window.onmouseup = window.ontouchend = () => drawing = false;
+            canvas.onmousedown = canvas.ontouchstart = (e) => { patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; handleInput(e); };
+            window.onmouseup = window.ontouchend = () => { if(drawing) { drawing = false; handleKeyDrawEnd(); } };
             canvas.onmousemove = canvas.ontouchmove = (e) => { if(e.touches) e.preventDefault(); handleInput(e); };
             draw();
-        }
+        })();
 
-        window.showYear = () => {
-            document.getElementById('month-page').classList.add('hidden');
-            document.getElementById('year-page').classList.remove('hidden');
-        };
+        window.showYear = () => { document.getElementById('month-page').classList.add('hidden'); document.getElementById('year-page').classList.remove('hidden'); };
     </script>
 </body>
 </html>
