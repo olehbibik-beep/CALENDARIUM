@@ -98,18 +98,53 @@
     let authMode = 'password';
     let patternResult = ""; // Здесь будем хранить "код" графического ключа
 
-    // --- СИСТЕМА ВХОДА И РЕГИСТРАЦИИ ---
-    window.handleAuthSubmit = async () => {
-        user = document.getElementById('username').value.trim().toLowerCase();
-        const passInput = document.getElementById('pass').value;
-        
-        if(!user) return alert("Введите имя!");
+    // --- ОБНОВЛЕННАЯ СИСТЕМА ВХОДА И ЗАЯВОК ---
+window.handleAuthSubmit = async () => {
+    user = document.getElementById('username').value.trim().toLowerCase();
+    const passInput = document.getElementById('pass').value;
+    
+    if(!user) return alert("Введите имя!");
 
-        // Формируем секретный код в зависимости от режима
-        let secret = (authMode === 'password') ? passInput : patternResult;
-        if(!secret || (authMode === 'pattern' && secret.length < 3)) {
-            return alert("Введите пароль или нарисуйте ключ (минимум 3 точки)!");
+    let secret = (authMode === 'password') ? passInput : patternResult;
+    if(!secret || (authMode === 'pattern' && secret.length < 3)) {
+        return alert("Введите пароль или нарисуйте ключ!");
+    }
+
+    // 1. Проверяем основную базу одобренных пользователей
+    const userRef = doc(db, "users", user);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+        if (userSnap.data().password === secret) {
+            loginSuccess();
+        } else {
+            alert("Неверный пароль или ключ!");
         }
+        return;
+    }
+
+    // 2. Если в основной базе нет, проверяем базу ЗАЯВОК (requests)
+    const reqRef = doc(db, "requests", user);
+    const reqSnap = await getDoc(reqRef);
+
+    if (reqSnap.exists()) {
+        alert("Ваша заявка уже на рассмотрении у администратора. Пожалуйста, подождите.");
+    } else {
+        // 3. Если пользователя вообще нет нигде — предлагаем создать ЗАЯВКУ
+        if(confirm(`Пользователь "${user}" не найден. Отправить запрос на регистрацию администратору?`)) {
+            try {
+                await setDoc(reqRef, { 
+                    password: secret, 
+                    mode: authMode,
+                    date: new Date().toISOString()
+                });
+                alert("Запрос отправлен! Зайдите позже, когда администратор одобрит ваш аккаунт.");
+            } catch (e) {
+                alert("Ошибка при отправке запроса.");
+            }
+        }
+    }
+};
 
         const userRef = doc(db, "users", user);
         const userSnap = await getDoc(userRef);
