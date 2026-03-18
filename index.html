@@ -158,4 +158,101 @@
             const toggleBtn = document.querySelector('.toggle-auth');
             if (authMode === 'password') {
                 pMode.classList.add('hidden'); gMode.classList.remove('hidden');
-                toggleBtn.innerText = "
+                toggleBtn.innerText = "Использовать обычный пароль";
+                authMode = 'pattern'; initPattern();
+            } else {
+                pMode.classList.remove('hidden'); gMode.classList.add('hidden');
+                toggleBtn.innerText = "Использовать графический ключ";
+                authMode = 'password';
+            }
+        };
+
+        window.handleAuthSubmit = () => {
+            user = document.getElementById('username').value.trim();
+            if(!user) return alert("Введите имя!");
+            
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+            document.getElementById('welcome-user').innerText = `Планы ${user} | 2026`;
+            renderYear();
+        };
+
+        // --- ГРАФИЧЕСКИЙ КЛЮЧ ---
+        function initPattern() {
+            const canvas = document.getElementById('pattern-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            const draw = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        ctx.beginPath();
+                        ctx.arc(50 + i * 80, 50 + j * 80, 10, 0, Math.PI * 2);
+                        ctx.fillStyle = "#dfe6e9"; ctx.fill();
+                    }
+                }
+            };
+            draw();
+            canvas.onmousedown = (e) => { drawing = true; draw(); };
+            window.onmouseup = () => drawing = false;
+            canvas.onmousemove = (e) => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ctx.fillStyle = "#0984e3";
+                ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill();
+            };
+        }
+
+        // --- КАЛЕНДАРЬ ---
+        function renderYear() {
+            const grid = document.getElementById('year-grid');
+            grid.innerHTML = '';
+            months.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = 'month-tile';
+                div.innerHTML = `<span>${icons[i]}</span><h3>${m}</h3>`;
+                div.onclick = () => openMonth(i);
+                grid.appendChild(div);
+            });
+        }
+
+        function openMonth(mIdx) {
+            document.getElementById('year-page').classList.add('hidden');
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = months[mIdx];
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (docSnap) => {
+                const monthData = docSnap.exists() ? docSnap.data() : {};
+                renderDays(mIdx, monthData);
+            });
+        }
+
+        function renderDays(mIdx, data) {
+            const grid = document.getElementById('days-grid');
+            const sidebar = document.getElementById('sidebar-list');
+            grid.innerHTML = ''; sidebar.innerHTML = '';
+            for (let d = 1; d <= 31; d++) {
+                const dayData = data[d] || { text: "", author: "" };
+                const canEdit = dayData.author === "" || dayData.author === user;
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                card.innerHTML = `<div class="day-num">${d}</div><textarea id="in-${d}" ${canEdit ? "" : "disabled"}>${dayData.text}</textarea>`;
+                grid.appendChild(card);
+                if(dayData.text) sidebar.innerHTML += `<div class="sidebar-item"><b>${d} ${months[mIdx]}</b><br>${dayData.text}<br><small style="color:#0984e3">👤 ${dayData.author}</small></div>`;
+                
+                card.querySelector('textarea').onchange = async (e) => {
+                    data[d] = { text: e.target.value, author: e.target.value ? user : "" };
+                    await setDoc(doc(db, "data", `month_${mIdx}`), data);
+                };
+            }
+        }
+
+        window.showYear = () => {
+            document.getElementById('month-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+        };
+    </script>
+</body>
+</html>
