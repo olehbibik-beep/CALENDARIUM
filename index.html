@@ -9,7 +9,7 @@
         body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
         .hidden { display: none !important; }
 
-        /* --- НОВЫЙ МИНИМАЛИСТИЧНЫЙ ВХОД (твоя идея) --- */
+        /* --- ВХОД ПО ТВОЕМУ МАКЕТУ --- */
         #auth-page { 
             display: flex; height: 100vh; width: 100vw; background: white; 
             position: fixed; top: 0; left: 0; z-index: 1000; 
@@ -20,36 +20,39 @@
         #auth-username { 
             width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
             border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; 
-            text-align: center; font-family: inherit; 
+            text-align: center; font-family: inherit; outline: none;
         }
-        #pattern-canvas { background: transparent; border-radius: 15px; cursor: crosshair; touch-action: none; margin-bottom: 20px; }
-        .auth-hint { font-size: 11px; color: #636e72; margin-top: -15px; margin-bottom: 20px; }
+        #pattern-canvas { background: transparent; cursor: crosshair; touch-action: none; margin-bottom: 10px; }
+        
+        /* СЕКРЕТНОЕ ПОЛЕ ДЛЯ АДМИНА */
+        #admin-pass-input {
+            width: 200px; padding: 8px; border-radius: 10px; border: 1px solid #eee;
+            margin-bottom: 15px; text-align: center; font-size: 13px;
+        }
+        .auth-hint { font-size: 11px; color: #636e72; margin-top: 5px; }
 
-        /* --- БЛОК СЕРОЙ ИНФОРМАЦИИ (твоя идея) --- */
+        /* СЕРАЯ ПОЛОСА ВНИЗУ */
         #site-info-bar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 50px; 
             background: #dfe6e9; display: flex; align-items: center; justify-content: center; 
             color: #636e72; font-size: 12px; z-index: 1002;
         }
 
-        /* --- ИНТЕРФЕЙС И КАЛЕНДАРЬ --- */
+        /* --- ОСТАЛЬНОЙ ИНТЕРФЕЙС --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; padding-bottom: 70px; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .month-tile { background: var(--card); aspect-ratio: 1/1; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
         .month-tile:hover { transform: translateY(-5px); border-color: var(--accent); }
         .month-tile span { font-size: 2.5rem; }
-
         .month-layout { display: flex; gap: 20px; align-items: flex-start; }
         .calendar-main { flex: 2; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day-card { background: var(--card); padding: 10px; border-radius: 8px; min-height: 80px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative; }
         .day-card:hover { border-color: var(--accent); background: #f0f7ff; }
         .day-preview { font-size: 10px; color: #636e72; margin-top: 5px; line-height: 1.2; overflow: hidden; }
-
         .notes-sidebar { flex: 1; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         #day-input { width: 100%; height: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; font-family: inherit; resize: none; box-sizing: border-box; margin-top: 10px; }
-        
         .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; margin-bottom: 5px; border-radius: 6px; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
     </style>
@@ -58,9 +61,16 @@
 
     <div id="auth-page">
         <h2>Добро пожаловать</h2>
-        <input type="text" id="auth-username" placeholder="Ваше имя">
+        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
+        
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
-        <p class="auth-hint">Проведите графический ключ (3+ точки)</p>
+        
+        <div id="admin-secret-wrap" class="hidden">
+            <input type="password" id="admin-pass-input" placeholder="Текстовый пароль">
+            <button class="btn" onclick="handleAuthSubmit()" style="display:block; margin: 0 auto;">Войти как Админ</button>
+        </div>
+
+        <p class="auth-hint">Проведите графический ключ</p>
     </div>
 
     <div id="site-info-bar">
@@ -135,50 +145,52 @@
         let currentDay = null;
         let currentMonthData = {};
 
-        // --- ВХОД И ЗАЯВКИ ---
-        // Запускаем проверку ключа сразу после того, как друг «отпустит палец»
-        function handleKeyDrawEnd() {
-            window.handleAuthSubmit();
+        // Функция-секретка
+        window.checkAdmin = (val) => {
+            const secretBox = document.getElementById('admin-secret-wrap');
+            if(val.toLowerCase() === 'admin') secretBox.classList.remove('hidden');
+            else secretBox.classList.add('hidden');
         }
 
         window.handleAuthSubmit = async () => {
             user = document.getElementById('auth-username').value.trim().toLowerCase();
+            const textPass = document.getElementById('admin-pass-input').value;
             
-            if(!user) { alert("Сначала введите Ваше имя."); return; }
-            if(!patternResult || patternResult.length < 3) { alert("Нарисуйте ключ (минимум 3 точки)."); return; }
+            if(!user) return alert("Введите имя.");
+
+            // Если есть текстовый пароль (для админа), используем его. Если нет - графический.
+            let finalSecret = textPass || patternResult;
+
+            if(!finalSecret || (finalSecret.length < 3 && !textPass)) return alert("Введите пароль или нарисуйте ключ.");
 
             const userRef = doc(db, "users", user);
             const userSnap = await getDoc(userRef);
 
-            // 1. Проверяем основную базу
             if (userSnap.exists()) {
-                if (userSnap.data().password === patternResult) loginSuccess();
-                else alert("Неверный ключ!");
+                if (userSnap.data().password === finalSecret) loginSuccess();
+                else alert("Неверный доступ!");
                 return;
             }
 
-            // 2. Если пользователя нет, проверяем Requests
             const reqRef = doc(db, "requests", user);
             const reqSnap = await getDoc(reqRef);
-            if (reqSnap.exists()) alert("Подождите одобрения администратором.");
-            else if(confirm("Отправить Ваш ключ администратору на регистрацию?")) {
-                await setDoc(reqRef, { password: patternResult, mode: 'pattern', date: new Date().toISOString() });
-                alert("Ключ отправлен!");
+            if (reqSnap.exists()) alert("Ожидайте одобрения.");
+            else if(confirm("Отправить запрос на регистрацию?")) {
+                await setDoc(reqRef, { password: finalSecret, mode: textPass ? 'password' : 'pattern' });
+                alert("Запрос отправлен!");
             }
         };
 
         function loginSuccess() {
             document.getElementById('auth-page').classList.add('hidden');
-            document.getElementById('site-info-bar').classList.add('hidden'); // Убираем серую полосу
+            document.getElementById('site-info-bar').classList.add('hidden');
             document.getElementById('year-page').classList.remove('hidden');
             document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
-            if (user === 'admin') {
-                document.getElementById('admin-btn').classList.remove('hidden');
-            }
+            if (user === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
             renderYear();
         }
 
-        // --- КАЛЕНДАРЬ (без изменений) ---
+        // --- ЛОГИКА КАЛЕНДАРЯ ---
         function renderYear() {
             const grid = document.getElementById('year-grid');
             grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
@@ -203,34 +215,44 @@
                 const card = document.createElement('div');
                 card.className = 'day-card';
                 if(dayData.author === 'admin') { card.style.border = "2px solid var(--admin-gold)"; card.style.background = "#fffdf0"; }
-                card.innerHTML = `<b>${d}</b><div class="day-preview">${dayData.text.substring(0,30)}${dayData.text.length > 30 ? '...' : ''}</div>`;
+                card.innerHTML = `<b>${d}</b><div class="day-preview">${dayData.text.substring(0,30)}</div>`;
                 card.onclick = () => selectDay(d);
                 grid.appendChild(card);
-                if(dayData.text) { const isAdm = dayData.author === 'admin'; sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold); background:#fffef5;' : ''}"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`; }
+                if(dayData.text) { const isAdm = dayData.author === 'admin'; sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold);' : ''}"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`; }
             }
         }
         window.selectDay = (d) => {
-            currentDay = d; const dayData = currentMonthData[d] || { text: "", author: "" }; document.getElementById('editor-section').classList.remove('hidden'); document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`; const input = document.getElementById('day-input'); const delBtn = document.getElementById('delete-btn'); const saveBtn = document.getElementById('save-btn'); input.value = dayData.text;
-            if (!dayData.author || dayData.author === user) { input.disabled = false; saveBtn.disabled = false; delBtn.style.display = dayData.text ? 'block' : 'none'; } else { input.disabled = true; saveBtn.disabled = true; delBtn.style.display = 'none'; }
+            currentDay = d; const dayData = currentMonthData[d] || { text: "", author: "" }; document.getElementById('editor-section').classList.remove('hidden'); document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`; const input = document.getElementById('day-input'); input.value = dayData.text;
+            const canEdit = !dayData.author || dayData.author === user;
+            input.disabled = !canEdit; document.getElementById('save-btn').disabled = !canEdit;
+            document.getElementById('delete-btn').style.display = (canEdit && dayData.text) ? 'block' : 'none';
         };
-        window.saveDayData = async () => { const text = document.getElementById('day-input').value.trim(); currentMonthData[currentDay] = { text: text, author: text ? user : "" }; await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData); };
-        window.deleteDayData = async () => { if(confirm("Удалить вашу запись?")) { document.getElementById('day-input').value = ""; await saveDayData(); } };
-        window.openAdminPanel = async () => { document.getElementById('admin-modal').classList.remove('hidden'); const listDiv = document.getElementById('requests-list'); listDiv.innerHTML = "Загрузка..."; const snap = await getDocs(collection(db, "requests")); listDiv.innerHTML = snap.empty ? "Заявок нет" : ""; snap.forEach((d) => { const item = document.createElement('div'); item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;"; item.innerHTML = `<span>${d.id}</span><div><button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button><button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`; listDiv.appendChild(item); }); };
-        window.approveUser = async (name, pass, mode) => { await setDoc(doc(db, "users", name), { password: pass, mode: mode }); await deleteDoc(doc(db, "requests", name)); openAdminPanel(); };
-        window.rejectUser = async (name) => { await deleteDoc(doc(db, "requests", name)); openAdminPanel(); };
+        window.saveDayData = async () => { const t = document.getElementById('day-input').value.trim(); currentMonthData[currentDay] = { text: t, author: t ? user : "" }; await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData); };
+        window.deleteDayData = async () => { if(confirm("Удалить?")) { document.getElementById('day-input').value = ""; await saveDayData(); } };
+        window.openAdminPanel = async () => { 
+            document.getElementById('admin-modal').classList.remove('hidden');
+            const listDiv = document.getElementById('requests-list');
+            const snap = await getDocs(collection(db, "requests"));
+            listDiv.innerHTML = snap.empty ? "Нет заявок" : "";
+            snap.forEach((d) => {
+                const item = document.createElement('div');
+                item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
+                item.innerHTML = `<span>${d.id} (${d.data().mode})</span><div><button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button> <button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`;
+                listDiv.appendChild(item);
+            });
+        };
+        window.approveUser = async (n, p, m) => { await setDoc(doc(db, "users", n), { password: p, mode: m }); await deleteDoc(doc(db, "requests", n)); openAdminPanel(); };
+        window.rejectUser = async (n) => { await deleteDoc(doc(db, "requests", n)); openAdminPanel(); };
 
-        // --- ИНИЦИАЛИЗАЦИЯ КЛЮЧА (всегда включен) ---
+        // ИНИЦИАЛИЗАЦИЯ КЛЮЧА
         (function initPattern() {
             const canvas = document.getElementById('pattern-canvas');
             const ctx = canvas.getContext('2d');
             let drawing = false;
             const dots = [];
-            // Рисуем сетку 3x3 из твоего рисунка (чуть шире для удобства)
             for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-
             const draw = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // 1. Рисуем линии
                 if (patternResult.length > 0) {
                     ctx.beginPath(); ctx.strokeStyle = "rgba(100, 100, 100, 0.4)"; ctx.lineWidth = 10; ctx.lineJoin = "round";
                     for(let k=0; k < patternResult.length; k+=2) {
@@ -239,28 +261,22 @@
                     }
                     ctx.stroke();
                 }
-                // 2. Рисуем точки (серые, как у тебя)
                 dots.forEach(d => {
                     ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                    ctx.fillStyle = d.hit ? "#7f8c8d" : "#95a5a6"; // Светло-серые, если не нажаты
-                    ctx.fill(); ctx.closePath();
+                    ctx.fillStyle = d.hit ? "#7f8c8d" : "#95a5a6"; ctx.fill();
                 });
             };
-
             const handleInput = (e) => {
                 if (!drawing) return;
                 const rect = canvas.getBoundingClientRect();
                 const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
                 const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
                 dots.forEach(d => {
-                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 28 && !d.hit) {
-                        d.hit = true; patternResult += d.id; draw();
-                    }
+                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 28 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
                 });
             };
-
             canvas.onmousedown = canvas.ontouchstart = (e) => { patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; handleInput(e); };
-            window.onmouseup = window.ontouchend = () => { if(drawing) { drawing = false; handleKeyDrawEnd(); } };
+            window.onmouseup = window.ontouchend = () => { if(drawing) { drawing = false; if(user !== 'admin') window.handleAuthSubmit(); } };
             canvas.onmousemove = canvas.ontouchmove = (e) => { if(e.touches) e.preventDefault(); handleInput(e); };
             draw();
         })();
