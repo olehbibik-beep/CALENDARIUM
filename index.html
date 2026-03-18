@@ -5,56 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan 2026 | Облачный Календарь</title>
     <style>
-        :root { --primary: #2d3436; --accent: #0984e3; --bg: #dfe6e9; --card: #ffffff; --admin-gold: #f1c40f; }
-        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
+        :root { --primary: #2d3436; --accent: #0984e3; --bg: #bdc3c7; --card: #ffffff; --admin-red: #d63031; --pink-line: #fd79a8; }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; color: var(--primary); height: 100%; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* --- ВХОД ПО ТВОЕМУ МАКЕТУ --- */
-        #auth-page { 
-            display: flex; height: 100vh; width: 100vw; background: white; 
-            position: fixed; top: 0; left: 0; z-index: 1000; 
-            flex-direction: column; align-items: center; justify-content: flex-start; 
-            padding-top: 5vh; box-sizing: border-box; 
-        }
-        #auth-page h2 { margin-bottom: 5px; font-weight: 400; font-size: 1.2rem; color: #2d3436; }
-        #auth-username { 
-            width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
-            border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; 
-            text-align: center; font-family: inherit; outline: none;
-        }
+        /* --- ВХОД (БЕЗ ИЗМЕНЕНИЙ) --- */
+        #auth-page { display: flex; height: 100vh; width: 100vw; background: white; position: fixed; top: 0; left: 0; z-index: 1000; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 5vh; box-sizing: border-box; }
+        #auth-username { width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; text-align: center; outline: none; }
         #pattern-canvas { background: transparent; cursor: crosshair; touch-action: none; margin-bottom: 10px; }
-        
-        /* СЕКРЕТНОЕ ПОЛЕ ДЛЯ АДМИНА */
-        #admin-pass-input {
-            width: 200px; padding: 8px; border-radius: 10px; border: 1px solid #eee;
-            margin-bottom: 15px; text-align: center; font-size: 13px;
-        }
-        .auth-hint { font-size: 11px; color: #636e72; margin-top: 5px; }
+        #admin-pass-input { width: 200px; padding: 8px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; text-align: center; }
+        #site-info-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 50px; background: #dfe6e9; display: flex; align-items: center; justify-content: center; color: #636e72; font-size: 12px; z-index: 1002; }
 
-        /* СЕРАЯ ПОЛОСА ВНИЗУ */
-        #site-info-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 50px; 
-            background: #dfe6e9; display: flex; align-items: center; justify-content: center; 
-            color: #636e72; font-size: 12px; z-index: 1002;
-        }
+        /* --- НОВЫЙ МАКЕТ С САЙДБАРОМ --- */
+        .app-container { display: flex; height: 100vh; width: 100vw; }
 
-        /* --- ОСТАЛЬНОЙ ИНТЕРФЕЙС --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; padding-bottom: 70px; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .month-tile { background: var(--card); aspect-ratio: 1/1; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
-        .month-tile:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .month-tile span { font-size: 2.5rem; }
-        .month-layout { display: flex; gap: 20px; align-items: flex-start; }
-        .calendar-main { flex: 2; }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-card { background: var(--card); padding: 10px; border-radius: 8px; min-height: 80px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative; }
-        .day-card:hover { border-color: var(--accent); background: #f0f7ff; }
-        .day-preview { font-size: 10px; color: #636e72; margin-top: 5px; line-height: 1.2; overflow: hidden; }
-        .notes-sidebar { flex: 1; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        #day-input { width: 100%; height: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; font-family: inherit; resize: none; box-sizing: border-box; margin-top: 10px; }
-        .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; margin-bottom: 5px; border-radius: 6px; }
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        /* Левая панель */
+        .sidebar { width: 300px; background: #bdc3c7; display: flex; flex-direction: column; padding: 40px 25px; box-sizing: border-box; border-right: 1px solid #95a5a6; }
+        .user-tag { color: #7f8c8d; font-size: 0.9rem; margin-bottom: auto; }
+        .sidebar-controls { display: flex; flex-direction: row; gap: 10px; }
+
+        /* Правая панель */
+        .main-view { flex: 1; padding: 60px; overflow-y: auto; background: white; }
+        .main-view h1 { font-size: 5rem; margin: 0 0 40px 0; font-weight: 300; }
+
+        /* Сетка месяцев */
+        .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+        .month-card { 
+            background: white; border: 1px solid #f0f0f0; border-radius: 15px; aspect-ratio: 1/1.2; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.2s; position: relative; 
+        }
+        .month-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .month-card h3 { font-weight: 400; font-size: 1.2rem; margin-bottom: 30px; }
+
+        /* Розовая полоска активности */
+        .activity-line { width: 50px; height: 6px; background: var(--pink-line); border-radius: 3px; position: absolute; bottom: 40px; }
+
+        /* Кнопки как на макете */
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-exit { background: #636e72; color: white; }
+        .btn-admin { background: var(--admin-red); color: white; display: flex; align-items: center; gap: 5px; }
+
+        /* Страница месяца (адаптация) */
+        #month-page { padding: 40px; }
+        .month-layout { display: flex; gap: 30px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; flex: 2; }
+        .day-box { background: #f8f9fa; border-radius: 10px; padding: 10px; min-height: 100px; border: 1px solid #eee; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -62,63 +58,56 @@
     <div id="auth-page">
         <h2>Добро пожаловать</h2>
         <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
-        
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
-        
         <div id="admin-secret-wrap" class="hidden">
-            <input type="password" id="admin-pass-input" placeholder="Текстовый пароль">
-            <button class="btn" onclick="handleAuthSubmit()" style="display:block; margin: 0 auto;">Войти как Админ</button>
+            <input type="password" id="admin-pass-input" placeholder="Пароль">
+            <button class="btn btn-exit" onclick="handleAuthSubmit()" style="margin: 0 auto; display: block;">Войти</button>
         </div>
-
         <p class="auth-hint">Проведите графический ключ</p>
     </div>
+    <div id="site-info-bar">© 2026 Твой Личный Облачный Планировщик</div>
 
-    <div id="site-info-bar">
-        © 2026 Твой Личный Облачный Планировщик | Для регистрации напиши админу.
-    </div>
-
-    <div id="year-page" class="hidden container">
-        <header>
-            <h1 id="welcome-user">2026</h1>
-            <button class="btn" style="background:#636e72" onclick="location.reload()">Выйти</button>
-        </header>
-        <div class="year-grid" id="year-grid"></div>
-    </div>
-
-    <div id="month-page" class="hidden container">
-        <header>
-            <button class="btn" onclick="showYear()">← К году</button>
-            <h1 id="month-title"></h1>
-            <div style="width:80px"></div>
-        </header>
-        <div class="month-layout">
-            <div class="calendar-main"><div class="days-grid" id="days-grid"></div></div>
-            <div class="notes-sidebar">
-                <div id="editor-section" class="hidden">
-                    <h3 id="selected-day-label" style="margin-top:0">Выбери день</h3>
-                    <textarea id="day-input" placeholder="Напишите планы..."></textarea>
-                    <div style="display:flex; gap:10px; margin-top:10px;">
-                        <button id="save-btn" class="btn" onclick="saveDayData()" style="flex:1">Сохранить</button>
-                        <button id="delete-btn" class="btn" onclick="deleteDayData()" style="background:#e74c3c; display:none;">🗑️</button>
-                    </div>
-                    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+    <div id="year-page" class="hidden">
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="user-tag" id="sidebar-user-name">Имя пользователя</div>
+                <div class="sidebar-controls">
+                    <button class="btn btn-exit" onclick="location.reload()">Выйти</button>
+                    <button id="admin-btn-side" class="btn btn-admin hidden" onclick="openAdminPanel()">⚙️ Управление</button>
                 </div>
-                <h3>🔔 Активность</h3>
-                <div id="sidebar-list"></div>
+            </aside>
+            <main class="main-view">
+                <h1 id="year-title">2026</h1>
+                <div class="year-grid" id="year-grid"></div>
+            </main>
+        </div>
+    </div>
+
+    <div id="month-page" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:500; overflow-y:auto;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 40px;">
+            <button class="btn btn-exit" onclick="showYear()">← Назад к году</button>
+            <h2 id="month-title" style="font-size: 3rem; margin: 20px 0;"></h2>
+            <div class="month-layout">
+                <div id="days-grid" class="days-grid"></div>
+                <div style="flex:1; background:#f8f9fa; padding:20px; border-radius:15px;">
+                    <div id="editor-section" class="hidden">
+                        <h4 id="selected-day-label"></h4>
+                        <textarea id="day-input" style="width:100%; height:150px; border-radius:10px; padding:10px; border:1px solid #ddd;"></textarea>
+                        <button class="btn btn-exit" style="background:#0984e3; width:100%; margin-top:10px;" onclick="saveDayData()">Сохранить</button>
+                    </div>
+                    <div id="sidebar-list" style="margin-top:20px; font-size: 0.8rem;"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="admin-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; align-items:center; justify-content:center;">
-        <div style="background:white; padding:30px; border-radius:15px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Заявки</h2>
-                <button class="btn" onclick="document.getElementById('admin-modal').classList.add('hidden')" style="background:#636e72">Закрыть</button>
-            </div>
+        <div style="background:white; padding:30px; border-radius:15px; width:400px;">
+            <h3>Заявки на доступ</h3>
             <div id="requests-list"></div>
+            <button class="btn btn-exit" style="width:100%; margin-top:20px;" onclick="document.getElementById('admin-modal').classList.add('hidden')">Закрыть</button>
         </div>
     </div>
-    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:70px; right:20px; background:#d63031; z-index:1001; opacity:0.8;">⚙️ Управление</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -130,54 +119,43 @@
             projectId: "calendarium-1f7d7",
             storageBucket: "calendarium-1f7d7.firebasestorage.app",
             messagingSenderId: "204240857105",
-            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0",
-            measurementId: "G-D2G4YVN8V4"
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const icons = ["❄️","🌨️","🌱","☔","🌸","☀️","🌊","🍎","🍂","🎃","☁️","🎄"];
         let user = "";
         let patternResult = "";
         let currentMonthIdx = null;
         let currentDay = null;
         let currentMonthData = {};
 
-        // Функция-секретка
         window.checkAdmin = (val) => {
             const secretBox = document.getElementById('admin-secret-wrap');
             if(val.toLowerCase() === 'admin') secretBox.classList.remove('hidden');
             else secretBox.classList.add('hidden');
-        }
+        };
 
         window.handleAuthSubmit = async () => {
             user = document.getElementById('auth-username').value.trim().toLowerCase();
             const textPass = document.getElementById('admin-pass-input').value;
-            
-            if(!user) return alert("Введите имя.");
-
-            // Если есть текстовый пароль (для админа), используем его. Если нет - графический.
             let finalSecret = textPass || patternResult;
-
-            if(!finalSecret || (finalSecret.length < 3 && !textPass)) return alert("Введите пароль или нарисуйте ключ.");
+            if(!user || !finalSecret) return alert("Введите имя и ключ.");
 
             const userRef = doc(db, "users", user);
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
                 if (userSnap.data().password === finalSecret) loginSuccess();
-                else alert("Неверный доступ!");
-                return;
-            }
-
-            const reqRef = doc(db, "requests", user);
-            const reqSnap = await getDoc(reqRef);
-            if (reqSnap.exists()) alert("Ожидайте одобрения.");
-            else if(confirm("Отправить запрос на регистрацию?")) {
-                await setDoc(reqRef, { password: finalSecret, mode: textPass ? 'password' : 'pattern' });
-                alert("Запрос отправлен!");
+                else alert("Ошибка доступа.");
+            } else {
+                const reqRef = doc(db, "requests", user);
+                if(confirm("Отправить запрос на доступ?")) {
+                    await setDoc(reqRef, { password: finalSecret, mode: textPass ? 'password' : 'pattern' });
+                    alert("Запрос отправлен.");
+                }
             }
         };
 
@@ -185,66 +163,70 @@
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('site-info-bar').classList.add('hidden');
             document.getElementById('year-page').classList.remove('hidden');
-            document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
-            if (user === 'admin') document.getElementById('admin-btn').classList.remove('hidden');
-            renderYear();
+            document.getElementById('sidebar-user-name').innerText = user.toUpperCase();
+            if (user === 'admin') document.getElementById('admin-btn-side').classList.remove('hidden');
+            renderYearGrid();
         }
 
-        // --- ЛОГИКА КАЛЕНДАРЯ ---
-        function renderYear() {
+        async function renderYearGrid() {
             const grid = document.getElementById('year-grid');
-            grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
-        }
-        window.openMonth = (mIdx) => {
-            currentMonthIdx = mIdx;
-            document.getElementById('year-page').classList.add('hidden');
-            document.getElementById('month-page').classList.remove('hidden');
-            document.getElementById('month-title').innerText = months[mIdx];
-            document.getElementById('editor-section').classList.add('hidden');
-            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
-                currentMonthData = snap.exists() ? snap.data() : {};
-                renderDays(mIdx, currentMonthData);
-            });
-        };
-        function renderDays(mIdx, data) {
-            const grid = document.getElementById('days-grid');
-            const sidebar = document.getElementById('sidebar-list');
-            grid.innerHTML = ''; sidebar.innerHTML = '';
-            for (let d = 1; d <= 31; d++) {
-                const dayData = data[d] || { text: "", author: "" };
+            grid.innerHTML = '';
+            
+            for(let i=0; i<months.length; i++) {
                 const card = document.createElement('div');
-                card.className = 'day-card';
-                if(dayData.author === 'admin') { card.style.border = "2px solid var(--admin-gold)"; card.style.background = "#fffdf0"; }
-                card.innerHTML = `<b>${d}</b><div class="day-preview">${dayData.text.substring(0,30)}</div>`;
-                card.onclick = () => selectDay(d);
+                card.className = 'month-card';
+                card.onclick = () => openMonth(i);
+                card.innerHTML = `<h3>${months[i]}</h3>`;
+                
+                // Проверка активности (розовая линия)
+                const snap = await getDoc(doc(db, "data", `month_${i}`));
+                if (snap.exists() && Object.keys(snap.data()).length > 0) {
+                    const line = document.createElement('div');
+                    line.className = 'activity-line';
+                    card.appendChild(line);
+                }
                 grid.appendChild(card);
-                if(dayData.text) { const isAdm = dayData.author === 'admin'; sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold);' : ''}"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`; }
             }
         }
-        window.selectDay = (d) => {
-            currentDay = d; const dayData = currentMonthData[d] || { text: "", author: "" }; document.getElementById('editor-section').classList.remove('hidden'); document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`; const input = document.getElementById('day-input'); input.value = dayData.text;
-            const canEdit = !dayData.author || dayData.author === user;
-            input.disabled = !canEdit; document.getElementById('save-btn').disabled = !canEdit;
-            document.getElementById('delete-btn').style.display = (canEdit && dayData.text) ? 'block' : 'none';
-        };
-        window.saveDayData = async () => { const t = document.getElementById('day-input').value.trim(); currentMonthData[currentDay] = { text: t, author: t ? user : "" }; await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData); };
-        window.deleteDayData = async () => { if(confirm("Удалить?")) { document.getElementById('day-input').value = ""; await saveDayData(); } };
-        window.openAdminPanel = async () => { 
-            document.getElementById('admin-modal').classList.remove('hidden');
-            const listDiv = document.getElementById('requests-list');
-            const snap = await getDocs(collection(db, "requests"));
-            listDiv.innerHTML = snap.empty ? "Нет заявок" : "";
-            snap.forEach((d) => {
-                const item = document.createElement('div');
-                item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
-                item.innerHTML = `<span>${d.id} (${d.data().mode})</span><div><button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button> <button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`;
-                listDiv.appendChild(item);
+
+        window.openMonth = (mIdx) => {
+            currentMonthIdx = mIdx;
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = months[mIdx];
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+                currentMonthData = snap.exists() ? snap.data() : {};
+                renderDays();
             });
         };
-        window.approveUser = async (n, p, m) => { await setDoc(doc(db, "users", n), { password: p, mode: m }); await deleteDoc(doc(db, "requests", n)); openAdminPanel(); };
-        window.rejectUser = async (n) => { await deleteDoc(doc(db, "requests", n)); openAdminPanel(); };
 
-        // ИНИЦИАЛИЗАЦИЯ КЛЮЧА
+        function renderDays() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            for (let d = 1; d <= 31; d++) {
+                const dayData = currentMonthData[d] || { text: "" };
+                const div = document.createElement('div');
+                div.className = 'day-box';
+                div.innerHTML = `<b>${d}</b><div style="font-size:10px; color:#666;">${dayData.text.substring(0,20)}</div>`;
+                div.onclick = () => {
+                    currentDay = d;
+                    document.getElementById('editor-section').classList.remove('hidden');
+                    document.getElementById('selected-day-label').innerText = `${d} ${months[currentMonthIdx]}`;
+                    document.getElementById('day-input').value = dayData.text;
+                };
+                grid.appendChild(div);
+            }
+        }
+
+        window.saveDayData = async () => {
+            const val = document.getElementById('day-input').value.trim();
+            currentMonthData[currentDay] = { text: val, author: user };
+            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
+            alert("Сохранено!");
+        };
+
+        window.showYear = () => document.getElementById('month-page').classList.add('hidden');
+
+        // ГРАФИЧЕСКИЙ КЛЮЧ
         (function initPattern() {
             const canvas = document.getElementById('pattern-canvas');
             const ctx = canvas.getContext('2d');
@@ -253,35 +235,42 @@
             for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
             const draw = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                if (patternResult.length > 0) {
-                    ctx.beginPath(); ctx.strokeStyle = "rgba(100, 100, 100, 0.4)"; ctx.lineWidth = 10; ctx.lineJoin = "round";
-                    for(let k=0; k < patternResult.length; k+=2) {
-                        const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
-                        if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
-                    }
-                    ctx.stroke();
-                }
                 dots.forEach(d => {
                     ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
                     ctx.fillStyle = d.hit ? "#7f8c8d" : "#95a5a6"; ctx.fill();
                 });
             };
-            const handleInput = (e) => {
-                if (!drawing) return;
+            canvas.onmousedown = canvas.ontouchstart = () => { patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; draw(); };
+            window.onmouseup = window.ontouchend = () => { drawing = false; if(user !== 'admin' && patternResult.length > 2) window.handleAuthSubmit(); };
+            canvas.onmousemove = canvas.ontouchmove = (e) => {
+                if(!drawing) return;
                 const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
-                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
                 dots.forEach(d => {
-                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 28 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
+                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
                 });
             };
-            canvas.onmousedown = canvas.ontouchstart = (e) => { patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; handleInput(e); };
-            window.onmouseup = window.ontouchend = () => { if(drawing) { drawing = false; if(user !== 'admin') window.handleAuthSubmit(); } };
-            canvas.onmousemove = canvas.ontouchmove = (e) => { if(e.touches) e.preventDefault(); handleInput(e); };
             draw();
         })();
 
-        window.showYear = () => { document.getElementById('month-page').classList.add('hidden'); document.getElementById('year-page').classList.remove('hidden'); };
+        window.openAdminPanel = async () => {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            const list = document.getElementById('requests-list');
+            const snap = await getDocs(collection(db, "requests"));
+            list.innerHTML = "";
+            snap.forEach(d => {
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>${d.id}</span>
+                    <button onclick="approveUser('${d.id}','${d.data().password}')">✅</button>
+                </div>`;
+            });
+        };
+        window.approveUser = async (n, p) => { 
+            await setDoc(doc(db, "users", n), { password: p }); 
+            await deleteDoc(doc(db, "requests", n)); 
+            alert("Готово"); openAdminPanel(); 
+        };
     </script>
 </body>
 </html>
