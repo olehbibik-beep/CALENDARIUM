@@ -33,6 +33,7 @@
         .day-card { background: var(--card); padding: 8px; border-radius: 8px; min-height: 100px; border: 1px solid #eee; }
         textarea { width: 100%; height: 60px; border: none; background: #f1f2f6; border-radius: 4px; resize: none; font-size: 12px; padding: 5px; box-sizing: border-box; }
         .notes-sidebar { flex: 1.2; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; }
+        .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
     </style>
 </head>
@@ -44,7 +45,7 @@
             <div class="auth-form-card">
                 <h2>Добро пожаловать</h2>
                 <input type="text" id="username" placeholder="Ваше имя">
-                <div id="password-mode"><input type="password" id="pass" placeholder="Пароль (1234)"></div>
+                <div id="password-mode"><input type="password" id="pass" placeholder="Пароль"></div>
                 <div id="pattern-mode" class="hidden">
                     <p style="font-size:12px">Проведите линию через 3+ точки:</p>
                     <canvas id="pattern-canvas" width="260" height="260"></canvas>
@@ -75,313 +76,213 @@
         </div>
     </div>
 
+    <div id="admin-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; align-items:center; justify-content:center;">
+        <div style="background:white; padding:30px; border-radius:15px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Заявки на регистрацию</h2>
+                <button class="btn" onclick="document.getElementById('admin-modal').classList.add('hidden')" style="background:#636e72">Закрыть</button>
+            </div>
+            <div id="requests-list"></div>
+        </div>
+    </div>
+    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:20px; right:20px; background:#d63031; z-index:1001; transition: 0.3s;">⚙️ Управление</button>
+
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-        authDomain: "calendarium-1f7d7.firebaseapp.com",
-        projectId: "calendarium-1f7d7",
-        storageBucket: "calendarium-1f7d7.firebasestorage.app",
-        messagingSenderId: "204240857105",
-        appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0",
-        measurementId: "G-D2G4YVN8V4"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0",
+            measurementId: "G-D2G4YVN8V4"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-    const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-    const icons = ["❄️","🌨️","🌱","☔","🌸","☀️","🌊","🍎","🍂","🎃","☁️","🎄"];
-    let user = "";
-    let authMode = 'password';
-    let patternResult = ""; // Здесь будем хранить "код" графического ключа
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const icons = ["❄️","🌨️","🌱","☔","🌸","☀️","🌊","🍎","🍂","🎃","☁️","🎄"];
+        let user = "";
+        let authMode = 'password';
+        let patternResult = "";
 
-    // --- ОБНОВЛЕННАЯ СИСТЕМА ВХОДА И ЗАЯВОК ---
-window.handleAuthSubmit = async () => {
-    user = document.getElementById('username').value.trim().toLowerCase();
-    const passInput = document.getElementById('pass').value;
-    
-    if(!user) return alert("Введите имя!");
+        // --- ВХОД И ЗАЯВКИ ---
+        window.handleAuthSubmit = async () => {
+            user = document.getElementById('username').value.trim().toLowerCase();
+            const passInput = document.getElementById('pass').value;
+            if(!user) return alert("Введите имя!");
 
-    let secret = (authMode === 'password') ? passInput : patternResult;
-    if(!secret || (authMode === 'pattern' && secret.length < 3)) {
-        return alert("Введите пароль или нарисуйте ключ!");
-    }
-
-    // 1. Проверяем основную базу одобренных пользователей
-    const userRef = doc(db, "users", user);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists()) {
-        if (userSnap.data().password === secret) {
-            loginSuccess();
-        } else {
-            alert("Неверный пароль или ключ!");
-        }
-        return;
-    }
-
-    // 2. Если в основной базе нет, проверяем базу ЗАЯВОК (requests)
-    const reqRef = doc(db, "requests", user);
-    const reqSnap = await getDoc(reqRef);
-
-    if (reqSnap.exists()) {
-        alert("Ваша заявка уже на рассмотрении у администратора. Пожалуйста, подождите.");
-    } else {
-        // 3. Если пользователя вообще нет нигде — предлагаем создать ЗАЯВКУ
-        if(confirm(`Пользователь "${user}" не найден. Отправить запрос на регистрацию администратору?`)) {
-            try {
-                await setDoc(reqRef, { 
-                    password: secret, 
-                    mode: authMode,
-                    date: new Date().toISOString()
-                });
-                alert("Запрос отправлен! Зайдите позже, когда администратор одобрит ваш аккаунт.");
-            } catch (e) {
-                alert("Ошибка при отправке запроса.");
+            let secret = (authMode === 'password') ? passInput : patternResult;
+            if(!secret || (authMode === 'pattern' && secret.length < 3)) {
+                return alert("Введите пароль или нарисуйте ключ!");
             }
-        }
-    }
-};
 
-        const userRef = doc(db, "users", user);
-        const userSnap = await getDoc(userRef);
+            const userRef = doc(db, "users", user);
+            const userSnap = await getDoc(userRef);
 
-        if (userSnap.exists()) {
-            // ПОЛЬЗОВАТЕЛЬ ЕСТЬ -> ПРОВЕРЯЕМ ПАРОЛЬ
-            if (userSnap.data().password === secret) {
-                loginSuccess();
+            if (userSnap.exists()) {
+                if (userSnap.data().password === secret) loginSuccess();
+                else alert("Неверный пароль!");
+                return;
+            }
+
+            const reqRef = doc(db, "requests", user);
+            const reqSnap = await getDoc(reqRef);
+
+            if (reqSnap.exists()) {
+                alert("Заявка на рассмотрении.");
             } else {
-                alert("Неверный пароль или ключ для этого пользователя!");
+                if(confirm(`Пользователь "${user}" не найден. Отправить запрос админу?`)) {
+                    await setDoc(reqRef, { password: secret, mode: authMode, date: new Date().toISOString() });
+                    alert("Запрос отправлен!");
+                }
             }
-        } else {
-            // ПОЛЬЗОВАТЕЛЯ НЕТ -> РЕГИСТРИРУЕМ
-            if(confirm(`Пользователь "${user}" не найден. Создать новый аккаунт с этим паролем/ключом?`)) {
-                await setDoc(userRef, { password: secret, mode: authMode });
-                loginSuccess();
+        };
+
+        function loginSuccess() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+            document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
+            if (user === 'admin') {
+                document.getElementById('admin-btn').classList.remove('hidden');
+                listenRequests(); // Следим за заявками
             }
+            renderYear();
         }
-    };
 
-    function loginSuccess() {
-    document.getElementById('auth-page').classList.add('hidden');
-    document.getElementById('year-page').classList.remove('hidden');
-    document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
-    checkAdmin(user); // <--- ДОБАВЬ ЭТУ СТРОКУ
-    renderYear();
-}
-        // Проверка, является ли зашедший админом
-function checkAdmin(username) {
-    if (username === 'admin') { // Здесь укажи имя, которое будет админским
-        document.getElementById('admin-btn').classList.remove('hidden');
-    }
-}
-
-// Открытие панели и загрузка заявок
-window.openAdminPanel = async () => {
-    document.getElementById('admin-modal').classList.remove('hidden');
-    const listDiv = document.getElementById('requests-list');
-    listDiv.innerHTML = "Загрузка...";
-
-    const querySnapshot = await getDocs(collection(db, "requests"));
-    listDiv.innerHTML = "";
-
-    if (querySnapshot.empty) {
-        listDiv.innerHTML = "<p>Новых заявок пока нет.</p>";
-    }
-
-    querySnapshot.forEach((documentReq) => {
-        const data = documentReq.data();
-        const reqName = documentReq.id;
-        
-        const item = document.createElement('div');
-        item.style = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;";
-        item.innerHTML = `
-            <div>
-                <strong>${reqName}</strong><br>
-                <small>Тип: ${data.mode}</small>
-            </div>
-            <div>
-                <button class="btn" onclick="approveUser('${reqName}', '${data.password}', '${data.mode}')" style="background:#2ecc71; margin-right:5px;">✅</button>
-                <button class="btn" onclick="rejectUser('${reqName}')" style="background:#e74c3c;">❌</button>
-            </div>
-        `;
-        listDiv.appendChild(item);
-    });
-};
-
-// Функция одобрения
-window.approveUser = async (name, pass, mode) => {
-    try {
-        // 1. Создаем пользователя в основной коллекции
-        await setDoc(doc(db, "users", name), { password: pass, mode: mode });
-        // 2. Удаляем из заявок
-        await deleteDoc(doc(db, "requests", name));
-        alert(`Пользователь ${name} одобрен!`);
-        openAdminPanel(); // Обновляем список
-    } catch (e) { alert("Ошибка!"); }
-};
-
-// Функция удаления заявки
-window.rejectUser = async (name) => {
-    if(confirm(`Удалить заявку от ${name}?`)) {
-        await deleteDoc(doc(db, "requests", name));
-        openAdminPanel();
-    }
-};
-
-    // --- ИСПРАВЛЕННЫЙ ГРАФИЧЕСКИЙ КЛЮЧ ---
-window.toggleAuthMode = () => {
-    const pMode = document.getElementById('password-mode');
-    const gMode = document.getElementById('pattern-mode');
-    const toggleBtn = document.querySelector('.toggle-auth');
-    
-    if (authMode === 'password') {
-        pMode.classList.add('hidden'); gMode.classList.remove('hidden');
-        toggleBtn.innerText = "Использовать обычный пароль";
-        authMode = 'pattern'; 
-        setTimeout(initPattern, 100); // Даем браузеру время показать канвас
-    } else {
-        pMode.classList.remove('hidden'); gMode.classList.add('hidden');
-        toggleBtn.innerText = "Использовать графический ключ";
-        authMode = 'password';
-    }
-};
-
-function initPattern() {
-    const canvas = document.getElementById('pattern-canvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-    patternResult = ""; 
-    const dots = [];
-    
-    // Создаем сетку точек 3x3
-    for(let i=0; i<3; i++) {
-        for(let j=0; j<3; j++) {
-            dots.push({
-                id: i + "" + j, 
-                x: 50 + i * 80, 
-                y: 50 + j * 80, 
-                hit: false
+        // --- АДМИНКА ---
+        function listenRequests() {
+            onSnapshot(collection(db, "requests"), (snap) => {
+                const btn = document.getElementById('admin-btn');
+                if (!snap.empty) {
+                    btn.style.boxShadow = "0 0 20px #ff7675";
+                    btn.innerHTML = `⚙️ Новых заявок: ${snap.size}`;
+                } else {
+                    btn.style.boxShadow = "none";
+                    btn.innerHTML = "⚙️ Управление";
+                }
             });
         }
-    }
 
-    const draw = () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // 1. Рисуем линии между активированными точками
-        const hitDots = dots.filter(d => d.hit);
-        if (hitDots.length > 0) {
-            ctx.beginPath();
-            ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; // Полупрозрачный синий
-            ctx.lineWidth = 8;
-            ctx.lineJoin = "round";
-            ctx.lineCap = "round";
+        window.openAdminPanel = async () => {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            const listDiv = document.getElementById('requests-list');
+            listDiv.innerHTML = "Загрузка...";
+            const querySnapshot = await getDocs(collection(db, "requests"));
+            listDiv.innerHTML = querySnapshot.empty ? "<p>Заявок нет</p>" : "";
             
-            // Находим точки в том порядке, в котором по ним вели (через patternResult)
-            for(let k=0; k < patternResult.length; k+=2) {
-                const dotId = patternResult.substring(k, k+2);
-                const dot = dots.find(d => d.id === dotId);
-                if (k === 0) ctx.moveTo(dot.x, dot.y);
-                else ctx.lineTo(dot.x, dot.y);
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                const item = document.createElement('div');
+                item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
+                item.innerHTML = `<span>${id} (${data.mode})</span>
+                    <div>
+                        <button class="btn" onclick="approveUser('${id}','${data.password}','${data.mode}')" style="background:#2ecc71">✅</button>
+                        <button class="btn" onclick="rejectUser('${id}')" style="background:#e74c3c">❌</button>
+                    </div>`;
+                listDiv.appendChild(item);
+            });
+        };
+
+        window.approveUser = async (name, pass, mode) => {
+            await setDoc(doc(db, "users", name), { password: pass, mode: mode });
+            await deleteDoc(doc(db, "requests", name));
+            openAdminPanel();
+        };
+
+        window.rejectUser = async (name) => {
+            if(confirm("Удалить?")) {
+                await deleteDoc(doc(db, "requests", name));
+                openAdminPanel();
             }
-            ctx.stroke();
+        };
+
+        // --- ГРАФИЧЕСКИЙ КЛЮЧ ---
+        window.toggleAuthMode = () => {
+            const pMode = document.getElementById('password-mode');
+            const gMode = document.getElementById('pattern-mode');
+            authMode = (authMode === 'password') ? 'pattern' : 'password';
+            pMode.classList.toggle('hidden');
+            gMode.classList.toggle('hidden');
+            document.querySelector('.toggle-auth').innerText = authMode === 'password' ? "Использовать ключ" : "Использовать пароль";
+            if(authMode === 'pattern') setTimeout(initPattern, 100);
+        };
+
+        function initPattern() {
+            const canvas = document.getElementById('pattern-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            patternResult = ""; 
+            const dots = [];
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+
+            const draw = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (patternResult.length > 0) {
+                    ctx.beginPath(); ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; ctx.lineWidth = 8; ctx.lineJoin = "round";
+                    for(let k=0; k < patternResult.length; k+=2) {
+                        const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
+                        if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
+                    }
+                    ctx.stroke();
+                }
+                dots.forEach(d => {
+                    ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
+                    ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
+                });
+            };
+
+            const handleInput = (e) => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+                const y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+                dots.forEach(d => {
+                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) {
+                        d.hit = true; patternResult += d.id; draw();
+                    }
+                });
+            };
+
+            canvas.onmousedown = (e) => { drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); handleInput(e); };
+            canvas.ontouchstart = (e) => { drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); handleInput(e); };
+            window.onmouseup = window.ontouchend = () => drawing = false;
+            canvas.onmousemove = canvas.ontouchmove = (e) => { if(e.touches) e.preventDefault(); handleInput(e); };
+            draw();
         }
 
-        // 2. Рисуем сами точки
-        dots.forEach(d => {
-            ctx.beginPath();
-            ctx.arc(d.x, d.y, 12, 0, Math.PI * 2);
-            ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9";
-            ctx.fill();
-            // Добавляем обводку для красоты
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        });
-    };
-
-    draw(); // Первый запуск
-
-    const handleInput = (e) => {
-        if (!drawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-
-        dots.forEach(d => {
-            const dist = Math.sqrt((x - d.x)**2 + (y - d.y)**2);
-            if (dist < 25 && !d.hit) { // Увеличили радиус захвата до 25
-                d.hit = true;
-                patternResult += d.id;
-                draw();
-            }
-        });
-    };
-
-    // Поддержка и мышки, и пальцев (для телефонов)
-    canvas.onmousedown = (e) => { drawing = true; dots.forEach(d=>d.hit=false); patternResult=""; draw(); handleInput(e); };
-    canvas.ontouchstart = (e) => { drawing = true; dots.forEach(d=>d.hit=false); patternResult=""; draw(); handleInput(e); };
-    
-    window.onmouseup = () => drawing = false;
-    window.ontouchend = () => drawing = false;
-    
-    canvas.onmousemove = handleInput;
-    canvas.ontouchmove = (e) => { e.preventDefault(); handleInput(e); };
-}
-
-    // Остальные функции (renderYear, openMonth, renderDays, showYear) оставь как были раньше
-    // ... (копируй их из предыдущего кода)
-
-        // --- CALENDAR ---
+        // --- КАЛЕНДАРЬ ---
         function renderYear() {
             const grid = document.getElementById('year-grid');
-            grid.innerHTML = months.map((m, i) => `
-                <div class="month-tile" onclick="window.openMonth(${i})">
-                    <span>${icons[i]}</span><h3>${m}</h3>
-                </div>`).join('');
+            grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
         }
 
         window.openMonth = (mIdx) => {
             document.getElementById('year-page').classList.add('hidden');
             document.getElementById('month-page').classList.remove('hidden');
             document.getElementById('month-title').innerText = months[mIdx];
-            
-            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
-                const data = snap.exists() ? snap.data() : {};
-                renderDays(mIdx, data);
-            });
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => renderDays(mIdx, snap.exists() ? snap.data() : {}));
         };
 
         function renderDays(mIdx, data) {
             const grid = document.getElementById('days-grid');
             const sidebar = document.getElementById('sidebar-list');
             grid.innerHTML = ''; sidebar.innerHTML = '';
-
             for (let d = 1; d <= 31; d++) {
                 const dayData = data[d] || { text: "", author: "" };
-                const canEdit = !dayData.author || dayData.author === user;
-                
                 const card = document.createElement('div');
                 card.className = 'day-card';
-                card.innerHTML = `<b>${d}</b><textarea id="t-${d}" ${canEdit?'':'disabled'}>${dayData.text}</textarea>`;
+                card.innerHTML = `<b>${d}</b><textarea ${dayData.author && dayData.author !== user ? 'disabled' : ''}>${dayData.text}</textarea>`;
                 grid.appendChild(card);
-
-                if(dayData.text) {
-                    sidebar.innerHTML += `<div class="sidebar-item"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>👤 ${dayData.author}</small></div>`;
-                }
-
+                if(dayData.text) sidebar.innerHTML += `<div class="sidebar-item"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>👤 ${dayData.author}</small></div>`;
                 card.querySelector('textarea').onchange = async (e) => {
-                    const newText = e.target.value;
-                    data[d] = { text: newText, author: newText ? user : "" };
-                    try {
-                        await setDoc(doc(db, "data", `month_${mIdx}`), data);
-                    } catch (err) {
-                        alert("Ошибка сохранения! Проверьте Rules в Firebase.");
-                    }
+                    data[d] = { text: e.target.value, author: e.target.value ? user : "" };
+                    await setDoc(doc(db, "data", `month_${mIdx}`), data);
                 };
             }
         }
@@ -391,17 +292,5 @@ function initPattern() {
             document.getElementById('year-page').classList.remove('hidden');
         };
     </script>
-    <div id="admin-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; align-items:center; justify-content:center;">
-    <div style="background:white; padding:30px; border-radius:15px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2>Заявки на регистрацию</h2>
-            <button class="btn" onclick="document.getElementById('admin-modal').classList.add('hidden')" style="background:#636e72">Закрыть</button>
-        </div>
-        <div id="requests-list">
-            </div>
-    </div>
-</div>
-
-<button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:20px; right:20px; background:#d63031; z-index:1001;">⚙️ Управление пользователями</button>
 </body>
 </html>
