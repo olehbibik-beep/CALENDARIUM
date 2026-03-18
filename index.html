@@ -137,47 +137,106 @@
         renderYear();
     }
 
-    // --- ОБНОВЛЕННЫЙ ГРАФИЧЕСКИЙ КЛЮЧ ---
-    function initPattern() {
-        const canvas = document.getElementById('pattern-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-        patternResult = ""; 
-        const dots = [];
-        for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+''+j, x: 50+i*80, y: 50+j*80, hit: false});
-
-        const draw = () => {
-            ctx.clearRect(0,0,260,260);
-            // Рисуем линии
-            ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 5;
-            dots.filter(d => d.hit).forEach((d, idx) => {
-                if(idx === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
-            });
-            ctx.stroke();
-            // Рисуем точки
-            dots.forEach(d => {
-                ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
-            });
-        };
-        draw();
-        
-        canvas.onmousedown = () => { drawing = true; dots.forEach(d=>d.hit=false); patternResult=""; draw(); };
-        window.onmouseup = () => drawing = false;
-        canvas.onmousemove = (e) => {
-            if(!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-            dots.forEach(d => {
-                const dist = Math.sqrt((x-d.x)**2 + (y-d.y)**2);
-                if(dist < 20 && !d.hit) { 
-                    d.hit = true; 
-                    patternResult += d.id; // Добавляем ID точки в строку-пароль (напр. "001122")
-                    draw(); 
-                }
-            });
-        };
+    // --- ИСПРАВЛЕННЫЙ ГРАФИЧЕСКИЙ КЛЮЧ ---
+window.toggleAuthMode = () => {
+    const pMode = document.getElementById('password-mode');
+    const gMode = document.getElementById('pattern-mode');
+    const toggleBtn = document.querySelector('.toggle-auth');
+    
+    if (authMode === 'password') {
+        pMode.classList.add('hidden'); gMode.classList.remove('hidden');
+        toggleBtn.innerText = "Использовать обычный пароль";
+        authMode = 'pattern'; 
+        setTimeout(initPattern, 100); // Даем браузеру время показать канвас
+    } else {
+        pMode.classList.remove('hidden'); gMode.classList.add('hidden');
+        toggleBtn.innerText = "Использовать графический ключ";
+        authMode = 'password';
     }
+};
+
+function initPattern() {
+    const canvas = document.getElementById('pattern-canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    patternResult = ""; 
+    const dots = [];
+    
+    // Создаем сетку точек 3x3
+    for(let i=0; i<3; i++) {
+        for(let j=0; j<3; j++) {
+            dots.push({
+                id: i + "" + j, 
+                x: 50 + i * 80, 
+                y: 50 + j * 80, 
+                hit: false
+            });
+        }
+    }
+
+    const draw = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 1. Рисуем линии между активированными точками
+        const hitDots = dots.filter(d => d.hit);
+        if (hitDots.length > 0) {
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(9, 132, 227, 0.5)"; // Полупрозрачный синий
+            ctx.lineWidth = 8;
+            ctx.lineJoin = "round";
+            ctx.lineCap = "round";
+            
+            // Находим точки в том порядке, в котором по ним вели (через patternResult)
+            for(let k=0; k < patternResult.length; k+=2) {
+                const dotId = patternResult.substring(k, k+2);
+                const dot = dots.find(d => d.id === dotId);
+                if (k === 0) ctx.moveTo(dot.x, dot.y);
+                else ctx.lineTo(dot.x, dot.y);
+            }
+            ctx.stroke();
+        }
+
+        // 2. Рисуем сами точки
+        dots.forEach(d => {
+            ctx.beginPath();
+            ctx.arc(d.x, d.y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9";
+            ctx.fill();
+            // Добавляем обводку для красоты
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+    };
+
+    draw(); // Первый запуск
+
+    const handleInput = (e) => {
+        if (!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+        dots.forEach(d => {
+            const dist = Math.sqrt((x - d.x)**2 + (y - d.y)**2);
+            if (dist < 25 && !d.hit) { // Увеличили радиус захвата до 25
+                d.hit = true;
+                patternResult += d.id;
+                draw();
+            }
+        });
+    };
+
+    // Поддержка и мышки, и пальцев (для телефонов)
+    canvas.onmousedown = (e) => { drawing = true; dots.forEach(d=>d.hit=false); patternResult=""; draw(); handleInput(e); };
+    canvas.ontouchstart = (e) => { drawing = true; dots.forEach(d=>d.hit=false); patternResult=""; draw(); handleInput(e); };
+    
+    window.onmouseup = () => drawing = false;
+    window.ontouchend = () => drawing = false;
+    
+    canvas.onmousemove = handleInput;
+    canvas.ontouchmove = (e) => { e.preventDefault(); handleInput(e); };
+}
 
     // Остальные функции (renderYear, openMonth, renderDays, showYear) оставь как были раньше
     // ... (копируй их из предыдущего кода)
