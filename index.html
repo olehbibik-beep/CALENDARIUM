@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan 2026 | Облачный Календарь</title>
     <style>
-        :root { --primary: #2d3436; --accent: #0984e3; --bg: #dfe6e9; --card: #ffffff; }
-        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); }
+        :root { --primary: #2d3436; --accent: #0984e3; --bg: #dfe6e9; --card: #ffffff; --admin-gold: #f1c40f; }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
         .hidden { display: none !important; }
 
         /* --- ВХОД --- */
@@ -27,14 +27,22 @@
         .month-tile { background: var(--card); aspect-ratio: 1/1; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
         .month-tile:hover { transform: translateY(-5px); border-color: var(--accent); }
         .month-tile span { font-size: 2.5rem; }
-        .month-layout { display: flex; gap: 20px; }
-        .calendar-main { flex: 3; }
+
+        /* --- КАЛЕНДАРЬ И БОКОВАЯ ПАНЕЛЬ --- */
+        .month-layout { display: flex; gap: 20px; align-items: flex-start; }
+        .calendar-main { flex: 2; }
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-card { background: var(--card); padding: 8px; border-radius: 8px; min-height: 100px; border: 1px solid #eee; }
-        textarea { width: 100%; height: 60px; border: none; background: #f1f2f6; border-radius: 4px; resize: none; font-size: 12px; padding: 5px; box-sizing: border-box; }
-        .notes-sidebar { flex: 1.2; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; }
-        .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .day-card { background: var(--card); padding: 10px; border-radius: 8px; min-height: 80px; border: 1px solid #eee; cursor: pointer; transition: 0.2s; position: relative; }
+        .day-card:hover { border-color: var(--accent); background: #f0f7ff; }
+        .day-card b { font-size: 1.1rem; }
+        .day-preview { font-size: 10px; color: #636e72; margin-top: 5px; line-height: 1.2; overflow: hidden; }
+
+        .notes-sidebar { flex: 1; background: var(--card); padding: 20px; border-radius: 15px; height: 80vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        #day-input { width: 100%; height: 120px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa; font-family: inherit; resize: none; box-sizing: border-box; margin-top: 10px; }
+        
+        .sidebar-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; margin-bottom: 5px; border-radius: 6px; }
         .btn { padding: 10px 20px; border-radius: 8px; border: none; background: var(--accent); color: white; cursor: pointer; font-weight: bold; }
+        .btn:disabled { background: #b2bec3; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -71,21 +79,36 @@
             <div style="width:80px"></div>
         </header>
         <div class="month-layout">
-            <div class="calendar-main"><div class="days-grid" id="days-grid"></div></div>
-            <div class="notes-sidebar"><h3>🔔 Активность</h3><div id="sidebar-list"></div></div>
+            <div class="calendar-main">
+                <div class="days-grid" id="days-grid"></div>
+            </div>
+            
+            <div class="notes-sidebar">
+                <div id="editor-section" class="hidden">
+                    <h3 id="selected-day-label" style="margin-top:0">Выбери день</h3>
+                    <textarea id="day-input" placeholder="Напишите планы..."></textarea>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button id="save-btn" class="btn" onclick="saveDayData()" style="flex:1">Сохранить</button>
+                        <button id="delete-btn" class="btn" onclick="deleteDayData()" style="background:#e74c3c; display:none;">🗑️</button>
+                    </div>
+                    <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                </div>
+                <h3>🔔 Активность</h3>
+                <div id="sidebar-list"></div>
+            </div>
         </div>
     </div>
 
     <div id="admin-modal" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; display:flex; align-items:center; justify-content:center;">
         <div style="background:white; padding:30px; border-radius:15px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Заявки на регистрацию</h2>
+                <h2>Заявки</h2>
                 <button class="btn" onclick="document.getElementById('admin-modal').classList.add('hidden')" style="background:#636e72">Закрыть</button>
             </div>
             <div id="requests-list"></div>
         </div>
     </div>
-    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:20px; right:20px; background:#d63031; z-index:1001; transition: 0.3s;">⚙️ Управление</button>
+    <button id="admin-btn" class="hidden btn" onclick="openAdminPanel()" style="position:fixed; bottom:20px; right:20px; background:#d63031; z-index:1001;">⚙️ Управление</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -109,6 +132,9 @@
         let user = "";
         let authMode = 'password';
         let patternResult = "";
+        let currentMonthIdx = null;
+        let currentDay = null;
+        let currentMonthData = {};
 
         // --- ВХОД И ЗАЯВКИ ---
         window.handleAuthSubmit = async () => {
@@ -117,9 +143,7 @@
             if(!user) return alert("Введите имя!");
 
             let secret = (authMode === 'password') ? passInput : patternResult;
-            if(!secret || (authMode === 'pattern' && secret.length < 3)) {
-                return alert("Введите пароль или нарисуйте ключ!");
-            }
+            if(!secret || (authMode === 'pattern' && secret.length < 3)) return alert("Введите пароль!");
 
             const userRef = doc(db, "users", user);
             const userSnap = await getDoc(userRef);
@@ -132,14 +156,10 @@
 
             const reqRef = doc(db, "requests", user);
             const reqSnap = await getDoc(reqRef);
-
-            if (reqSnap.exists()) {
-                alert("Заявка на рассмотрении.");
-            } else {
-                if(confirm(`Пользователь "${user}" не найден. Отправить запрос админу?`)) {
-                    await setDoc(reqRef, { password: secret, mode: authMode, date: new Date().toISOString() });
-                    alert("Запрос отправлен!");
-                }
+            if (reqSnap.exists()) alert("Подождите одобрения админом.");
+            else if(confirm("Отправить запрос на регистрацию админу?")) {
+                await setDoc(reqRef, { password: secret, mode: authMode });
+                alert("Запрос отправлен!");
             }
         };
 
@@ -149,42 +169,108 @@
             document.getElementById('welcome-user').innerText = `Планы: ${user.toUpperCase()}`;
             if (user === 'admin') {
                 document.getElementById('admin-btn').classList.remove('hidden');
-                listenRequests(); // Следим за заявками
+                onSnapshot(collection(db, "requests"), (snap) => {
+                    document.getElementById('admin-btn').style.boxShadow = !snap.empty ? "0 0 15px #ff7675" : "none";
+                });
             }
             renderYear();
         }
 
-        // --- АДМИНКА ---
-        function listenRequests() {
-            onSnapshot(collection(db, "requests"), (snap) => {
-                const btn = document.getElementById('admin-btn');
-                if (!snap.empty) {
-                    btn.style.boxShadow = "0 0 20px #ff7675";
-                    btn.innerHTML = `⚙️ Новых заявок: ${snap.size}`;
-                } else {
-                    btn.style.boxShadow = "none";
-                    btn.innerHTML = "⚙️ Управление";
-                }
-            });
+        // --- КАЛЕНДАРЬ ---
+        function renderYear() {
+            const grid = document.getElementById('year-grid');
+            grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
         }
 
+        window.openMonth = (mIdx) => {
+            currentMonthIdx = mIdx;
+            document.getElementById('year-page').classList.add('hidden');
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = months[mIdx];
+            document.getElementById('editor-section').classList.add('hidden');
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+                currentMonthData = snap.exists() ? snap.data() : {};
+                renderDays(mIdx, currentMonthData);
+            });
+        };
+
+        function renderDays(mIdx, data) {
+            const grid = document.getElementById('days-grid');
+            const sidebar = document.getElementById('sidebar-list');
+            grid.innerHTML = ''; sidebar.innerHTML = '';
+
+            for (let d = 1; d <= 31; d++) {
+                const dayData = data[d] || { text: "", author: "" };
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                
+                if(dayData.author === 'admin') {
+                    card.style.border = "2px solid var(--admin-gold)";
+                    card.style.background = "#fffdf0";
+                }
+
+                card.innerHTML = `<b>${d}</b><div class="day-preview">${dayData.text.substring(0,30)}${dayData.text.length > 30 ? '...' : ''}</div>`;
+                card.onclick = () => selectDay(d);
+                grid.appendChild(card);
+
+                if(dayData.text) {
+                    const isAdm = dayData.author === 'admin';
+                    sidebar.innerHTML += `<div class="sidebar-item" style="${isAdm ? 'border-left:4px solid var(--admin-gold); background:#fffef5;' : ''}">
+                        <b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>${isAdm ? '⭐' : '👤'} ${dayData.author}</small></div>`;
+                }
+            }
+        }
+
+        window.selectDay = (d) => {
+            currentDay = d;
+            const dayData = currentMonthData[d] || { text: "", author: "" };
+            document.getElementById('editor-section').classList.remove('hidden');
+            document.getElementById('selected-day-label').innerText = `День: ${d} ${months[currentMonthIdx]}`;
+            
+            const input = document.getElementById('day-input');
+            const delBtn = document.getElementById('delete-btn');
+            const saveBtn = document.getElementById('save-btn');
+            
+            input.value = dayData.text;
+            
+            if (!dayData.author || dayData.author === user) {
+                input.disabled = false;
+                saveBtn.disabled = false;
+                delBtn.style.display = dayData.text ? 'block' : 'none';
+            } else {
+                input.disabled = true;
+                saveBtn.disabled = true;
+                delBtn.style.display = 'none';
+            }
+        };
+
+        window.saveDayData = async () => {
+            const text = document.getElementById('day-input').value.trim();
+            currentMonthData[currentDay] = { text: text, author: text ? user : "" };
+            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
+            alert("Сохранено!");
+        };
+
+        window.deleteDayData = async () => {
+            if(confirm("Удалить вашу запись?")) {
+                document.getElementById('day-input').value = "";
+                await saveDayData();
+            }
+        };
+
+        // --- АДМИНКА ---
         window.openAdminPanel = async () => {
             document.getElementById('admin-modal').classList.remove('hidden');
             const listDiv = document.getElementById('requests-list');
             listDiv.innerHTML = "Загрузка...";
-            const querySnapshot = await getDocs(collection(db, "requests"));
-            listDiv.innerHTML = querySnapshot.empty ? "<p>Заявок нет</p>" : "";
-            
-            querySnapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const id = docSnap.id;
+            const snap = await getDocs(collection(db, "requests"));
+            listDiv.innerHTML = snap.empty ? "Заявок нет" : "";
+            snap.forEach((d) => {
                 const item = document.createElement('div');
                 item.style = "padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;";
-                item.innerHTML = `<span>${id} (${data.mode})</span>
-                    <div>
-                        <button class="btn" onclick="approveUser('${id}','${data.password}','${data.mode}')" style="background:#2ecc71">✅</button>
-                        <button class="btn" onclick="rejectUser('${id}')" style="background:#e74c3c">❌</button>
-                    </div>`;
+                item.innerHTML = `<span>${d.id}</span><div>
+                    <button class="btn" onclick="approveUser('${d.id}','${d.data().password}','${d.data().mode}')" style="background:#2ecc71">✅</button>
+                    <button class="btn" onclick="rejectUser('${d.id}')" style="background:#e74c3c">❌</button></div>`;
                 listDiv.appendChild(item);
             });
         };
@@ -196,20 +282,15 @@
         };
 
         window.rejectUser = async (name) => {
-            if(confirm("Удалить?")) {
-                await deleteDoc(doc(db, "requests", name));
-                openAdminPanel();
-            }
+            await deleteDoc(doc(db, "requests", name));
+            openAdminPanel();
         };
 
         // --- ГРАФИЧЕСКИЙ КЛЮЧ ---
         window.toggleAuthMode = () => {
-            const pMode = document.getElementById('password-mode');
-            const gMode = document.getElementById('pattern-mode');
             authMode = (authMode === 'password') ? 'pattern' : 'password';
-            pMode.classList.toggle('hidden');
-            gMode.classList.toggle('hidden');
-            document.querySelector('.toggle-auth').innerText = authMode === 'password' ? "Использовать ключ" : "Использовать пароль";
+            document.getElementById('password-mode').classList.toggle('hidden');
+            document.getElementById('pattern-mode').classList.toggle('hidden');
             if(authMode === 'pattern') setTimeout(initPattern, 100);
         };
 
@@ -254,37 +335,6 @@
             window.onmouseup = window.ontouchend = () => drawing = false;
             canvas.onmousemove = canvas.ontouchmove = (e) => { if(e.touches) e.preventDefault(); handleInput(e); };
             draw();
-        }
-
-        // --- КАЛЕНДАРЬ ---
-        function renderYear() {
-            const grid = document.getElementById('year-grid');
-            grid.innerHTML = months.map((m, i) => `<div class="month-tile" onclick="openMonth(${i})"><span>${icons[i]}</span><h3>${m}</h3></div>`).join('');
-        }
-
-        window.openMonth = (mIdx) => {
-            document.getElementById('year-page').classList.add('hidden');
-            document.getElementById('month-page').classList.remove('hidden');
-            document.getElementById('month-title').innerText = months[mIdx];
-            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => renderDays(mIdx, snap.exists() ? snap.data() : {}));
-        };
-
-        function renderDays(mIdx, data) {
-            const grid = document.getElementById('days-grid');
-            const sidebar = document.getElementById('sidebar-list');
-            grid.innerHTML = ''; sidebar.innerHTML = '';
-            for (let d = 1; d <= 31; d++) {
-                const dayData = data[d] || { text: "", author: "" };
-                const card = document.createElement('div');
-                card.className = 'day-card';
-                card.innerHTML = `<b>${d}</b><textarea ${dayData.author && dayData.author !== user ? 'disabled' : ''}>${dayData.text}</textarea>`;
-                grid.appendChild(card);
-                if(dayData.text) sidebar.innerHTML += `<div class="sidebar-item"><b>${d} ${months[mIdx]}</b>: ${dayData.text} <br><small>👤 ${dayData.author}</small></div>`;
-                card.querySelector('textarea').onchange = async (e) => {
-                    data[d] = { text: e.target.value, author: e.target.value ? user : "" };
-                    await setDoc(doc(db, "data", `month_${mIdx}`), data);
-                };
-            }
         }
 
         window.showYear = () => {
