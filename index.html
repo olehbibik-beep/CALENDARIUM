@@ -3,144 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDAR 2026 | Cloud Ecosystem</title>
+    <title>Plan 2026 | Cloud Calendar</title>
     <style>
-        /* ============================================================
-           0. ГЛОБАЛЬНЫЕ НАСТРОЙКИ
-           ============================================================ */
-        :root {
+        :root { 
+            --primary: #2d3436; 
+            --accent: #0984e3; 
+            --bg-sidebar: #bdc3c7; 
+            --admin-red: #d63031; 
+            --pink-line: #fd79a8; 
             --orange-notif: #f39c12;
-            --admin-red: #d63031;
-            --accent-blue: #0984e3;
-            --bg-soft: #f4f7f9; 
-            --card-shadow: 0 10px 40px rgba(0,0,0,0.06);
         }
         
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh; overflow: hidden; background: var(--bg-soft); }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* Анимация ошибки (тряска) */
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+        /* --- СТРАНИЦА ВХОДА --- */
+        #auth-page { 
+            display: flex; height: 100vh; width: 100vw; background: white; 
+            position: fixed; top: 0; left: 0; z-index: 2000; 
+            flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding-top: 5vh; box-sizing: border-box; 
         }
+        #auth-username { 
+            width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
+            border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; text-align: center; outline: none; 
+        }
+        #pattern-canvas { background: #fdfdfd; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; }
 
-        /* ============================================================
-           1. СИСТЕМНЫЕ КОМПОНЕНТЫ (ШТОРКА И ФУТЕР)
-           ============================================================ */
-        .system-footer-white {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 35px;
-            background: #ffffff; color: #b2bec3; font-size: 10px; font-weight: 700;
-            display: flex; align-items: center; padding: 0 25px; z-index: 4500;
-            border-top: 1px solid #edf0f2; letter-spacing: 1px; text-transform: uppercase;
-            box-sizing: border-box;
-        }
-        .footer-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 8px #2ecc71; }
-
-        .system-sidebar {
-            position: fixed; right: 0; top: 0; width: 340px; height: 100vh;
-            background: var(--orange-notif); color: white; z-index: 5000;
-            transform: translateX(100%); transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-            padding: 30px; box-sizing: border-box; box-shadow: -15px 0 50px rgba(0,0,0,0.1);
-        }
-        .system-sidebar.active { transform: translateX(0); }
-
-        .notify-item {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 20px;
-            margin-bottom: 12px; animation: slideIn 0.3s ease-out;
-        }
-        @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
-
-        /* ============================================================
-           2. СТРАНИЦА: АВТОРИЗАЦИЯ
-           ============================================================ */
-        #auth-page { height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .auth-container {
-            background: #ffffff; padding: 50px 60px; border-radius: 40px;
-            box-shadow: var(--card-shadow); display: flex; flex-direction: column; align-items: center;
-            transition: transform 0.3s ease;
-        }
-        .auth-logo { font-weight: 900; color: #2d3436; font-size: 3rem; letter-spacing: -3px; text-transform: uppercase; margin: 0; opacity: 0.8; }
-        .auth-input {
-            width: 280px; padding: 16px; border-radius: 30px; border: 1px solid #eee;
-            margin: 25px 0 15px 0; outline: none; font-size: 16px; text-align: center; transition: 0.3s;
-        }
-        .auth-input:focus { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(9, 132, 227, 0.1); }
-        #pattern-canvas { background: #fff; border-radius: 25px; border: 1px solid #f1f2f6; cursor: crosshair; }
-
-        /* ============================================================
-           3. СТРАНИЦА: ГОД
-           ============================================================ */
-        #year-page { height: 100vh; display: flex; }
-        .y-sidebar { width: 280px; background: #ffffff; padding: 40px 25px; display: flex; flex-direction: column; border-right: 1px solid #edf0f2; }
-        .y-main-content { flex: 1; padding: 60px; overflow-y: auto; position: relative; }
-        .y-bg-label { font-size: 10rem; font-weight: 900; color: #000; opacity: 0.03; position: absolute; top: -20px; right: 40px; pointer-events: none; }
+        /* --- ГЛАВНЫЙ ИНТЕРФЕЙС --- */
+        .app-container { display: flex; height: 100vh; width: 100vw; }
         
-        .y-month-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; position: relative; z-index: 1; }
-        .y-month-card {
-            background: #ffffff; border-radius: 30px; padding: 40px 20px; text-align: center;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid transparent;
+        .sidebar { 
+            width: 280px; background: var(--bg-sidebar); 
+            display: flex; flex-direction: column; padding: 30px 20px; 
+            box-sizing: border-box; border-right: 1px solid #95a5a6; 
         }
-        .y-month-card:hover { transform: translateY(-8px); border-color: var(--accent-blue); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
+        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: auto; }
+        .user-avatar { 
+            width: 45px; height: 45px; background: var(--accent); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 1.2rem; text-transform: uppercase; 
+        }
+        .sidebar-controls { display: flex; gap: 8px; }
 
-        .btn { border: none; padding: 14px 20px; border-radius: 15px; cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.3s; }
-        .btn-blue { background: var(--accent-blue); color: white; }
+        .main-view { flex: 1; padding: 40px 60px; display: flex; flex-direction: column; background: white; overflow: hidden; }
+        .main-view h1 { font-size: 4rem; margin: 0 0 30px 0; font-weight: 300; color: #2d3436; }
+
+        .year-grid { 
+            display: grid; grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(3, 1fr); gap: 15px; flex-grow: 1; 
+        }
+        .month-card { 
+            background: white; border: 1px solid #eee; border-radius: 15px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.2s; position: relative; 
+        }
+        .month-card.current-month { border: 2.5px solid var(--accent); background: #f0f7ff; }
+        .month-card h3 { font-weight: 500; font-size: 1.1rem; margin: 0; }
+        
+        .activity-line { width: 40px; height: 5px; background: var(--pink-line); border-radius: 3px; margin-top: 10px; }
+        .last-edit { font-size: 9px; color: #b2bec3; position: absolute; bottom: 10px; text-transform: uppercase; }
+
+        /* --- ОРАНЖЕВАЯ ПАНЕЛЬ --- */
+        .notifications-sidebar {
+            width: 320px; background: var(--orange-notif); height: 100vh; 
+            position: fixed; right: 0; top: 0; z-index: 1500;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            padding: 25px; box-sizing: border-box; color: white;
+            transform: translateX(100%); transition: transform 0.3s ease;
+        }
+        .notifications-sidebar.active { transform: translateX(0); }
+        
+        .notif-item { 
+            background: rgba(255,255,255,0.2); border-radius: 12px; 
+            padding: 15px; margin-bottom: 15px; position: relative; 
+        }
+        .notif-badge {
+            position: absolute; top: -8px; left: -8px; background: #d63031;
+            color: white; width: 22px; height: 22px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
+        }
+
+        .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-exit { background: #636e72; color: white; }
+        .btn-admin { background: var(--admin-red); color: white; }
+        
+        #month-page { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; z-index: 1000; padding: 40px; box-sizing: border-box; overflow-y: auto;
+        }
     </style>
 </head>
 <body>
 
-    <div id="side-panel" class="system-sidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:15px;">
-            <h3 style="margin:0; font-weight:800;">SYSTEM LOG</h3>
-            <button onclick="window.togglePanel(false)" style="background:none; border:none; color:white; font-size:30px; cursor:pointer;">&times;</button>
-        </div>
-        <div id="panel-content" style="margin-top:20px;"></div>
-    </div>
-
-    <div class="system-footer-white">
-        <div class="footer-dot"></div>
-        <span>Cloud Plan Ecosystem — Secure Terminal</span>
-        <div style="flex:1"></div>
-        <span>2026 Node: Active</span>
-    </div>
-
     <div id="auth-page">
-        <div class="auth-container">
-            <h2 class="auth-logo">Calendar</h2>
-            <input type="text" id="auth-username" class="auth-input" placeholder="Логин..." oninput="window.checkAdmin(this.value)">
-            <canvas id="pattern-canvas" width="260" height="260"></canvas>
-            
-            <div id="admin-secret-wrap" class="hidden" style="margin-top:20px; text-align:center;">
-                <input type="password" id="admin-pass-input" class="auth-input" placeholder="Пароль администратора" style="margin-top:0">
-                <button class="btn btn-blue" style="width:100%; background:var(--admin-red)" onclick="window.handleAuthSubmit()">Войти как ADMIN</button>
-            </div>
-            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; margin-top:15px; text-transform:uppercase; letter-spacing:1px;">Нарисуйте ключ</p>
+        <h2>Вход в систему</h2>
+        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
+        <canvas id="pattern-canvas" width="260" height="260"></canvas>
+        <div id="admin-secret-wrap" class="hidden">
+            <input type="password" id="admin-pass-input" placeholder="Пароль администратора">
+            <button class="btn btn-exit" onclick="handleAuthSubmit()">Войти</button>
         </div>
+        <p id="auth-hint" style="font-size: 11px; color: #636e72;">Нарисуйте ключ</p>
     </div>
 
     <div id="year-page" class="hidden">
-        <aside class="y-sidebar">
-            <div style="display:flex; align-items:center; gap:15px; margin-bottom:50px;">
-                <div id="u-avatar" style="width:50px; height:50px; background:var(--accent-blue); border-radius:15px; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:22px;">?</div>
-                <div id="sidebar-user-name" style="font-weight:800; color:#2d3436;">USER</div>
-            </div>
-            <button class="btn btn-blue" style="width:100%; text-align:left; margin-bottom:10px;">📅 Календарь 2026</button>
-            <button id="admin-btn-side" class="btn hidden" style="background:var(--admin-red); color:white; width:100%; text-align:left; margin-bottom:10px;" onclick="window.loadAdminRequests()">⚙️ Запросы</button>
-            <button class="btn" style="background:#f1f2f6; color:#636e72; width:100%; margin-top:auto;" onclick="location.reload()">Выход</button>
-        </aside>
-        <main class="y-main-content">
-            <div class="y-bg-label">2026</div>
-            <div class="y-month-grid" id="year-grid"></div>
-        </main>
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <div class="user-avatar" id="u-avatar">?</div>
+                    <div class="user-tag" id="sidebar-user-name">USER</div>
+                </div>
+                <div class="sidebar-controls">
+                    <button class="btn btn-exit" onclick="location.reload()">Выйти</button>
+                    <button id="admin-btn-side" class="btn btn-admin hidden" onclick="openAdminPanel()">⚙️</button>
+                </div>
+            </aside>
+            <main class="main-view">
+                <h1>2026</h1>
+                <div class="year-grid" id="year-grid"></div>
+            </main>
+        </div>
+    </div>
+
+    <div id="admin-sidebar" class="notifications-sidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0">Уведомления</h3>
+            <button onclick="closeAdminPanel()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="requests-list">Список пуст</div>
+    </div>
+
+    <div id="month-page" class="hidden">
+        <button class="btn btn-exit" onclick="showYear()">← Назад</button>
+        <h2 id="month-title" style="font-size: 3rem; margin: 20px 0;"></h2>
+        <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
+        <div id="editor-section" class="hidden" style="margin-top:20px; background:#f8f9fa; padding:20px; border-radius:15px;">
+            <h4 id="selected-day-label"></h4>
+            <textarea id="day-input" style="width:100%; height:100px; padding:10px; border-radius:10px; border:1px solid #ddd;"></textarea>
+            <button class="btn btn-exit" style="background:var(--accent); margin-top:10px;" onclick="saveDayData()">Сохранить</button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -153,40 +160,95 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
         let user = "";
         let patternResult = "";
+        let currentMonthIdx = null;
+        let currentDay = null;
+        let currentMonthData = {};
 
-        // --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
-        window.togglePanel = (show) => document.getElementById('side-panel').classList.toggle('active', show);
-        
-        window.pushNotify = (title, text) => {
-            const container = document.getElementById('panel-content');
-            const item = document.createElement('div');
-            item.className = 'notify-item';
-            item.innerHTML = `<b>${title}</b><p style="margin:5px 0 0 0; font-size:13px;">${text}</p>`;
-            container.prepend(item);
-            window.togglePanel(true);
+        window.checkAdmin = (val) => {
+            const secretBox = document.getElementById('admin-secret-wrap');
+            if(val.toLowerCase() === 'admin') secretBox.classList.remove('hidden');
+            else secretBox.classList.add('hidden');
         };
 
-        window.checkAdmin = (val) => document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
+        // ГРАФИЧЕСКИЙ КЛЮЧ - ЛОГИКА ОЧИСТКИ
+        const canvas = document.getElementById('pattern-canvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        let drawing = false;
 
-        function resetAuthForm() {
-            patternResult = ""; 
-            dots.forEach(d => d.hit = false); 
-            draw(); 
-            document.getElementById('auth-username').value = ""; 
-            document.getElementById('auth-username').focus();
+        function resetCanvas(color = "#bdc3c7") {
+            patternResult = "";
+            dots.forEach(d => d.hit = false);
+            drawPattern(color);
         }
 
-        // --- ВХОД ---
+        function drawPattern(dotColor = "#bdc3c7") {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (patternResult.length > 0) {
+                ctx.beginPath(); ctx.strokeStyle = "rgba(9, 132, 227, 0.3)"; ctx.lineWidth = 10; ctx.lineJoin = "round";
+                for(let k=0; k < patternResult.length; k+=2) {
+                    const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
+                    if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
+                }
+                ctx.stroke();
+            }
+            dots.forEach(d => {
+                ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
+                ctx.fillStyle = d.hit ? "#0984e3" : dotColor; ctx.fill();
+            });
+        }
+
+        (function initPattern() {
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+            drawPattern();
+
+            const startDraw = (e) => { 
+                e.preventDefault(); 
+                resetCanvas(); 
+                drawing = true; 
+            };
+            const moveDraw = (e) => {
+                if(!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+                const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+                
+                dots.forEach(d => {
+                    const dist = Math.sqrt((x-d.x)**2 + (y-d.y)**2);
+                    if (dist < 20 && !d.hit) {
+                        d.hit = true;
+                        patternResult += d.id;
+                        drawPattern();
+                    }
+                });
+            };
+            const endDraw = () => {
+                drawing = false;
+                if(patternResult.length > 2) {
+                    if(user !== 'admin') handleAuthSubmit();
+                } else {
+                    resetCanvas(); // Сброс, если кликнули просто в пустоту или провели короткую линию
+                }
+            };
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('touchstart', startDraw);
+            window.addEventListener('mousemove', moveDraw);
+            window.addEventListener('touchmove', moveDraw);
+            window.addEventListener('mouseup', endDraw);
+            window.addEventListener('touchend', endDraw);
+        })();
+
         window.handleAuthSubmit = async () => {
-            const authContainer = document.querySelector('.auth-container');
             user = document.getElementById('auth-username').value.trim().toLowerCase();
             const textPass = document.getElementById('admin-pass-input').value;
             let finalSecret = textPass || patternResult;
             
-            if(!user || !finalSecret) { window.pushNotify("Внимание", "Логин или ключ не заполнены"); return; }
+            if(!user) { alert("Введите имя!"); resetCanvas(); return; }
 
             const userRef = doc(db, "users", user);
             const userSnap = await getDoc(userRef);
@@ -195,21 +257,19 @@
                 if (userSnap.data().password === finalSecret) {
                     loginSuccess();
                 } else {
-                    window.pushNotify("Ошибка", "Неверный графический ключ");
-                    authContainer.classList.add('shake');
-                    setTimeout(() => authContainer.classList.remove('shake'), 400);
-                    resetAuthForm();
+                    document.getElementById('auth-hint').innerText = "Неверный ключ! Попробуйте снова.";
+                    document.getElementById('auth-hint').style.color = "red";
+                    resetCanvas("#d63031"); // Подсветить красным
+                    setTimeout(() => { resetCanvas(); document.getElementById('auth-hint').style.color = "#636e72"; }, 1000);
                 }
             } else {
-                window.pushNotify("Новый профиль", `Отправить запрос для "${user}"?`);
-                const btn = document.createElement('button');
-                btn.className = "btn btn-blue"; btn.style="width:100%; margin-top:10px;"; btn.innerText = "Отправить запрос";
-                btn.onclick = async () => {
+                if(confirm("Пользователь не найден. Отправить запрос?")) {
                     await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
-                    window.pushNotify("Запрос", "Отправлено на модерацию");
-                };
-                document.getElementById('panel-content').appendChild(btn);
-                resetAuthForm();
+                    alert("Запрос отправлен.");
+                    resetCanvas();
+                } else {
+                    resetCanvas();
+                }
             }
         };
 
@@ -217,67 +277,121 @@
             document.getElementById('auth-page').classList.add('hidden');
             document.getElementById('year-page').classList.remove('hidden');
             document.getElementById('sidebar-user-name').innerText = user.toUpperCase();
-            document.getElementById('u-avatar').innerText = user.charAt(0).toUpperCase();
+            document.getElementById('u-avatar').innerText = user.charAt(0);
             if (user === 'admin') document.getElementById('admin-btn-side').classList.remove('hidden');
             renderYearGrid();
         }
 
-        function renderYearGrid() {
+        async function renderYearGrid() {
             const grid = document.getElementById('year-grid');
             grid.innerHTML = '';
-            const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            months.forEach((m) => {
-                const card = document.createElement('div');
-                card.className = 'y-month-card';
-                card.innerHTML = `<h3 style="margin:0">${m}</h3><p style="font-size:11px; color:#b2bec3; margin-top:10px;">2026</p>`;
-                grid.appendChild(card);
-            });
-        }
+            const thisMonth = new Date().getMonth();
 
-        // --- КАНВАС ---
-        const canvas = document.getElementById('pattern-canvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
-        const dots = [];
-        for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (patternResult.length >= 2) {
-                ctx.beginPath(); ctx.lineWidth = 6; ctx.lineCap = "round"; ctx.lineJoin = "round";
-                const grad = ctx.createLinearGradient(0, 0, 260, 260); grad.addColorStop(0, '#0984e3'); grad.addColorStop(1, '#6c5ce7');
-                ctx.strokeStyle = grad; ctx.shadowBlur = 15; ctx.shadowColor = "rgba(9, 132, 227, 0.4)";
-                for(let k=0; k < patternResult.length; k+=2) {
-                    const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
-                    if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
+            for(let i=0; i<months.length; i++) {
+                const snap = await getDoc(doc(db, "data", `month_${i}`));
+                let lastUser = ""; let hasData = false;
+                if(snap.exists()){
+                    const data = snap.data();
+                    const entries = Object.values(data);
+                    if(entries.length > 0) { hasData = true; lastUser = entries[entries.length - 1].author || ""; }
                 }
-                ctx.stroke(); ctx.shadowBlur = 0;
+
+                const card = document.createElement('div');
+                card.className = `month-card ${i === thisMonth ? 'current-month' : ''}`;
+                card.onclick = () => openMonth(i);
+                card.innerHTML = `
+                    <h3>${months[i]}</h3>
+                    ${hasData ? '<div class="activity-line"></div>' : ''}
+                    <div class="last-edit">${lastUser ? 'ред: ' + lastUser : ''}</div>
+                `;
+                grid.appendChild(card);
             }
-            dots.forEach(d => {
-                ctx.beginPath(); ctx.arc(d.x, d.y, d.hit ? 12 : 8, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9";
-                if(d.hit) { ctx.shadowBlur = 20; ctx.shadowColor = "#0984e3"; }
-                ctx.fill(); ctx.shadowBlur = 0;
-            });
         }
 
-        canvas.onmousedown = canvas.ontouchstart = (e) => { 
-            e.preventDefault(); drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); 
-        };
-        window.onmouseup = window.ontouchend = () => { 
-            if(drawing && document.getElementById('auth-username').value.toLowerCase() !== 'admin') window.handleAuthSubmit();
-            drawing = false; 
-        };
-        canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if(!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
-            const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
-            dots.forEach(d => {
-                if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
+        window.openAdminPanel = async () => {
+            document.getElementById('admin-sidebar').classList.add('active');
+            const list = document.getElementById('requests-list');
+            list.innerHTML = "Поиск заявок...";
+            
+            const snap = await getDocs(collection(db, "requests"));
+            list.innerHTML = snap.empty ? "Новых уведомлений нет" : "";
+            
+            snap.forEach(d => {
+                const item = document.createElement('div');
+                item.id = `req-${d.id}`;
+                item.className = 'notif-item';
+                item.innerHTML = `
+                    <div class="notif-badge">!</div>
+                    <b>Запрос доступа</b>
+                    <p style="margin:5px 0; font-size:13px;">Имя: ${d.id}</p>
+                    <div style="display:flex; gap:5px; margin-top:10px;">
+                        <button class="btn" style="background:#2ecc71; flex:1" onclick="approveUser('${d.id}', '${d.data().password}')">✅</button>
+                        <button class="btn" style="background:#c0392b; flex:1" onclick="rejectUser('${d.id}')">❌</button>
+                    </div>
+                `;
+                list.appendChild(item);
             });
         };
-        draw();
+
+        window.closeAdminPanel = () => document.getElementById('admin-sidebar').classList.remove('active');
+
+        window.approveUser = async (uId, uPass) => {
+            await setDoc(doc(db, "users", uId), { password: uPass });
+            await deleteDoc(doc(db, "requests", uId));
+            document.getElementById(`req-${uId}`).remove(); // Сразу удаляем уведомление из списка
+            if(document.getElementById('requests-list').innerHTML === "") {
+                document.getElementById('requests-list').innerHTML = "Новых уведомлений нет";
+            }
+        };
+
+        window.rejectUser = async (uId) => {
+            await deleteDoc(doc(db, "requests", uId));
+            document.getElementById(`req-${uId}`).remove();
+            if(document.getElementById('requests-list').innerHTML === "") {
+                document.getElementById('requests-list').innerHTML = "Новых уведомлений нет";
+            }
+        };
+
+        window.openMonth = (mIdx) => {
+            currentMonthIdx = mIdx;
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = months[mIdx];
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+                currentMonthData = snap.exists() ? snap.data() : {};
+                renderDays();
+            });
+        };
+
+        function renderDays() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            for (let d = 1; d <= 31; d++) {
+                const dayData = currentMonthData[d] || { text: "" };
+                const div = document.createElement('div');
+                div.style = "background:#f8f9fa; border:1px solid #eee; padding:10px; border-radius:10px; cursor:pointer; min-height:60px;";
+                div.innerHTML = `<b>${d}</b><div style="font-size:10px; color:#999;">${dayData.text.substring(0,15)}</div>`;
+                div.onclick = () => {
+                    currentDay = d;
+                    document.getElementById('editor-section').classList.remove('hidden');
+                    document.getElementById('selected-day-label').innerText = `${d} ${months[currentMonthIdx]}`;
+                    document.getElementById('day-input').value = dayData.text;
+                };
+                grid.appendChild(div);
+            }
+        }
+
+        window.saveDayData = async () => {
+            const val = document.getElementById('day-input').value.trim();
+            currentMonthData[currentDay] = { text: val, author: user };
+            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
+            alert("Сохранено!");
+        };
+
+        window.showYear = () => {
+            document.getElementById('month-page').classList.add('hidden');
+            renderYearGrid();
+        };
+
     </script>
 </body>
 </html>
