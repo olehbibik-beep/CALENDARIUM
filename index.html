@@ -30,25 +30,90 @@
         }
         #auth-page input:focus { border-color: var(--accent-blue); }
 
-        /* --- 2. СТИЛИ: КАЛЕНДАРЬ ГОДА --- */
-        #year-page { height: 100vh; display: flex; }
-        #year-page .sidebar { 
-            width: 280px; background: #ffffff; padding: 40px 25px; 
-            display: flex; flex-direction: column; border-right: 1px solid #edf0f2;
-        }
-        .user-info { display: flex; align-items: center; gap: 15px; margin-bottom: 50px; }
-        .avatar { 
-            width: 50px; height: 50px; background: var(--accent-blue); border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 22px;
-        }
-        #year-page .main-content { flex: 1; padding: 60px; overflow-y: auto; position: relative; }
-        #year-page .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
-        .month-card {
-            background: #ffffff; border-radius: 25px; padding: 35px 20px;
-            text-align: center; cursor: pointer; transition: 0.3s; box-shadow: var(--card-shadow);
-        }
-        .month-card:hover { transform: translateY(-5px); border: 1px solid var(--accent-blue); }
+       /* ============================================================
+   PAGE: YEAR (Сетка месяцев)
+   Все стили этой страницы изолированы через префикс .y-
+   ============================================================ */
+
+#year-page {
+    height: 100vh;
+    display: flex;
+    background: var(--bg-soft);
+}
+
+/* Боковая панель года */
+.y-sidebar {
+    width: 280px;
+    background: #ffffff;
+    padding: 40px 25px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #edf0f2;
+    z-index: 10;
+}
+
+/* Основной контент (Сетка) */
+.y-main-content {
+    flex: 1;
+    padding: 60px;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Декоративный заголовок на фоне */
+.y-bg-year-label {
+    font-size: 10rem;
+    font-weight: 900;
+    color: #000;
+    opacity: 0.03;
+    position: absolute;
+    top: -20px;
+    right: 40px;
+    user-select: none;
+}
+
+/* Сетка карточек */
+.y-month-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 30px;
+    position: relative;
+}
+
+/* Индивидуальная карточка месяца */
+.y-month-card {
+    background: #ffffff;
+    border-radius: 30px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.y-month-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.07);
+    border-color: var(--accent-blue);
+}
+
+.y-month-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #2d3436;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.y-month-label {
+    font-size: 11px;
+    color: var(--accent-blue);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+}
 
         /* --- 3. СТИЛИ: РАСПИСАНИЕ МЕСЯЦА --- */
         #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; padding: 40px; z-index: 1000; overflow-y: auto; }
@@ -89,19 +154,27 @@
     </div>
 
     <div id="year-page" class="hidden">
-        <aside class="sidebar">
-            <div class="user-info">
-                <div class="avatar" id="u-avatar">?</div>
-                <div id="sidebar-user-name" style="font-weight:bold;">USER</div>
+    <aside class="y-sidebar">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:50px;">
+            <div class="avatar" id="u-avatar">?</div>
+            <div id="sidebar-user-name" style="font-weight:800; color:#2d3436; font-size: 1.1rem;">USER</div>
+        </div>
+        
+        <div style="flex:1">
+            <p style="font-size:11px; color:#b2bec3; text-transform:uppercase; letter-spacing:1px; margin-bottom:15px;">Навигация</p>
+            <button class="btn btn-blue" style="width:100%; text-align:left; margin-bottom:10px;">📅 Календарь 2026</button>
+            <button id="admin-btn-side" class="btn hidden" style="background:var(--admin-red); color:white; width:100%; text-align:left;" onclick="window.loadAdminRequests()">⚙️ Админ-панель</button>
+        </div>
+
+        <button class="btn" style="background:#f1f2f6; color:#636e72; width:100%;" onclick="location.reload()">Выйти из системы</button>
+    </aside>
+
+    <main class="y-main-content">
+        <div class="y-bg-year-label">2026</div>
+        <div class="y-month-grid" id="year-grid">
             </div>
-            <button class="btn" style="background:#f1f2f6; color:#636e72;" onclick="location.reload()">Выйти</button>
-            <button id="admin-btn-side" class="btn hidden" style="background:var(--admin-red); color:white; margin-top:10px;" onclick="window.loadAdminRequests()">Запросы</button>
-        </aside>
-        <main class="main-content">
-            <h1 style="font-size:4rem; margin:0 0 30px 0; font-weight:900; opacity:0.1;">2026</h1>
-            <div class="year-grid" id="year-grid"></div>
-        </main>
-    </div>
+    </main>
+</div>
 
     <div id="month-page" class="hidden">
         <button class="btn" onclick="window.showYear()">← Назад</button>
