@@ -6,18 +6,27 @@
     <title>CALENDAR 2026 | Cloud Ecosystem</title>
     <style>
         /* ============================================================
-           0. ГЛОБАЛЬНЫЕ НАСТРОЙКИ И ПЕРЕМЕННЫЕ
+           0. ГЛОБАЛЬНЫЕ НАСТРОЙКИ
            ============================================================ */
         :root {
             --orange-notif: #f39c12;
             --admin-red: #d63031;
             --accent-blue: #0984e3;
-            --bg-soft: #f4f7f9; /* Тот самый нежный фон */
+            --bg-soft: #f4f7f9; 
             --card-shadow: 0 10px 40px rgba(0,0,0,0.06);
         }
         
         body, html { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; height: 100vh; overflow: hidden; background: var(--bg-soft); }
         .hidden { display: none !important; }
+
+        /* Анимация ошибки (тряска) */
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
 
         /* ============================================================
            1. СИСТЕМНЫЕ КОМПОНЕНТЫ (ШТОРКА И ФУТЕР)
@@ -47,12 +56,13 @@
         @keyframes slideIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform: translateX(0); } }
 
         /* ============================================================
-           2. СТРАНИЦА: АВТОРИЗАЦИЯ (ИЗОЛИРОВАНО)
+           2. СТРАНИЦА: АВТОРИЗАЦИЯ
            ============================================================ */
         #auth-page { height: 100vh; display: flex; align-items: center; justify-content: center; }
         .auth-container {
             background: #ffffff; padding: 50px 60px; border-radius: 40px;
             box-shadow: var(--card-shadow); display: flex; flex-direction: column; align-items: center;
+            transition: transform 0.3s ease;
         }
         .auth-logo { font-weight: 900; color: #2d3436; font-size: 3rem; letter-spacing: -3px; text-transform: uppercase; margin: 0; opacity: 0.8; }
         .auth-input {
@@ -63,7 +73,7 @@
         #pattern-canvas { background: #fff; border-radius: 25px; border: 1px solid #f1f2f6; cursor: crosshair; }
 
         /* ============================================================
-           3. СТРАНИЦА: ГОД (ИЗОЛИРОВАНО ПРЕФИКСОМ y-)
+           3. СТРАНИЦА: ГОД
            ============================================================ */
         #year-page { height: 100vh; display: flex; }
         .y-sidebar { width: 280px; background: #ffffff; padding: 40px 25px; display: flex; flex-direction: column; border-right: 1px solid #edf0f2; }
@@ -77,7 +87,6 @@
         }
         .y-month-card:hover { transform: translateY(-8px); border-color: var(--accent-blue); box-shadow: 0 15px 35px rgba(0,0,0,0.06); }
 
-        /* Общие кнопки */
         .btn { border: none; padding: 14px 20px; border-radius: 15px; cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.3s; }
         .btn-blue { background: var(--accent-blue); color: white; }
     </style>
@@ -131,7 +140,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -162,8 +171,17 @@
 
         window.checkAdmin = (val) => document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
 
+        function resetAuthForm() {
+            patternResult = ""; 
+            dots.forEach(d => d.hit = false); 
+            draw(); 
+            document.getElementById('auth-username').value = ""; 
+            document.getElementById('auth-username').focus();
+        }
+
         // --- ВХОД ---
         window.handleAuthSubmit = async () => {
+            const authContainer = document.querySelector('.auth-container');
             user = document.getElementById('auth-username').value.trim().toLowerCase();
             const textPass = document.getElementById('admin-pass-input').value;
             let finalSecret = textPass || patternResult;
@@ -174,17 +192,24 @@
             const userSnap = await getDoc(userRef);
 
             if (userSnap.exists()) {
-                if (userSnap.data().password === finalSecret) loginSuccess();
-                else { window.pushNotify("Ошибка", "Неверный графический ключ"); resetCanvas(); }
+                if (userSnap.data().password === finalSecret) {
+                    loginSuccess();
+                } else {
+                    window.pushNotify("Ошибка", "Неверный графический ключ");
+                    authContainer.classList.add('shake');
+                    setTimeout(() => authContainer.classList.remove('shake'), 400);
+                    resetAuthForm();
+                }
             } else {
                 window.pushNotify("Новый профиль", `Отправить запрос для "${user}"?`);
                 const btn = document.createElement('button');
-                btn.className = "btn btn-blue"; btn.style="width:100%; margin-top:10px;"; btn.innerText = "Отправить";
+                btn.className = "btn btn-blue"; btn.style="width:100%; margin-top:10px;"; btn.innerText = "Отправить запрос";
                 btn.onclick = async () => {
                     await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
                     window.pushNotify("Запрос", "Отправлено на модерацию");
                 };
                 document.getElementById('panel-content').appendChild(btn);
+                resetAuthForm();
             }
         };
 
@@ -201,7 +226,7 @@
             const grid = document.getElementById('year-grid');
             grid.innerHTML = '';
             const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            months.forEach((m, i) => {
+            months.forEach((m) => {
                 const card = document.createElement('div');
                 card.className = 'y-month-card';
                 card.innerHTML = `<h3 style="margin:0">${m}</h3><p style="font-size:11px; color:#b2bec3; margin-top:10px;">2026</p>`;
@@ -215,8 +240,6 @@
         let drawing = false;
         const dots = [];
         for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-
-        function resetCanvas() { patternResult = ""; dots.forEach(d => d.hit = false); draw(); }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -242,7 +265,7 @@
             e.preventDefault(); drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); 
         };
         window.onmouseup = window.ontouchend = () => { 
-            if(drawing && user.toLowerCase() !== 'admin') window.handleAuthSubmit();
+            if(drawing && document.getElementById('auth-username').value.toLowerCase() !== 'admin') window.handleAuthSubmit();
             drawing = false; 
         };
         canvas.onmousemove = canvas.ontouchmove = (e) => {
