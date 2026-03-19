@@ -65,7 +65,7 @@
         /* --- ОРАНЖЕВАЯ ШТОРКА --- */
         .notifications-sidebar {
             width: 320px; background: var(--orange-notif); height: 100vh; 
-            position: fixed; right: 0; top: 0; z-index: 3000; /* Выше всего */
+            position: fixed; right: 0; top: 0; z-index: 3000; 
             box-shadow: -5px 0 15px rgba(0,0,0,0.1);
             padding: 25px; box-sizing: border-box; color: white;
             transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -102,8 +102,7 @@
             <h3 id="panel-title" style="margin:0">Уведомления</h3>
             <button onclick="window.togglePanel(false)" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">&times;</button>
         </div>
-        <div id="panel-content">
-            </div>
+        <div id="panel-content"></div>
     </div>
 
     <div id="auth-page">
@@ -170,32 +169,21 @@
         let currentDay = null;
         let currentMonthData = {};
 
-        // --- СИСТЕМА УВЕДОМЛЕНИЙ В ШТОРКЕ ---
-        window.togglePanel = (show) => {
-            document.getElementById('side-panel').classList.toggle('active', show);
-        };
+        // --- УВЕДОМЛЕНИЯ ---
+        window.togglePanel = (show) => document.getElementById('side-panel').classList.toggle('active', show);
 
         window.pushNotify = (title, text, type = 'info') => {
             const container = document.getElementById('panel-content');
             document.getElementById('panel-title').innerText = "Система";
-            
             const item = document.createElement('div');
             item.className = 'notif-item';
-            item.innerHTML = `
-                <div class="notif-badge">${type === 'err' ? '×' : '!'}</div>
-                <b>${title}</b>
-                <p style="margin:5px 0; font-size:13px;">${text}</p>
-            `;
-            container.prepend(item); // Новые сверху
+            item.innerHTML = `<div class="notif-badge">${type === 'err' ? '×' : '!'}</div><b>${title}</b><p style="margin:5px 0; font-size:13px;">${text}</p>`;
+            container.prepend(item);
             window.togglePanel(true);
-            
-            // Авто-закрытие через 4 секунды, если это просто инфо
-            if(type === 'info') setTimeout(() => item.style.opacity = '0.5', 3500);
         };
 
         window.checkAdmin = (val) => {
-            const secretBox = document.getElementById('admin-secret-wrap');
-            secretBox.classList.toggle('hidden', val.toLowerCase() !== 'admin');
+            document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
         };
 
         window.handleAuthSubmit = async () => {
@@ -211,20 +199,17 @@
 
             if (userSnap.exists()) {
                 if (userSnap.data().password === finalSecret) loginSuccess();
-                else window.pushNotify("Доступ запрещен", "Неверный графический ключ", "err");
+                else window.pushNotify("Ошибка", "Неверный графический ключ", "err");
             } else {
-                // Если юзера нет, предлагаем регу через шторку
                 const container = document.getElementById('panel-content');
-                container.innerHTML = ''; // Чистим
-                window.pushNotify("Новый пользователь", `Имя "${user}" не найдено. Хотите отправить запрос на регистрацию?`);
-                
+                container.innerHTML = '';
+                window.pushNotify("Регистрация", `Имя "${user}" не найдено. Отправить запрос?`);
                 const btn = document.createElement('button');
-                btn.className = "btn";
-                btn.style = "width:100%; margin-top:10px; background:white; color:var(--orange-notif);";
-                btn.innerText = "Отправить запрос";
+                btn.className = "btn"; btn.style = "width:100%; margin-top:10px; background:white; color:var(--orange-notif);";
+                btn.innerText = "Да, отправить";
                 btn.onclick = async () => {
                     await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
-                    container.innerHTML = '<p>Запрос отправлен! Ожидайте подтверждения админом.</p>';
+                    container.innerHTML = '<p>Запрос отправлен!</p>';
                 };
                 container.appendChild(btn);
             }
@@ -240,26 +225,17 @@
             renderYearGrid();
         }
 
-        // --- ФУНКЦИИ АДМИНА ---
         window.loadAdminRequests = async () => {
             const list = document.getElementById('panel-content');
             document.getElementById('panel-title').innerText = "Запросы";
             list.innerHTML = "Загрузка...";
             window.togglePanel(true);
-            
             const snap = await getDocs(collection(db, "requests"));
-            list.innerHTML = snap.empty ? "Новых заявок нет" : "";
-            
+            list.innerHTML = snap.empty ? "Заявок нет" : "";
             snap.forEach(d => {
                 const item = document.createElement('div');
                 item.className = 'notif-item';
-                item.innerHTML = `
-                    <b>Запрос: ${d.id}</b>
-                    <div style="display:flex; gap:5px; margin-top:10px;">
-                        <button class="btn" style="background:#2ecc71; color:white; flex:1" onclick="window.approveUser('${d.id}', '${d.data().password}')">Да</button>
-                        <button class="btn" style="background:#d63031; color:white; flex:1" onclick="window.rejectUser('${d.id}')">Нет</button>
-                    </div>
-                `;
+                item.innerHTML = `<b>Запрос: ${d.id}</b><div style="display:flex; gap:5px; margin-top:10px;"><button class="btn" style="background:#2ecc71; color:white; flex:1" onclick="window.approveUser('${d.id}', '${d.data().password}')">Да</button><button class="btn" style="background:#d63031; color:white; flex:1" onclick="window.rejectUser('${d.id}')">Нет</button></div>`;
                 list.appendChild(item);
             });
         };
@@ -275,14 +251,12 @@
             window.loadAdminRequests();
         };
 
-        // --- ОСТАЛЬНАЯ ЛОГИКА (КАЛЕНДАРЬ) ---
         async function renderYearGrid() {
             const grid = document.getElementById('year-grid');
             grid.innerHTML = '';
             for(let i=0; i<months.length; i++) {
                 const card = document.createElement('div');
-                card.className = 'month-card';
-                card.innerHTML = `<h3>${months[i]}</h3>`;
+                card.className = 'month-card'; card.innerHTML = `<h3>${months[i]}</h3>`;
                 card.onclick = () => window.openMonth(i);
                 grid.appendChild(card);
             }
@@ -321,44 +295,90 @@
             currentMonthData[currentDay] = { text: document.getElementById('day-input').value, author: user };
             await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
             document.getElementById('editor-section').classList.add('hidden');
-            window.pushNotify("Успех", "Данные сохранены в облаке");
+            window.pushNotify("Успех", "Сохранено");
         };
 
         window.showYear = () => document.getElementById('month-page').classList.add('hidden');
 
-        // Графический ключ
+        // --- ЛОГИКА ГРАФИЧЕСКОГО КЛЮЧА (С ДОРОЖКАМИ) ---
         (function initPattern() {
             const canvas = document.getElementById('pattern-canvas');
             const ctx = canvas.getContext('2d');
             let drawing = false;
             const dots = [];
+            
+            // Генерируем точки 3x3
             for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
 
             const draw = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // РИСУЕМ ЛИНИИ (ДОРОЖКИ)
+                if (patternResult.length >= 2) {
+                    ctx.beginPath();
+                    ctx.lineWidth = 6;
+                    ctx.lineJoin = "round";
+                    ctx.lineCap = "round";
+                    ctx.strokeStyle = "rgba(9, 132, 227, 0.4)"; // Синий полупрозрачный
+                    
+                    for(let k=0; k < patternResult.length; k+=2) {
+                        const dotId = patternResult.substring(k, k+2);
+                        const dot = dots.find(d => d.id === dotId);
+                        if (k === 0) ctx.moveTo(dot.x, dot.y);
+                        else ctx.lineTo(dot.x, dot.y);
+                    }
+                    ctx.stroke();
+                }
+
+                // РИСУЕМ ТОЧКИ
                 dots.forEach(d => {
-                    ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
-                    ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7"; ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
+                    ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7";
+                    ctx.fill();
+                    
+                    // Маленькая точка внутри для красоты
+                    if(!d.hit) {
+                        ctx.beginPath();
+                        ctx.arc(d.x, d.y, 2, 0, Math.PI*2);
+                        ctx.fillStyle = "#fff";
+                        ctx.fill();
+                    }
                 });
             };
 
-            canvas.onmousedown = canvas.ontouchstart = (e) => { 
-                patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; 
-            };
-            window.onmouseup = window.ontouchend = () => { 
-                if(!drawing) return;
-                drawing = false; 
-                if(user !== 'admin') window.handleAuthSubmit();
-            };
-            canvas.onmousemove = canvas.ontouchmove = (e) => {
+            const handleInteraction = (e) => {
                 if(!drawing) return;
                 const rect = canvas.getBoundingClientRect();
                 const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
                 const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+                
                 dots.forEach(d => {
-                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 20 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
+                    const dist = Math.sqrt((x-d.x)**2 + (y-d.y)**2);
+                    if (dist < 25 && !d.hit) {
+                        d.hit = true;
+                        patternResult += d.id;
+                        draw();
+                    }
                 });
             };
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => {
+                patternResult = ""; 
+                dots.forEach(d => d.hit = false); 
+                drawing = true;
+                handleInteraction(e);
+                draw();
+            };
+
+            window.onmouseup = window.ontouchend = () => {
+                if(!drawing) return;
+                drawing = false;
+                if(user.toLowerCase() !== 'admin') window.handleAuthSubmit();
+            };
+
+            canvas.onmousemove = canvas.ontouchmove = (e) => handleInteraction(e);
+            
             draw();
         })();
     </script>
