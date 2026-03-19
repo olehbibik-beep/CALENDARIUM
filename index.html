@@ -71,4 +71,306 @@
             background: white; padding: 40px 20px; border-radius: 25px; text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.03); cursor: pointer; transition: 0.3s;
         }
-        #year-page .month-card:hover { transform: translateY(-5
+        #year-page .month-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.08); }
+
+        /* --- 3. СТИЛИ: РАСПИСАНИЕ --- */
+        #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; padding: 50px; z-index: 1000; overflow-y: auto; }
+        #month-page .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px; }
+        #month-page .day-cell {
+            aspect-ratio: 1/1; border: 1px solid #f1f2f6; border-radius: 15px; padding: 15px;
+            cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column;
+        }
+        #month-page .day-cell:hover { border-color: var(--accent-blue); background: #fafbfc; }
+        
+        #month-page .editor {
+            position: fixed; bottom: 50px; right: 50px; width: 400px; background: white;
+            padding: 30px; border-radius: 30px; box-shadow: 0 25px 50px rgba(0,0,0,0.15); border: 1px solid #eee;
+        }
+
+        /* Кнопки */
+        .btn { border: none; padding: 14px 22px; border-radius: 15px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .btn-blue { background: var(--accent-blue); color: white; }
+        .btn-red { background: var(--admin-red); color: white; }
+        .btn-gray { background: #f1f2f6; color: #2d3436; }
+    </style>
+</head>
+<body>
+
+    <div id="side-panel" class="system-sidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 id="panel-title" style="margin:0">System Status</h3>
+            <button onclick="window.togglePanel(false)" style="background:none; border:none; color:white; font-size:35px; cursor:pointer;">&times;</button>
+        </div>
+        <div id="panel-content"></div>
+    </div>
+    
+    <div class="system-footer-info">
+        Cloud Plan Ecosystem • Secure Access • 2026
+    </div>
+
+    <div id="auth-page">
+        <div class="auth-container">
+            <h2>CALENDAR</h2>
+            <p class="auth-subtitle">Введите логин и нарисуйте графический ключ на сетке</p>
+            
+            <div class="input-group">
+                <i>👤</i>
+                <input type="text" id="auth-username" placeholder="Имя пользователя..." oninput="window.checkAdmin(this.value)">
+            </div>
+            
+            <canvas id="pattern-canvas" width="260" height="260"></canvas>
+            
+            <div id="admin-secret-wrap" class="hidden" style="text-align: center;">
+                <input type="password" id="admin-pass-input" placeholder="Пароль администратора..." style="padding: 16px; width: 280px; border-radius: 30px; border: 1px solid #eee; margin-bottom: 10px; box-sizing: border-box;">
+                <button class="btn btn-red" style="width:280px" onclick="window.handleAuthSubmit()">Войти как ADMIN</button>
+            </div>
+            
+            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; text-transform:uppercase;">Ожидание ввода...</p>
+        </div>
+    </div>
+
+    <div id="year-page" class="hidden">
+        <aside class="sidebar">
+            <div style="display:flex; align-items:center; gap:12px; margin-bottom:40px;">
+                <div id="u-avatar" style="width:45px; height:45px; border-radius:15px; background:var(--accent-blue); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:20px;">?</div>
+                <span id="sidebar-user-name" style="font-weight:700; color:#2f3542; letter-spacing:0.5px;">USER</span>
+            </div>
+            <button class="btn btn-gray" style="width:100%; margin-bottom:10px;" onclick="location.reload()">Выйти</button>
+            <button id="admin-btn-side" class="btn btn-red hidden" style="width:100%;" onclick="window.loadAdminRequests()">Запросы</button>
+        </aside>
+        <main class="main-content">
+            <h1 style="font-size: 6rem; font-weight: 900; color: #000; opacity: 0.03; position: absolute; top: 20px; right: 60px; pointer-events: none;">2026</h1>
+            <div class="year-grid" id="year-grid"></div>
+        </main>
+    </div>
+
+    <div id="month-page" class="hidden">
+        <div style="display:flex; align-items:center; gap:25px; margin-bottom:40px;">
+            <button class="btn btn-gray" onclick="window.showYear()">← Назад</button>
+            <h2 id="month-title" style="margin:0; font-size:3rem; font-weight:800; letter-spacing:-2px; text-transform:uppercase;">Январь</h2>
+        </div>
+        
+        <div class="days-grid" id="days-grid"></div>
+
+        <div id="editor-section" class="editor hidden">
+            <h3 id="selected-day-label" style="margin:0 0 20px 0; color:var(--accent-blue)">Редактирование</h3>
+            <textarea id="day-input" style="width:100%; height:150px; border:1px solid #f1f2f6; border-radius:15px; padding:15px; font-family:inherit; outline:none; box-sizing:border-box; background: #fcfcfc;"></textarea>
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn btn-blue" style="flex:1" onclick="window.saveDayData()">Сохранить</button>
+                <button class="btn btn-gray" onclick="document.getElementById('editor-section').classList.add('hidden')">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        
+        let user = "";
+        let patternResult = "";
+        let currentMonthIdx = null;
+        let currentDay = null;
+        let currentMonthData = {};
+
+        // --- УВЕДОМЛЕНИЯ ---
+        window.togglePanel = (show) => document.getElementById('side-panel').classList.toggle('active', show);
+        
+        window.pushNotify = (title, text) => {
+            const container = document.getElementById('panel-content');
+            const item = document.createElement('div');
+            item.style = "background:rgba(255,255,255,0.2); padding:15px; border-radius:15px; margin-bottom:10px; border: 1px solid rgba(255,255,255,0.1);";
+            item.innerHTML = `<b>${title}</b><p style="margin:5px 0; font-size:13px; opacity:0.9;">${text}</p>`;
+            container.prepend(item);
+            window.togglePanel(true);
+        };
+
+        // --- ЛОГИКА ВХОДА ---
+        window.checkAdmin = (val) => {
+            document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
+        };
+
+        window.handleAuthSubmit = async () => {
+            user = document.getElementById('auth-username').value.trim().toLowerCase();
+            const textPass = document.getElementById('admin-pass-input').value;
+            let finalSecret = textPass || patternResult;
+            
+            if(!user || !finalSecret) { window.pushNotify("Ошибка", "Имя или ключ не заполнены"); return; }
+
+            const userRef = doc(db, "users", user);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                if (userSnap.data().password === finalSecret) loginSuccess();
+                else window.pushNotify("Доступ запрещен", "Неверный графический ключ");
+            } else {
+                window.pushNotify("Регистрация", `Пользователь "${user}" не найден. Отправить запрос?`);
+                const btn = document.createElement('button');
+                btn.className = "btn btn-gray"; btn.style = "width:100%; margin-top:10px;"; btn.innerText = "Да, создать запрос";
+                btn.onclick = async () => {
+                    await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
+                    document.getElementById('panel-content').innerHTML = "<b>Успех!</b><br>Заявка отправлена администратору.";
+                };
+                document.getElementById('panel-content').appendChild(btn);
+            }
+        };
+
+        function loginSuccess() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+            document.getElementById('sidebar-user-name').innerText = user.toUpperCase();
+            document.getElementById('u-avatar').innerText = user.charAt(0).toUpperCase();
+            if (user === 'admin') document.getElementById('admin-btn-side').classList.remove('hidden');
+            renderYearGrid();
+        }
+
+        // --- КАЛЕНДАРЬ ---
+        async function renderYearGrid() {
+            const grid = document.getElementById('year-grid');
+            grid.innerHTML = '';
+            months.forEach((m, i) => {
+                const card = document.createElement('div');
+                card.className = 'month-card';
+                card.innerHTML = `<h3 style="margin:0; color:#2d3436; font-weight:700; letter-spacing:-0.5px;">${m}</h3>`;
+                card.onclick = () => window.openMonth(i);
+                grid.appendChild(card);
+            });
+        }
+
+        window.openMonth = (mIdx) => {
+            currentMonthIdx = mIdx;
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = months[mIdx];
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+                currentMonthData = snap.exists() ? snap.data() : {};
+                renderDays();
+            });
+        };
+
+        function renderDays() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            const daysInMonth = new Date(2026, currentMonthIdx + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const data = currentMonthData[d] || { text: "" };
+                const div = document.createElement('div');
+                div.className = 'day-cell';
+                div.innerHTML = `<b>${d}</b><div style="font-size:10px; color:#b2bec3; margin-top:5px; line-height:1.2;">${data.text.substring(0,35)}</div>`;
+                div.onclick = () => {
+                    currentDay = d;
+                    document.getElementById('editor-section').classList.remove('hidden');
+                    document.getElementById('selected-day-label').innerText = `${d} ${months[currentMonthIdx]}`;
+                    document.getElementById('day-input').value = data.text;
+                };
+                grid.appendChild(div);
+            }
+        }
+
+        window.saveDayData = async () => {
+            currentMonthData[currentDay] = { text: document.getElementById('day-input').value, author: user };
+            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
+            document.getElementById('editor-section').classList.add('hidden');
+            window.pushNotify("Облако", "Данные успешно синхронизированы");
+        };
+
+        window.showYear = () => document.getElementById('month-page').classList.add('hidden');
+
+        // --- АДМИН ПАНЕЛЬ ---
+        window.loadAdminRequests = async () => {
+            const list = document.getElementById('panel-content');
+            document.getElementById('panel-title').innerText = "Запросы доступа";
+            list.innerHTML = "Загрузка...";
+            window.togglePanel(true);
+            const snap = await getDocs(collection(db, "requests"));
+            list.innerHTML = snap.empty ? "Новых заявок нет" : "";
+            snap.forEach(d => {
+                const item = document.createElement('div');
+                item.style = "background:rgba(255,255,255,0.2); padding:15px; border-radius:15px; margin-bottom:10px;";
+                item.innerHTML = `<b>${d.id}</b><div style="display:flex; gap:5px; margin-top:10px;"><button class="btn btn-blue" style="padding:8px; flex:1" onclick="window.approveUser('${d.id}', '${d.data().password}')">OK</button><button class="btn btn-red" style="padding:8px; flex:1" onclick="window.rejectUser('${d.id}')">НЕТ</button></div>`;
+                list.appendChild(item);
+            });
+        };
+
+        window.approveUser = async (uId, uPass) => {
+            await setDoc(doc(db, "users", uId), { password: uPass });
+            await deleteDoc(doc(db, "requests", uId));
+            window.loadAdminRequests();
+        };
+
+        window.rejectUser = async (uId) => {
+            await deleteDoc(doc(db, "requests", uId));
+            window.loadAdminRequests();
+        };
+
+        // --- СУПЕР-КАНВАС (ЛОГИКА) ---
+        (function initPattern() {
+            const canvas = document.getElementById('pattern-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            const dots = [];
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+
+            const draw = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (patternResult.length >= 2) {
+                    ctx.beginPath(); ctx.lineWidth = 5; ctx.lineCap = "round"; ctx.lineJoin = "round";
+                    const grad = ctx.createLinearGradient(0, 0, 260, 260); grad.addColorStop(0, '#0984e3'); grad.addColorStop(1, '#6c5ce7');
+                    ctx.strokeStyle = grad; ctx.shadowBlur = 10; ctx.shadowColor = "rgba(9, 132, 227, 0.4)";
+                    for(let k=0; k < patternResult.length; k+=2) {
+                        const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
+                        if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
+                    }
+                    ctx.stroke(); ctx.shadowBlur = 0;
+                }
+                dots.forEach(d => {
+                    if (d.hit) { ctx.beginPath(); ctx.arc(d.x, d.y, 18, 0, Math.PI*2); ctx.fillStyle = "rgba(9, 132, 227, 0.1)"; ctx.fill(); }
+                    ctx.beginPath(); ctx.arc(d.x, d.y, d.hit ? 10 : 7, 0, Math.PI*2);
+                    if (d.hit) { ctx.fillStyle = "#0984e3"; ctx.shadowBlur = 15; ctx.shadowColor = "#0984e3"; }
+                    else { ctx.fillStyle = "#dfe6e9"; ctx.shadowBlur = 0; }
+                    ctx.fill(); ctx.shadowBlur = 0;
+                });
+            };
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                return { x: (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left, y: (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top };
+            };
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { 
+                e.preventDefault(); patternResult = ""; dots.forEach(d=>d.hit=false); drawing = true; 
+                document.getElementById('auth-status-hint').innerText = "Запись ключа...";
+                draw(); 
+            };
+            window.onmouseup = window.ontouchend = () => { 
+                if(!drawing) return; drawing = false; 
+                if(user !== 'admin' && patternResult.length > 0) { window.handleAuthSubmit(); document.getElementById('auth-status-hint').innerText = "Проверка..."; }
+                draw();
+            };
+            canvas.onmousemove = canvas.ontouchmove = (e) => {
+                if(!drawing) return;
+                const pos = getPos(e);
+                dots.forEach(d => {
+                    if (Math.sqrt((pos.x-d.x)**2 + (pos.y-d.y)**2) < 25 && !d.hit) { 
+                        d.hit = true; patternResult += d.id; 
+                        if (navigator.vibrate) navigator.vibrate(10);
+                        draw(); 
+                    }
+                });
+            };
+            draw();
+        })();
+    </script>
+</body>
+</html>
