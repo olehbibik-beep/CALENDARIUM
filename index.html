@@ -3,36 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDAR 2026</title>
+    <title>CALENDAR 2026 | Cloud Ecosystem</title>
     <style>
+        /* --- ОБЩИЕ ПЕРЕМЕННЫЕ И СТИЛИ --- */
         :root {
             --orange-notif: #f39c12;
             --admin-red: #d63031;
             --accent-blue: #0984e3;
-            /* Наш новый нежный однотонный фон */
-            --bg-soft: #f7f8fa; 
-            --card-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            --bg-soft: #f4f7f9; /* Нежный однотонный фон */
+            --card-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
         
-        body, html { margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; height: 100vh; overflow: hidden; background: var(--bg-soft); }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; overflow: hidden; background: var(--bg-soft); }
         .hidden { display: none !important; }
 
-        /* --- 1. СТИЛИ: АВТОРИЗАЦИЯ (ОДНОТОННЫЙ ФОН) --- */
-        #auth-page {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: var(--bg-soft); /* Убрали градиент */
-        }
+        /* --- 1. СТИЛИ: АВТОРИЗАЦИЯ --- */
+        #auth-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg-soft); }
         #auth-page .auth-container {
             background: #ffffff; padding: 50px 60px; border-radius: 40px;
-            box-shadow: var(--card-shadow);
-            display: flex; flex-direction: column; align-items: center;
+            box-shadow: var(--card-shadow); display: flex; flex-direction: column; align-items: center;
         }
         #auth-page h2 { font-weight: 900; color: #2d3436; font-size: 3rem; letter-spacing: -3px; text-transform: uppercase; margin: 0; }
+        #auth-page input {
+            width: 280px; padding: 16px; border-radius: 20px; border: 1px solid #eee;
+            margin: 20px 0; outline: none; font-size: 16px; transition: 0.3s;
+        }
+        #auth-page input:focus { border-color: var(--accent-blue); }
 
-        /* --- 2. СТИЛИ: КАЛЕНДАРЬ ГОДА (ВТОРАЯ СТРАНИЦА) --- */
-        #year-page { height: 100vh; display: flex; background: var(--bg-soft); }
-
-        /* Левая панель */
+        /* --- 2. СТИЛИ: КАЛЕНДАРЬ ГОДА --- */
+        #year-page { height: 100vh; display: flex; }
         #year-page .sidebar { 
             width: 280px; background: #ffffff; padding: 40px 25px; 
             display: flex; flex-direction: column; border-right: 1px solid #edf0f2;
@@ -41,61 +40,51 @@
         .avatar { 
             width: 50px; height: 50px; background: var(--accent-blue); border-radius: 15px;
             display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: bold; font-size: 22px; box-shadow: 0 5px 15px rgba(9,132,227,0.2);
+            color: white; font-weight: bold; font-size: 22px;
         }
-        .user-name { font-weight: 700; color: #2d3436; font-size: 1.1rem; }
-
-        /* Сетка месяцев */
         #year-page .main-content { flex: 1; padding: 60px; overflow-y: auto; position: relative; }
-        #year-page .year-header { font-size: 8rem; font-weight: 900; color: #e9ecef; position: absolute; top: -20px; right: 40px; z-index: 0; }
-        
-        #year-page .year-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
-            gap: 25px; position: relative; z-index: 1; 
-        }
-
+        #year-page .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
         .month-card {
             background: #ffffff; border-radius: 25px; padding: 35px 20px;
-            text-align: center; cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid transparent; box-shadow: var(--card-shadow);
+            text-align: center; cursor: pointer; transition: 0.3s; box-shadow: var(--card-shadow);
         }
-        .month-card:hover { 
-            transform: translateY(-8px); border-color: var(--accent-blue);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-        }
-        .month-name { font-size: 1.4rem; font-weight: 700; color: #2d3436; margin: 0; letter-spacing: -0.5px; }
-        .month-status { font-size: 11px; color: #b2bec3; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .month-card:hover { transform: translateY(-5px); border: 1px solid var(--accent-blue); }
 
-        /* --- ОБЩИЕ ЭЛЕМЕНТЫ --- */
-        .btn { border: none; padding: 14px 20px; border-radius: 15px; cursor: pointer; font-weight: 600; font-family: inherit; transition: 0.3s; }
-        .btn-logout { background: #f1f2f6; color: #636e72; width: 100%; margin-top: auto; }
-        .btn-logout:hover { background: #dfe6e9; color: #2d3436; }
-        
-        /* Системная шторка и инфо-строка (неизменные) */
+        /* --- 3. СТИЛИ: РАСПИСАНИЕ МЕСЯЦА --- */
+        #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; padding: 40px; z-index: 1000; overflow-y: auto; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .day-cell { border: 1px solid #eee; padding: 15px; border-radius: 12px; aspect-ratio: 1/1; cursor: pointer; }
+        .day-cell:hover { background: var(--bg-soft); }
+        .editor { position: fixed; bottom: 30px; right: 30px; width: 350px; background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+
+        /* Системные элементы */
         .system-sidebar { position: fixed; right: 0; top: 0; width: 320px; height: 100vh; background: var(--orange-notif); color: white; z-index: 5000; transform: translateX(100%); transition: 0.4s; padding: 25px; box-sizing: border-box; }
         .system-sidebar.active { transform: translateX(0); }
-        .system-footer-info { position: fixed; bottom: 0; left: 0; width: 100%; height: 30px; background: #636e72; color: #bdc3c7; font-size: 10px; display: flex; align-items: center; justify-content: center; z-index: 4000; text-transform: uppercase; }
+        .btn { border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+        .btn-blue { background: var(--accent-blue); color: white; }
     </style>
 </head>
 <body>
 
     <div id="side-panel" class="system-sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 id="panel-title" style="margin:0">Уведомления</h3>
-            <button onclick="window.togglePanel(false)" style="background:none; border:none; color:white; font-size:35px; cursor:pointer;">&times;</button>
+            <h3 style="margin:0">Уведомления</h3>
+            <button onclick="window.togglePanel(false)" style="background:none; border:none; color:white; font-size:30px; cursor:pointer;">&times;</button>
         </div>
         <div id="panel-content" style="margin-top:20px;"></div>
     </div>
-    
-    <div class="system-footer-info">Cloud System • 2026 • Encrypted Session</div>
 
     <div id="auth-page">
         <div class="auth-container">
             <h2>CALENDAR</h2>
-            <p style="color:#b2bec3; font-size:13px; margin: 10px 0 30px 0;">Авторизация в экосистеме</p>
-            <input type="text" id="auth-username" placeholder="Ваш логин..." style="width: 280px; padding: 16px; border-radius: 20px; border: 1px solid #eee; margin-bottom: 20px; outline: none; font-size: 16px;">
-            <canvas id="pattern-canvas" width="260" height="260" style="background: #fff; border-radius: 25px; border: 1px solid #f1f2f6; cursor: crosshair;"></canvas>
-            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; margin-top:15px; text-transform:uppercase;">Нарисуйте ключ</p>
+            <input type="text" id="auth-username" placeholder="Ваш логин..." oninput="window.checkAdmin(this.value)">
+            <canvas id="pattern-canvas" width="260" height="260" style="cursor: crosshair;"></canvas>
+            
+            <div id="admin-secret-wrap" class="hidden">
+                <input type="password" id="admin-pass-input" placeholder="Пароль администратора">
+                <button class="btn btn-blue" style="width:100%; background:var(--admin-red)" onclick="window.handleAuthSubmit()">Войти как ADMIN</button>
+            </div>
+            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; margin-top:15px;">НАРИСУЙТЕ КЛЮЧ</p>
         </div>
     </div>
 
@@ -103,58 +92,207 @@
         <aside class="sidebar">
             <div class="user-info">
                 <div class="avatar" id="u-avatar">?</div>
-                <div class="user-name" id="sidebar-user-name">USER</div>
+                <div id="sidebar-user-name" style="font-weight:bold;">USER</div>
             </div>
-            
-            <nav style="display:flex; flex-direction:column; gap:10px;">
-                <p style="font-size:11px; color:#b2bec3; text-transform:uppercase; letter-spacing:1px; margin-left:5px;">Меню</p>
-                <button class="btn" style="background:var(--accent-blue); color:white; text-align:left;">📅 Весь год</button>
-                <button id="admin-btn-side" class="btn hidden" style="background:var(--admin-red); color:white; text-align:left;" onclick="window.loadAdminRequests()">⚙️ Запросы доступа</button>
-            </nav>
-
-            <button class="btn btn-logout" onclick="location.reload()">Выйти из системы</button>
+            <button class="btn" style="background:#f1f2f6; color:#636e72;" onclick="location.reload()">Выйти</button>
+            <button id="admin-btn-side" class="btn hidden" style="background:var(--admin-red); color:white; margin-top:10px;" onclick="window.loadAdminRequests()">Запросы</button>
         </aside>
-
         <main class="main-content">
-            <div class="year-header">2026</div>
-            <div class="year-grid" id="year-grid">
-                </div>
+            <h1 style="font-size:4rem; margin:0 0 30px 0; font-weight:900; opacity:0.1;">2026</h1>
+            <div class="year-grid" id="year-grid"></div>
         </main>
     </div>
 
-    <script type="module">
-        // Здесь вся логика Firebase (она остается неизменной)
-        // ... (Подключение Firebase, handleAuthSubmit, и т.д.)
+    <div id="month-page" class="hidden">
+        <button class="btn" onclick="window.showYear()">← Назад</button>
+        <h2 id="month-title" style="font-size:2.5rem; margin:20px 0;"></h2>
+        <div class="days-grid" id="days-grid"></div>
         
-        // ВАЖНО: При генерации сетки месяцев я добавил новый стиль карточек:
-        window.renderYearGrid = () => {
+        <div id="editor-section" class="editor hidden">
+            <h4 id="selected-day-label" style="margin:0 0 15px 0; color:var(--accent-blue)"></h4>
+            <textarea id="day-input" style="width:100%; height:100px; border:1px solid #eee; border-radius:10px; padding:10px; outline:none;"></textarea>
+            <button class="btn btn-blue" style="width:100%; margin-top:10px;" onclick="window.saveDayData()">Сохранить в облако</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let user = "";
+        let patternResult = "";
+        let currentMonthIdx = null;
+        let currentDay = null;
+        let currentMonthData = {};
+
+        // --- ЛОГИКА ИНТЕРФЕЙСА ---
+        window.togglePanel = (show) => document.getElementById('side-panel').classList.toggle('active', show);
+        
+        window.pushNotify = (title, text) => {
+            const container = document.getElementById('panel-content');
+            const item = document.createElement('div');
+            item.style = "background:rgba(255,255,255,0.2); padding:12px; border-radius:12px; margin-bottom:10px; font-size:13px;";
+            item.innerHTML = `<b>${title}</b><br>${text}`;
+            container.prepend(item);
+            window.togglePanel(true);
+        };
+
+        window.checkAdmin = (val) => {
+            document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
+        };
+
+        // --- ВХОД (FIREBASE) ---
+        window.handleAuthSubmit = async () => {
+            user = document.getElementById('auth-username').value.trim().toLowerCase();
+            const textPass = document.getElementById('admin-pass-input').value;
+            let finalSecret = textPass || patternResult;
+            
+            if(!user || !finalSecret) { alert("Введите имя и нарисуйте ключ!"); return; }
+
+            const userRef = doc(db, "users", user);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+                if (userSnap.data().password === finalSecret) loginSuccess();
+                else { 
+                    alert("Неверный ключ!"); 
+                    patternResult = ""; 
+                    initPattern(); // Сброс канваса
+                }
+            } else {
+                window.pushNotify("Регистрация", `Пользователь "${user}" не найден. Нажмите, чтобы отправить запрос.`);
+                const btn = document.createElement('button');
+                btn.className = "btn btn-blue"; btn.style="width:100%; margin-top:10px;"; btn.innerText = "Отправить запрос";
+                btn.onclick = async () => {
+                    await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
+                    alert("Запрос отправлен админу!");
+                };
+                document.getElementById('panel-content').appendChild(btn);
+            }
+        };
+
+        function loginSuccess() {
+            document.getElementById('auth-page').classList.add('hidden');
+            document.getElementById('year-page').classList.remove('hidden');
+            document.getElementById('sidebar-user-name').innerText = user.toUpperCase();
+            document.getElementById('u-avatar').innerText = user.charAt(0).toUpperCase();
+            if (user === 'admin') document.getElementById('admin-btn-side').classList.remove('hidden');
+            renderYearGrid();
+        }
+
+        // --- КАЛЕНДАРЬ ГОДА ---
+        function renderYearGrid() {
             const grid = document.getElementById('year-grid');
             grid.innerHTML = '';
             const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-            
             months.forEach((m, i) => {
                 const card = document.createElement('div');
                 card.className = 'month-card';
-                card.innerHTML = `
-                    <p class="month-status">Month ${i+1}</p>
-                    <h3 class="month-name">${m}</h3>
-                    <div style="width:30px; height:3px; background:var(--accent-blue); margin: 15px auto 0; border-radius:10px; opacity:0.3;"></div>
-                `;
-                card.onclick = () => window.openMonth(i);
+                card.innerHTML = `<h3>${m}</h3><p style="font-size:12px; color:#b2bec3;">2026</p>`;
+                card.onclick = () => openMonth(i);
                 grid.appendChild(card);
             });
+        }
+
+        async function openMonth(mIdx) {
+            currentMonthIdx = mIdx;
+            document.getElementById('month-page').classList.remove('hidden');
+            document.getElementById('month-title').innerText = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"][mIdx];
+            
+            onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+                currentMonthData = snap.exists() ? snap.data() : {};
+                renderDays();
+            });
+        }
+
+        function renderDays() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            const daysInMonth = new Date(2026, currentMonthIdx + 1, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                const data = currentMonthData[d] || { text: "" };
+                const div = document.createElement('div');
+                div.className = 'day-cell';
+                div.innerHTML = `<b>${d}</b><div style="font-size:10px; color:#999; margin-top:5px;">${data.text.substring(0,20)}</div>`;
+                div.onclick = () => {
+                    currentDay = d;
+                    document.getElementById('editor-section').classList.remove('hidden');
+                    document.getElementById('selected-day-label').innerText = `${d} число`;
+                    document.getElementById('day-input').value = data.text;
+                };
+                grid.appendChild(div);
+            }
+        }
+
+        window.saveDayData = async () => {
+            currentMonthData[currentDay] = { text: document.getElementById('day-input').value, author: user };
+            await setDoc(doc(db, "data", `month_${currentMonthIdx}`), currentMonthData);
+            document.getElementById('editor-section').classList.add('hidden');
+            window.pushNotify("Облако", "Данные сохранены!");
         };
 
-        // Логика переключения на страницу года после входа
-        window.loginSuccess = (userName) => {
-            document.getElementById('auth-page').classList.add('hidden');
-            document.getElementById('year-page').classList.remove('hidden');
-            document.getElementById('sidebar-user-name').innerText = userName.toUpperCase();
-            document.getElementById('u-avatar').innerText = userName.charAt(0).toUpperCase();
-            window.renderYearGrid();
-        };
+        window.showYear = () => document.getElementById('month-page').classList.add('hidden');
 
-        // ... (Остальной JS код с канвасом и уведомлениями)
+        // --- КАНВАС (КЛЮЧ) ---
+        function initPattern() {
+            const canvas = document.getElementById('pattern-canvas');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            const dots = [];
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+
+            const draw = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Линии
+                if (patternResult.length >= 2) {
+                    ctx.beginPath(); ctx.lineWidth = 5; ctx.strokeStyle = "#0984e3"; ctx.lineCap="round"; ctx.lineJoin="round";
+                    for(let k=0; k < patternResult.length; k+=2) {
+                        const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
+                        if (k === 0) ctx.moveTo(d.x, d.y); else ctx.lineTo(d.x, d.y);
+                    }
+                    ctx.stroke();
+                }
+                // Точки
+                dots.forEach(d => {
+                    ctx.beginPath(); ctx.arc(d.x, d.y, d.hit ? 12 : 8, 0, Math.PI*2);
+                    ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
+                });
+            };
+
+            const handleMove = (e) => {
+                if(!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+                const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+                dots.forEach(d => {
+                    if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 20 && !d.hit) {
+                        d.hit = true; patternResult += d.id; draw();
+                    }
+                });
+            };
+
+            canvas.onmousedown = canvas.ontouchstart = (e) => { drawing = true; patternResult = ""; dots.forEach(d=>d.hit=false); handleMove(e); };
+            window.onmouseup = window.ontouchend = () => { 
+                if(drawing && user !== 'admin') window.handleAuthSubmit();
+                drawing = false; 
+            };
+            canvas.onmousemove = canvas.ontouchmove = handleMove;
+            draw();
+        }
+
+        initPattern();
     </script>
 </body>
 </html>
