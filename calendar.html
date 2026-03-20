@@ -18,121 +18,118 @@
         
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
 
-        /* ЕДИНЫЙ ЛЕВЫЙ САЙДБАР */
+        /* САЙДБАР (СЛЕВА) */
         .sidebar { 
-            width: 320px; background: #fff; padding: 30px 20px; 
-            display: flex; flex-direction: column; border-right: 1px solid #e0e0e0;
-            z-index: 10; overflow-y: auto;
+            width: 380px; /* Сделал шире, чтобы влезла инфо-колонна */
+            background: #fff; 
+            display: flex; 
+            border-right: 1px solid #e0e0e0;
+            z-index: 10; flex-shrink: 0;
         }
 
-        /* Профиль */
-        .user-profile { margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
-        .user-name { font-size: 1.2rem; font-weight: 800; color: var(--text); text-transform: uppercase; }
-        .user-role { font-size: 0.6rem; color: #b2bec3; letter-spacing: 1.5px; text-transform: uppercase; }
+        /* Левая часть сайдбара (Профиль и выход) */
+        .side-left {
+            width: 120px;
+            padding: 40px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid #f1f2f6;
+            background: #fafafa;
+        }
 
-        /* ГОД */
+        /* Правая часть сайдбара (Год, Легенда, Логи) */
+        .side-right {
+            flex: 1;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Стили элементов */
+        .user-avatar { width: 50px; height: 50px; background: var(--accent); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 10px; }
+        .user-name { font-size: 0.8rem; font-weight: 800; text-align: center; text-transform: uppercase; color: var(--text); }
+
         #display-year { 
-            font-size: 4.5rem; font-weight: 900; color: #dfe6e9; 
-            letter-spacing: -4px; line-height: 0.8; margin: 10px 0 30px 0; 
+            font-size: 4rem; font-weight: 900; color: #dfe6e9; 
+            letter-spacing: -4px; line-height: 0.8; margin-bottom: 30px; 
         }
 
-        /* ЛЕГЕНДА */
-        .side-section { margin-bottom: 25px; padding-top: 15px; border-top: 1px solid #f0f0f0; }
-        .side-label { font-size: 0.65rem; font-weight: 900; color: #b2bec3; margin-bottom: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
+        .side-label { font-size: 0.65rem; font-weight: 900; color: #b2bec3; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase; }
         
-        .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 600; color: #636e72; }
-        .color-mark { width: 8px; height: 8px; border-radius: 2px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 600; color: #636e72; margin-bottom: 8px; }
+        .color-dot { width: 8px; height: 8px; border-radius: 2px; }
 
-        /* ЛОГИ ИЗМЕНЕНИЙ */
-        .logs-box { max-height: 200px; overflow-y: auto; }
-        .log-entry { 
-            font-size: 0.75rem; padding: 8px; border-radius: 8px; background: #f8f9fa; 
-            margin-bottom: 6px; border-left: 3px solid var(--accent);
+        .log-entry { font-size: 0.7rem; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--accent); line-height: 1.3; }
+        
+        .logout-btn { margin-top: auto; border: none; background: none; color: #fab1a0; cursor: pointer; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; }
+
+        /* ЦЕНТРАЛЬНАЯ СЕТКА (КАК И БЫЛО) */
+        .main-view { 
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; 
         }
-        .log-user { font-weight: 800; color: var(--text); }
-        .log-time { font-size: 0.6rem; opacity: 0.5; display: block; }
 
-        /* КНОПКИ */
-        .nav-btn { 
-            width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 10px; border: none;
-            background: #f1f2f6; color: var(--text); font-weight: 700; cursor: pointer; text-align: left;
-            font-size: 0.8rem; transition: 0.2s;
-        }
-        .nav-btn:hover { background: #e2e3e9; }
-        .admin-btn { background: var(--orange); color: white; display: none; }
-
-        .logout-btn { margin-top: auto; background: transparent; color: #fab1a0; border: 1px solid #fab1a0; text-align: center; }
-
-        /* ЦЕНТРАЛЬНАЯ СЕТКА */
-        .main-content { 
-            flex: 1; display: flex; align-items: center; justify-content: center; 
-            padding: 40px; overflow-y: auto; 
-        }
         .months-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; width: 100%; max-width: 900px; 
+            display: grid; grid-template-columns: repeat(4, 180px); gap: 20px; 
         }
+
         .month-card { 
             background: var(--card-bg); backdrop-filter: blur(10px);
-            border-radius: 12px; height: 110px; position: relative;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-weight: 700; font-size: 1rem; color: #636e72;
+            border-radius: 18px; height: 120px; position: relative;
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 700; font-size: 1.1rem; color: #636e72;
             cursor: pointer; border: 1px solid rgba(255,255,255,0.5);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
         }
-        .month-card:hover { transform: scale(1.06); background: #fff; color: var(--accent); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
 
-        .event-dots { position: absolute; bottom: 12px; display: flex; gap: 4px; }
-        .dot { width: 5px; height: 5px; border-radius: 50%; }
+        .month-card:hover { 
+            transform: scale(1.05); background: #fff; color: var(--accent); 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.06); border-color: var(--accent);
+        }
 
-        footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 6px 20px; font-size: 9px; color: #b2bec3; border-top: 1px solid #eee; z-index: 5; }
+        .card-dots { position: absolute; bottom: 12px; right: 12px; display: flex; gap: 4px; }
+        .mini-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+        footer { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 6px 20px; font-size: 9px; color: #b2bec3; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="user-profile">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <div>
-                <div class="user-name" id="display-name">Guest</div>
-                <div class="user-role" id="display-role">User Terminal</div>
+        <div class="side-left">
+            <div class="user-avatar">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
+            <div class="user-name" id="display-name">User</div>
+            <button class="logout-btn" onclick="logout()">Выход</button>
         </div>
 
-        <div id="display-year">2026</div>
+        <div class="side-right">
+            <div id="display-year">2026</div>
 
-        <div class="side-section">
-            <div class="side-label">Категории событий</div>
-            <div class="legend-grid">
-                <div class="legend-item"><div class="color-mark" style="background: var(--ev-work);"></div>Работа</div>
-                <div class="legend-item"><div class="color-mark" style="background: var(--ev-important);"></div>Важное</div>
-                <div class="legend-item"><div class="color-mark" style="background: var(--ev-personal);"></div>Личное</div>
+            <div style="margin-bottom: 30px;">
+                <div class="side-label">Легенда</div>
+                <div class="legend-item"><div class="color-dot" style="background: var(--ev-work);"></div> Работа</div>
+                <div class="legend-item"><div class="color-dot" style="background: var(--ev-important);"></div> Важное</div>
+                <div class="legend-item"><div class="color-dot" style="background: var(--ev-personal);"></div> Личное</div>
             </div>
-        </div>
 
-        <div class="side-section">
-            <div class="side-label">Последние изменения</div>
-            <div class="logs-box" id="logs-container">
-                <div class="log-entry">
-                    <span class="log-user">System</span>: Терминал запущен.
-                    <span class="log-time">Сегодня, 18:40</span>
+            <div style="margin-bottom: 30px;">
+                <div class="side-label">Логи изменений</div>
+                <div id="logs-container">
+                    <div class="log-entry">Система синхронизирована.</div>
                 </div>
             </div>
-        </div>
 
-        <div class="side-section admin-only" id="req-section" style="display:none;">
-            <div class="side-label">Заявки доступа</div>
-            <div id="requests-list"></div>
+            <div class="admin-only" style="display:none;">
+                <div class="side-label">Заявки</div>
+                <div id="requests-list"></div>
+            </div>
         </div>
-
-        <button class="nav-btn logout-btn" onclick="logout()">ВЫЙТИ</button>
     </div>
 
-    <div class="main-content">
+    <div class="main-view">
         <div class="months-grid" id="months"></div>
     </div>
 
@@ -140,7 +137,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -156,50 +153,38 @@
 
         if (!currentUser) window.location.href = 'index.html';
         document.getElementById('display-name').innerText = currentUser;
-        
+
         if (currentUser === 'admin') {
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            document.getElementById('display-role').innerText = 'System Administrator';
             initAdminRequests();
         }
 
         const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const grid = document.getElementById('months');
-        
         months.forEach((m, i) => {
             const card = document.createElement('div');
             card.className = 'month-card';
-            card.innerHTML = `${m}<div class="event-dots"><div class="dot" style="background:var(--ev-work)"></div></div>`;
-            card.onclick = () => {
-                localStorage.setItem('selectedMonth', i);
-                window.location.href = 'notes.html';
-            };
+            card.innerHTML = `${m}<div class="card-dots"><div class="mini-dot" style="background:var(--ev-work)"></div></div>`;
+            card.onclick = () => { localStorage.setItem('selectedMonth', i); window.location.href = 'notes.html'; };
             grid.appendChild(card);
         });
 
-        // Живое обновление заявок в сайдбаре
         function initAdminRequests() {
             onSnapshot(collection(db, "requests"), (snapshot) => {
                 const list = document.getElementById('requests-list');
                 list.innerHTML = '';
-                snapshot.forEach((docSnap) => {
-                    const name = docSnap.id;
-                    const data = docSnap.data();
+                snapshot.forEach((d) => {
+                    const name = d.id;
                     const item = document.createElement('div');
                     item.className = 'log-entry';
                     item.style.borderLeftColor = 'var(--orange)';
-                    item.innerHTML = `Заявка: <b>${name}</b> <br>
-                        <button onclick="approve('${name}', '${data.password}')" style="background:none; border:none; color:var(--orange); font-weight:900; cursor:pointer; padding:0; font-size:10px;">ОДОБРИТЬ ✓</button>`;
+                    item.innerHTML = `Запрос: ${name} <button onclick="approve('${name}', '${d.data().password}')" style="float:right; border:none; color:var(--orange); background:none; cursor:pointer; font-weight:bold;">OK</button>`;
                     list.appendChild(item);
                 });
             });
         }
 
-        window.approve = async (name, pass) => {
-            await setDoc(doc(db, "users", name), { password: pass });
-            await deleteDoc(doc(db, "requests", name));
-        };
-
+        window.approve = async (n, p) => { await setDoc(doc(db, "users", n), {password: p}); await deleteDoc(doc(db, "requests", n)); };
         window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
     </script>
 </body>
