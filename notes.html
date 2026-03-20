@@ -1,1 +1,71 @@
 
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заметки</title>
+    <style>
+        /* Скопируй сюда стили для сетки дней и редактора */
+        body { padding: 40px; font-family: sans-serif; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .day-box { background: #f8f9fa; border: 1px solid #ddd; padding: 10px; border-radius: 10px; cursor: pointer; min-height: 80px; }
+        .editor { margin-top: 20px; background: #eee; padding: 20px; border-radius: 15px; }
+    </style>
+</head>
+<body>
+    <button onclick="window.location.href='calendar.html'">← Назад к году</button>
+    <h1 id="month-title"></h1>
+    <div class="days-grid" id="days-grid"></div>
+    
+    <div id="editor-section" style="display:none;" class="editor">
+        <h4 id="day-label"></h4>
+        <textarea id="day-input" style="width:100%; height:100px;"></textarea><br>
+        <button onclick="saveData()">Сохранить</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { /* ТВОЙ КОНФИГ */ };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const mIdx = localStorage.getItem('selectedMonth');
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        document.getElementById('month-title').innerText = months[mIdx];
+
+        let currentData = {};
+        let activeDay = null;
+
+        onSnapshot(doc(db, "data", `month_${mIdx}`), (snap) => {
+            currentData = snap.exists() ? snap.data() : {};
+            render();
+        });
+
+        function render() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            for(let d=1; d<=31; d++) {
+                const box = document.createElement('div');
+                box.className = 'day-box';
+                box.innerHTML = `<b>${d}</b><div>${(currentData[d]?.text || "").substring(0,10)}</div>`;
+                box.onclick = () => {
+                    activeDay = d;
+                    document.getElementById('editor-section').style.display = 'block';
+                    document.getElementById('day-label').innerText = d + " число";
+                    document.getElementById('day-input').value = currentData[d]?.text || "";
+                };
+                grid.appendChild(box);
+            }
+        }
+
+        window.saveData = async () => {
+            const text = document.getElementById('day-input').value;
+            currentData[activeDay] = { text: text, author: localStorage.getItem('currentUser') };
+            await setDoc(doc(db, "data", `month_${mIdx}`), currentData);
+            alert("Сохранено!");
+        };
+    </script>
+</body>
+</html>
