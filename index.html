@@ -5,14 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход | Plan 2026</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Дополнение к твоему style.css для блокировки */
+        #pattern-canvas {
+            transition: opacity 0.3s ease;
+        }
+        #pattern-canvas.disabled {
+            opacity: 0.15; /* Делаем его бледным */
+            pointer-events: none; /* Запрещаем любые клики */
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body class="auth-screen">
     
     <div id="auth-page">
-        <h2>Добро пожаловать</h2>
-        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
+        <h2 id="welcome-text">Добро пожаловать</h2>
         
-        <canvas id="pattern-canvas" width="260" height="260"></canvas>
+        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="handleInput(this.value)">
+        
+        <canvas id="pattern-canvas" width="260" height="260" class="disabled"></canvas>
         
         <div id="admin-secret-wrap" class="hidden">
             <input type="password" id="admin-pass-input" placeholder="Пароль для админа" 
@@ -21,14 +33,13 @@
             <button class="btn" style="background: var(--accent); color:white; width:260px;" onclick="handleAuthSubmit()">Войти как админ</button>
         </div>
 
-        <p id="auth-status" style="font-size: 11px; color: #636e72; margin-top: 15px;">Нарисуйте графический ключ</p>
+        <p id="auth-status" style="font-size: 11px; color: #636e72; margin-top: 15px;">Введите имя, чтобы начать</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Твой актуальный конфиг
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
             authDomain: "calendarium-1f7d7.firebaseapp.com",
@@ -47,13 +58,24 @@
         let dots = [];
         let drawing = false;
 
-        // Показ поля пароля только для admin
-        window.checkAdmin = (val) => {
+        // ГЛАВНАЯ ФУНКЦИЯ ПРОВЕРКИ ВВОДА
+        window.handleInput = (val) => {
+            const name = val.trim();
+            const status = document.getElementById('auth-status');
+            
+            // Проверка на админа (показываем поле пароля)
             const wrap = document.getElementById('admin-secret-wrap');
-            if (val.toLowerCase() === 'admin') {
-                wrap.classList.remove('hidden');
+            if (name.toLowerCase() === 'admin') wrap.classList.remove('hidden');
+            else wrap.classList.add('hidden');
+
+            if (name.length > 0) {
+                canvas.classList.remove('disabled');
+                status.innerText = "Теперь нарисуйте ключ";
+                status.style.color = "#636e72";
             } else {
-                wrap.classList.add('hidden');
+                canvas.classList.add('disabled');
+                status.innerText = "Введите имя, чтобы начать";
+                resetCanvas();
             }
         };
 
@@ -68,8 +90,6 @@
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Рисуем линии ключа
             if (patternResult.length > 0) {
                 ctx.beginPath();
                 ctx.strokeStyle = "#0984e3";
@@ -83,8 +103,6 @@
                 }
                 ctx.stroke();
             }
-
-            // Рисуем точки
             dots.forEach(d => {
                 ctx.beginPath();
                 ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
@@ -93,8 +111,14 @@
             });
         }
 
-        // События мыши и тача
+        function resetCanvas() {
+            patternResult = "";
+            initDots();
+            draw();
+        }
+
         canvas.onmousedown = canvas.ontouchstart = (e) => {
+            if(canvas.classList.contains('disabled')) return;
             e.preventDefault();
             patternResult = "";
             initDots();
@@ -105,14 +129,13 @@
         window.onmouseup = window.ontouchend = () => {
             if (!drawing) return;
             drawing = false;
-            // Если не админ — пробуем войти сразу после рисования
             if (patternResult.length >= 4 && document.getElementById('auth-username').value.toLowerCase() !== 'admin') {
                 window.handleAuthSubmit();
             }
         };
 
         canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if (!drawing) return;
+            if (!drawing || canvas.classList.contains('disabled')) return;
             const rect = canvas.getBoundingClientRect();
             const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
             const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
@@ -132,14 +155,7 @@
         window.handleAuthSubmit = async () => {
             const name = document.getElementById('auth-username').value.trim().toLowerCase();
             const adminPass = document.getElementById('admin-pass-input').value;
-            
-            // Если в поле имени "admin", приоритет текстовому паролю, иначе графическому
             const finalSecret = (name === 'admin' && adminPass) ? adminPass : patternResult;
-
-            if (!name || !finalSecret) {
-                document.getElementById('auth-status').innerText = "Введите имя и ключ!";
-                return;
-            }
 
             try {
                 const userSnap = await getDoc(doc(db, "users", name));
@@ -147,15 +163,12 @@
                     localStorage.setItem('currentUser', name);
                     window.location.href = 'calendar.html';
                 } else {
-                    document.getElementById('auth-status').innerText = "❌ Ошибка доступа";
+                    document.getElementById('auth-status').innerText = "❌ Неверный ключ";
                     document.getElementById('auth-status').style.color = "red";
-                    patternResult = ""; 
-                    initDots(); 
-                    draw();
+                    resetCanvas();
                 }
             } catch (e) {
                 console.error(e);
-                alert("Ошибка связи с базой");
             }
         };
 
