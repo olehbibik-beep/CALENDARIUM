@@ -9,6 +9,7 @@
             --accent: #0984e3; 
             --bg: #f4f7f6; 
             --orange: #f39c12; 
+            --footer-bg: #eceff1;
         }
         
         body { 
@@ -20,6 +21,7 @@
             justify-content: center; 
             height: 100vh; 
             overflow: hidden; 
+            flex-direction: column;
         }
 
         /* ЦЕНТРАЛЬНАЯ КАРТОЧКА */
@@ -31,112 +33,65 @@
             text-align: center; 
             width: 340px; 
             z-index: 10;
+            margin-bottom: 20px;
         }
         
-        h1 { 
-            font-size: 2.5rem; 
-            margin: 0 0 20px; 
-            color: #444; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            letter-spacing: -1px;
-        }
+        h1 { font-size: 2.5rem; margin: 0 0 20px; color: #444; font-weight: 800; text-transform: uppercase; letter-spacing: -1px; }
 
         input#username { 
-            width: 100%; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 20px; 
-            border: 1px solid #f0f0f0; 
-            background: #fafafa; 
-            text-align: center; 
-            font-size: 1rem; 
-            outline: none; 
-            box-sizing: border-box; 
-            transition: border 0.3s;
+            width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 20px; 
+            border: 1px solid #f0f0f0; background: #fafafa; text-align: center; 
+            font-size: 1rem; outline: none; box-sizing: border-box; 
         }
         
-        input#username:focus { border-color: var(--accent); }
-        
-        canvas { 
-            background: #fff; 
-            border: 1px solid #f0f0f0; 
-            border-radius: 30px; 
-            cursor: crosshair; 
-            transition: opacity 0.3s;
-        }
-        
-        canvas.disabled { 
-            opacity: 0.1; 
-            pointer-events: none; 
-        }
+        canvas { background: #fff; border: 1px solid #f0f0f0; border-radius: 30px; cursor: crosshair; }
+        canvas.disabled { opacity: 0.1; pointer-events: none; }
 
-        .status-text { 
-            font-size: 10px; 
-            color: var(--accent); 
-            margin-top: 15px; 
-            text-transform: uppercase; 
-            font-weight: bold; 
-            letter-spacing: 1px;
-        }
+        .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
-        /* ОРАНЖЕВАЯ ШТОРКА (SYSTEM LOG) */
+        /* ОРАНЖЕВАЯ ШТОРКА */
         #notif-sidebar { 
-            position: fixed; 
-            right: 0; 
-            top: 0; 
-            width: 350px; 
-            height: 100vh; 
-            background: var(--orange); 
-            color: white; 
-            z-index: 9999;
-            transform: translateX(100%); 
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            padding: 30px; 
-            box-sizing: border-box;
+            position: fixed; right: 0; top: 0; width: 350px; height: 100vh; 
+            background: var(--orange); color: white; z-index: 9999;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            padding: 30px; box-sizing: border-box;
         }
-        
         #notif-sidebar.active { transform: translateX(0); }
-        
-        .notif-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 30px; 
-            font-weight: 900; 
-        }
-        
-        .close-x { 
-            cursor: pointer; 
-            font-size: 28px; 
-            line-height: 1;
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: 900; }
+        .close-x { cursor: pointer; font-size: 28px; line-height: 1; }
+        .log-card { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
+        .orange-btn { width: 100%; padding: 16px; border-radius: 18px; border: none; background: white; color: var(--orange); font-weight: bold; cursor: pointer; font-size: 1rem; }
+
+        /* СЕРЫЙ ФУТЕР */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--footer-bg);
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+            border-top: 1px solid #dfe6e9;
         }
 
-        /* КАРТОЧКА ВНУТРИ ШТОРКИ */
-        .log-card { 
-            background: rgba(255,255,255,0.2); 
-            border-radius: 20px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
+        .footer-dot {
+            width: 8px;
+            height: 8px;
+            background: #2ecc71; /* Зеленый индикатор */
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
         }
-        
-        .log-card h3 { margin: 0 0 8px; font-size: 1.1rem; }
-        .log-card p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
-        
-        .orange-btn { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 18px; 
-            border: none; 
-            background: white; 
-            color: var(--orange); 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 1rem; 
-            transition: transform 0.2s;
+
+        .footer-text {
+            font-size: 10px;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
-        
-        .orange-btn:active { transform: scale(0.98); }
 
         .hidden { display: none; }
     </style>
@@ -158,6 +113,11 @@
         <p class="status-text" id="status">Введите имя</p>
     </div>
 
+    <footer>
+        <div class="footer-dot"></div>
+        <div class="footer-text">Cloud Plan Ecosystem — Secure Terminal</div>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -171,15 +131,12 @@
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
+        const db = getFirestore(initializeApp(firebaseConfig));
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const sidebar = document.getElementById('notif-sidebar');
         let dots = [], pattern = "", drawing = false;
 
-        // ЗАКРЫТИЕ И СБРОС
         window.closeLog = () => {
             sidebar.classList.remove('active');
             resetCanvas();
@@ -191,14 +148,13 @@
             draw();
         }
 
-        // КЛИК ПО ПУСТОМУ МЕСТУ ЗАКРЫВАЕТ ШТОРКУ
+        // Закрытие при клике по пустому месту
         window.addEventListener('mousedown', (e) => {
             if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target.id !== 'canvas') {
                 closeLog();
             }
         });
 
-        // ПРОВЕРКА ИМЕНИ
         window.checkName = (val) => {
             const isOk = val.trim().length > 0;
             canvas.classList.toggle('disabled', !isOk);
@@ -228,7 +184,6 @@
             });
         }
 
-        // СОБЫТИЯ МЫШИ
         canvas.onmousedown = canvas.ontouchstart = (e) => {
             if (canvas.classList.contains('disabled')) return;
             e.preventDefault(); pattern = ""; initDots(); drawing = true; draw();
@@ -246,59 +201,38 @@
             const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
             const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
             dots.forEach(d => {
-                const dist = Math.sqrt((x - d.x)**2 + (y - d.y)**2);
-                if(dist < 25 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
+                if(Math.sqrt((x - d.x)**2 + (y - d.y)**2) < 25 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
             });
         };
 
-        // ЛОГИКА ВХОДА И ШТОРКИ
         async function handleLogin() {
             const name = document.getElementById('username').value.trim().toLowerCase();
             if (!name) return;
 
             try {
-                const userRef = doc(db, "users", name);
-                const userSnap = await getDoc(userRef);
-
-                if (userSnap.exists()) {
-                    if (userSnap.data().password === pattern) {
+                const snap = await getDoc(doc(db, "users", name));
+                if (snap.exists()) {
+                    if (snap.data().password === pattern) {
                         localStorage.setItem('currentUser', name);
                         window.location.href = 'calendar.html';
                     } else {
-                        document.getElementById('log-container').innerHTML = `
-                            <div class="log-card">
-                                <h3>Ошибка</h3>
-                                <p>Ключ безопасности не совпадает.</p>
-                            </div>
-                        `;
+                        document.getElementById('log-container').innerHTML = `<div class="log-card"><h3>Ошибка</h3><p>Ключ не подходит.</p></div>`;
                         sidebar.classList.add('active');
                         setTimeout(closeLog, 2500);
                     }
                 } else {
-                    // РЕГИСТРАЦИЯ ЧЕРЕЗ ШТОРКУ
                     document.getElementById('log-container').innerHTML = `
-                        <div class="log-card">
-                            <h3>Новый профиль</h3>
-                            <p>Запрос для "${name}"?</p>
-                        </div>
+                        <div class="log-card"><h3>Новый профиль</h3><p>Запрос для "${name}"?</p></div>
                         <button class="orange-btn" id="send-req">Отправить</button>
                     `;
                     sidebar.classList.add('active');
-                    
                     document.getElementById('send-req').onclick = async () => {
-                        await setDoc(doc(db, "requests", name), { 
-                            password: pattern, 
-                            date: new Date().toISOString() 
-                        });
-                        document.getElementById('log-container').innerHTML = `
-                            <div class="log-card"><h3>Готово</h3><p>Заявка отправлена в систему.</p></div>
-                        `;
+                        await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
+                        document.getElementById('log-container').innerHTML = `<div class="log-card"><h3>Готово</h3><p>Заявка отправлена.</p></div>`;
                         setTimeout(closeLog, 2000);
                     };
                 }
-            } catch (e) {
-                console.error("Firebase Error:", e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         initDots(); draw();
