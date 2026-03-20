@@ -61,7 +61,6 @@
             margin: 25px 0 15px 0; outline: none; font-size: 16px; text-align: center; transition: 0.3s;
         }
         
-        /* Состояние заблокированного канваса */
         #pattern-canvas { 
             background: #fff; border-radius: 25px; border: 1px solid #f1f2f6; 
             cursor: not-allowed; opacity: 0.2; transition: 0.5s; 
@@ -106,11 +105,12 @@
             <h2 class="auth-logo">Calendar</h2>
             <input type="text" id="auth-username" class="auth-input" placeholder="Введите имя..." oninput="window.updateCanvasState(this.value)">
             <canvas id="pattern-canvas" width="260" height="260"></canvas>
+            
             <div id="admin-secret-wrap" class="hidden" style="margin-top:20px; text-align:center;">
                 <input type="password" id="admin-pass-input" class="auth-input" placeholder="Пароль администратора" style="margin-top:0">
                 <button class="btn btn-blue" style="width:100%; background:var(--admin-red)" onclick="window.handleAuthSubmit()">Войти как ADMIN</button>
             </div>
-            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; margin-top:15px; text-transform:uppercase; letter-spacing:1px;">Введите имя, чтобы разблокировать ключ</p>
+            <p id="auth-status-hint" style="color:#bdc3c7; font-size:11px; margin-top:15px; text-transform:uppercase; letter-spacing:1px;">Введите имя</p>
         </div>
     </div>
 
@@ -151,7 +151,6 @@
         let drawing = false;
         let canvasEnabled = false;
 
-        // --- ЛОГИКА БЛОКИРОВКИ КАНВАСА ---
         window.updateCanvasState = (val) => {
             const cvs = document.getElementById('pattern-canvas');
             const hint = document.getElementById('auth-status-hint');
@@ -163,17 +162,19 @@
                 hint.style.color = "#0984e3";
             } else {
                 cvs.classList.remove('active');
-                hint.innerText = "Введите имя, чтобы разблокировать ключ";
+                hint.innerText = "Введите имя";
                 hint.style.color = "#bdc3c7";
-                resetAuthUI(false); // Сброс рисунка если имя стерли
+                resetAuthUI(false);
             }
             document.getElementById('admin-secret-wrap').classList.toggle('hidden', val.toLowerCase() !== 'admin');
         };
 
         window.togglePanel = (show) => document.getElementById('side-panel').classList.toggle('active', show);
 
-        window.pushNotify = (title, text) => {
+        window.pushNotify = (title, text, isAction = false) => {
             const container = document.getElementById('panel-content');
+            if(!isAction) container.innerHTML = ""; // Очищаем для новых уведомлений
+            
             const item = document.createElement('div');
             item.className = 'notify-item';
             item.innerHTML = `<b>${title}</b><p style="margin:5px 0 0 0; font-size:13px;">${text}</p>`;
@@ -188,7 +189,6 @@
             if(clearName) {
                 document.getElementById('auth-username').value = ""; 
                 window.updateCanvasState("");
-                document.getElementById('auth-username').focus();
             }
         }
 
@@ -207,25 +207,40 @@
                 if (userSnap.data().password === finalSecret) {
                     loginSuccess();
                 } else {
-                    window.pushNotify("Ошибка", "Неверный ключ доступа");
+                    window.pushNotify("Доступ запрещен", "Неверный графический ключ");
                     authContainer.classList.add('shake');
                     setTimeout(() => authContainer.classList.remove('shake'), 400);
-                    resetAuthUI(true);
+                    resetAuthUI(false); // Оставляем имя, стираем ключ
                 }
             } else {
-                // ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ
-                window.pushNotify("Новый профиль", `Отправить запрос для "${user}"?`);
+                // ПРЕДЛОЖЕНИЕ ОТПРАВИТЬ ЗАПРОС
+                const container = document.getElementById('panel-content');
+                container.innerHTML = ""; 
+                
+                window.pushNotify("Новый профиль", `Отправить запрос для "${user}"?`, true);
+                
                 const btn = document.createElement('button');
-                btn.className = "btn btn-blue"; btn.style="width:100%; margin-top:10px;"; btn.innerText = "Да, отправить запрос";
+                btn.className = "btn btn-blue"; 
+                btn.style="width:100%; margin-top:10px; background:#fff; color:var(--orange-notif)"; 
+                btn.innerText = "Да, отправить";
                 
                 btn.onclick = async () => {
+                    btn.disabled = true;
+                    btn.innerText = "Отправка...";
                     await setDoc(doc(db, "requests", user), { password: finalSecret, date: new Date().toISOString() });
-                    document.getElementById('panel-content').innerHTML = ""; // Очистка шторки
-                    window.togglePanel(false); // Закрытие шторки
-                    alert("Запрос успешно отправлен администратору!");
-                    resetAuthUI(true);
+                    
+                    // ФИНАЛЬНЫЙ ЭФФЕКТ:
+                    container.innerHTML = `
+                        <div class="notify-item" style="background:rgba(46, 204, 113, 0.3); border-color:#2ecc71;">
+                            <b>Успешно!</b><br>Запрос в обработке.
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        window.togglePanel(false);
+                        resetAuthUI(true);
+                    }, 2000);
                 };
-                document.getElementById('panel-content').appendChild(btn);
+                container.appendChild(btn);
             }
         };
 
