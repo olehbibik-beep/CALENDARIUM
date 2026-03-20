@@ -2,44 +2,190 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Календарь 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 | CALENDARIUM</title>
     <style>
-        /* Скопируй сюда стили из секции --- ИНТЕРФЕЙС --- твоего кода */
-        body { background: white; margin: 0; display: flex; }
-        .sidebar { width: 280px; height: 100vh; background: #bdc3c7; padding: 20px; box-sizing: border-box; }
-        .main-view { flex: 1; padding: 40px; overflow-y: auto; }
-        .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
-        .month-card { border: 1px solid #eee; border-radius: 15px; height: 120px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .month-card:hover { border-color: #0984e3; }
+        :root { --accent: #0984e3; --bg: #f4f7f6; --orange: #f39c12; --text: #2d3436; }
+        
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: white; overflow: hidden; }
+
+        /* САЙДБАР */
+        .sidebar { 
+            width: 300px; background: #dfe6e9; padding: 40px 20px; 
+            display: flex; flex-direction: column; border-right: 1px solid #ddd;
+        }
+        .user-profile { margin-bottom: 40px; }
+        .user-name { font-size: 1.8rem; font-weight: 900; color: var(--text); text-transform: uppercase; line-height: 1; }
+        .user-role { font-size: 0.7rem; color: #636e72; letter-spacing: 2px; margin-top: 5px; }
+
+        .nav-btn { 
+            width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 15px; border: none;
+            background: white; color: var(--text); font-weight: bold; cursor: pointer; text-align: left;
+            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .nav-btn:hover { background: #f1f2f6; transform: translateX(5px); }
+        .nav-btn.admin-only { background: var(--orange); color: white; display: none; } /* Скрыта по умолчанию */
+
+        .logout-btn { margin-top: auto; background: #b2bec3; color: white; }
+
+        /* ОСНОВНАЯ СЕТКА */
+        .main-content { flex: 1; padding: 60px; overflow-y: auto; background: var(--bg); }
+        h1 { font-size: 5rem; font-weight: 200; margin: 0 0 40px 0; color: #b2bec3; }
+
+        .months-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        .month-card { 
+            background: white; border-radius: 25px; height: 180px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 1.2rem; cursor: pointer; 
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid transparent;
+        }
+        .month-card:hover { transform: translateY(-10px); border-color: var(--accent); color: var(--accent); }
+
+        /* ШТОРКА ЗАЯВОК (ДЛЯ АДМИНА) */
+        .admin-sidebar {
+            position: fixed; right: 0; top: 0; width: 380px; height: 100vh; 
+            background: var(--orange); color: white; z-index: 1000;
+            transform: translateX(100%); transition: 0.4s; padding: 30px; box-sizing: border-box;
+        }
+        .admin-sidebar.active { transform: translateX(0); }
+        .request-item { 
+            background: rgba(255,255,255,0.2); border-radius: 20px; padding: 20px; margin-bottom: 15px;
+        }
+        .req-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .req-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; cursor: pointer; font-weight: bold; }
+        .approve { background: #2ecc71; color: white; }
+        .reject { background: #e74c3c; color: white; }
+
+        footer { position: fixed; bottom: 0; width: 100%; background: #eceff1; padding: 5px 20px; font-size: 10px; color: #95a5a6; }
     </style>
 </head>
 <body>
+
     <div class="sidebar">
-        <h2 id="user-name">USER</h2>
-        <button onclick="location.href='index.html'">Выйти</button>
+        <div class="user-profile">
+            <div class="user-name" id="display-name">Guest</div>
+            <div class="user-role" id="display-role">Terminal User</div>
+        </div>
+        
+        <button class="nav-btn" onclick="location.reload()">ОБновить данные</button>
+        <button id="admin-req-btn" class="nav-btn admin-only" onclick="toggleAdminSidebar(true)">ЗАЯВКИ ПОЛЬЗОВАТЕЛЕЙ</button>
+        
+        <button class="nav-btn logout-btn" onclick="logout()">ВЫЙТИ</button>
     </div>
-    <div class="main-view">
-        <h1>2026</h1>
-        <div class="year-grid" id="year-grid"></div>
+
+    <div class="main-content">
+        <h1 id="year">2026</h1>
+        <div class="months-grid" id="months"></div>
     </div>
+
+    <div id="admin-sidebar" class="admin-sidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <span style="font-weight:900;">USER REQUESTS</span>
+            <span style="cursor:pointer; font-size:24px;" onclick="toggleAdminSidebar(false)">×</span>
+        </div>
+        <div id="requests-list">
+            </div>
+    </div>
+
+    <footer>Cloud Plan Ecosystem — Calendar Access</footer>
 
     <script type="module">
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const user = localStorage.getItem('currentUser');
-        if(!user) window.location.href = 'index.html';
-        document.getElementById('user-name').innerText = user.toUpperCase();
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const grid = document.getElementById('year-grid');
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const currentUser = localStorage.getItem('currentUser');
+
+        if (!currentUser) window.location.href = 'index.html';
+
+        // 1. Инициализация интерфейса
+        document.getElementById('display-name').innerText = currentUser;
+        if (currentUser === 'admin') {
+            document.getElementById('admin-req-btn').style.display = 'block';
+            document.getElementById('display-role').innerText = 'System Administrator';
+        }
+
+        // 2. Генерация месяцев
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const grid = document.getElementById('months');
         months.forEach((m, i) => {
             const card = document.createElement('div');
             card.className = 'month-card';
-            card.innerHTML = `<h3>${m}</h3>`;
+            card.innerText = m;
             card.onclick = () => {
                 localStorage.setItem('selectedMonth', i);
-                window.location.href = 'notes.html'; // Переход к заметкам
+                window.location.href = 'notes.html';
             };
             grid.appendChild(card);
         });
+
+        // 3. Логика админа (Заявки)
+        window.toggleAdminSidebar = async (show) => {
+            const sb = document.getElementById('admin-sidebar');
+            if (show) {
+                sb.classList.add('active');
+                loadRequests();
+            } else {
+                sb.classList.remove('active');
+            }
+        };
+
+        async function loadRequests() {
+            const list = document.getElementById('requests-list');
+            list.innerHTML = 'Загрузка...';
+            const querySnapshot = await getDocs(collection(db, "requests"));
+            list.innerHTML = '';
+            
+            querySnapshot.forEach((documentSnap) => {
+                const data = documentSnap.data();
+                const name = documentSnap.id;
+                
+                const item = document.createElement('div');
+                item.className = 'request-item';
+                item.innerHTML = `
+                    <div style="font-weight:bold;">Пользователь: ${name}</div>
+                    <div style="font-size:0.8rem; opacity:0.8;">Ключ: ${data.password}</div>
+                    <div class="req-actions">
+                        <button class="req-btn approve" onclick="manageUser('${name}', '${data.password}', 'approve')">Одобрить</button>
+                        <button class="req-btn reject" onclick="manageUser('${name}', '', 'reject')">Удалить</button>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            if (list.innerHTML === '') list.innerHTML = 'Заявок пока нет.';
+        }
+
+        window.manageUser = async (name, pass, action) => {
+            if (action === 'approve') {
+                await setDoc(doc(db, "users", name), { password: pass });
+                await deleteDoc(doc(db, "requests", name));
+                alert(`Пользователь ${name} активирован!`);
+            } else {
+                await deleteDoc(doc(db, "requests", name));
+                alert(`Заявка ${name} удалена.`);
+            }
+            loadRequests();
+        };
+
+        window.logout = () => {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        };
+
     </script>
 </body>
 </html>
