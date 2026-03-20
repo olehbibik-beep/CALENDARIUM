@@ -17,30 +17,18 @@
         body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; overflow: hidden; }
         .hidden { display: none !important; }
 
-        /* --- ВХОД (ФИКСИРОВАННЫЙ) --- */
+        /* --- ВХОД --- */
         #auth-page { 
             display: flex; height: 100vh; width: 100vw; background: white; 
             position: fixed; top: 0; left: 0; z-index: 2000; 
-            flex-direction: column; align-items: center; justify-content: center; 
-            box-sizing: border-box; 
+            flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding-top: 5vh; box-sizing: border-box; 
         }
         #auth-username { 
-            width: 260px; padding: 12px; margin-bottom: 15px; border-radius: 20px; 
+            width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
             border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; text-align: center; outline: none; 
         }
-        #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; border: 1px solid #eee; flex-shrink: 0; }
-
-        /* Резервируем место под блок админа, чтобы окно не прыгало */
-        #admin-secret-wrap {
-            height: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-            visibility: hidden; /* Место занято, но контент невидим */
-        }
-        #admin-secret-wrap.visible { visibility: visible; }
+        #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; }
 
         /* --- ИНТЕРФЕЙС --- */
         .app-container { display: flex; height: 100vh; width: 100vw; }
@@ -70,6 +58,7 @@
         .activity-line { width: 40px; height: 5px; background: var(--pink-line); border-radius: 3px; margin-top: 10px; }
         .last-edit { font-size: 9px; color: #b2bec3; position: absolute; bottom: 10px; text-transform: uppercase; }
 
+        /* --- ОРАНЖЕВАЯ ПАНЕЛЬ --- */
         .notifications-sidebar {
             width: 320px; background: var(--orange-notif); height: 100vh; 
             position: fixed; right: 0; top: 0; z-index: 1500;
@@ -91,14 +80,13 @@
 
     <div id="auth-page">
         <h2>Добро пожаловать</h2>
-        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="window.checkAdmin(this.value)">
-        
-        <div id="admin-secret-wrap">
-            <input type="password" id="admin-pass-input" placeholder="Пароль" style="padding: 8px; border-radius: 10px; border: 1px solid #ddd; width: 200px; text-align: center;">
-            <button class="btn btn-exit" onclick="window.handleAuthSubmit()">Войти как админ</button>
-        </div>
-
+        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
+        <div id="admin-secret-wrap" class="hidden">
+            <input type="password" id="admin-pass-input" placeholder="Пароль" style="margin-bottom:10px; padding:8px; border-radius:10px; border:1px solid #ddd;">
+            <br>
+            <button class="btn btn-exit" onclick="handleAuthSubmit()">Войти как админ</button>
+        </div>
         <p id="auth-status" style="font-size: 11px; color: #636e72;">Нарисуйте графический ключ</p>
     </div>
 
@@ -109,9 +97,9 @@
                     <div class="user-avatar" id="u-avatar">?</div>
                     <div class="user-tag" id="sidebar-user-name">USER</div>
                 </div>
-                <div class="sidebar-controls" style="display:flex; gap:10px; margin-top:20px;">
+                <div class="sidebar-controls">
                     <button class="btn btn-exit" onclick="location.reload()">Выйти</button>
-                    <button id="admin-btn-side" class="btn btn-admin hidden" onclick="window.openAdminPanel()">⚙️</button>
+                    <button id="admin-btn-side" class="btn btn-admin hidden" onclick="openAdminPanel()">⚙️</button>
                 </div>
             </aside>
             <main class="main-view">
@@ -124,19 +112,19 @@
     <div id="admin-sidebar" class="notifications-sidebar">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h3 style="margin:0">Уведомления</h3>
-            <button onclick="window.closeAdminPanel()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+            <button onclick="closeAdminPanel()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
         </div>
         <div id="requests-list">Загрузка...</div>
     </div>
 
     <div id="month-page" class="hidden">
-        <button class="btn btn-exit" onclick="window.showYear()">← К году</button>
+        <button class="btn btn-exit" onclick="showYear()">← К году</button>
         <h2 id="month-title" style="font-size: 3rem; margin: 20px 0;"></h2>
         <div id="days-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px;"></div>
         <div id="editor-section" class="hidden" style="margin-top:20px; background:#f8f9fa; padding:20px; border-radius:15px;">
             <h4 id="selected-day-label"></h4>
-            <textarea id="day-input" style="width:100%; height:100px; padding:10px; border-radius:10px; border:1px solid #ddd; box-sizing:border-box;"></textarea>
-            <button class="btn btn-exit" style="background:var(--accent); margin-top:10px;" onclick="window.saveDayData()">Сохранить</button>
+            <textarea id="day-input" style="width:100%; height:100px; padding:10px; border-radius:10px; border:1px solid #ddd;"></textarea>
+            <button class="btn btn-exit" style="background:var(--accent); margin-top:10px;" onclick="saveDayData()">Сохранить</button>
         </div>
     </div>
 
@@ -166,8 +154,8 @@
         // --- ЛОГИКА ВХОДА ---
         window.checkAdmin = (val) => {
             const secretBox = document.getElementById('admin-secret-wrap');
-            if(val.toLowerCase() === 'admin') secretBox.classList.add('visible');
-            else secretBox.classList.remove('visible');
+            if(val.toLowerCase() === 'admin') secretBox.classList.remove('hidden');
+            else secretBox.classList.add('hidden');
         };
 
         window.handleAuthSubmit = async () => {
@@ -175,7 +163,7 @@
             const textPass = document.getElementById('admin-pass-input').value;
             let finalSecret = textPass || patternResult;
             
-            if(!nameInput || !finalSecret) { window.resetCanvas(); return; }
+            if(!nameInput || !finalSecret) { resetCanvas(); return; }
 
             const userRef = doc(db, "users", nameInput);
             const userSnap = await getDoc(userRef);
@@ -187,14 +175,14 @@
                 } else {
                     document.getElementById('auth-status').innerText = "❌ Неверный ключ!";
                     document.getElementById('auth-status').style.color = "red";
-                    window.resetCanvas();
+                    resetCanvas();
                 }
             } else {
                 if(confirm("Зарегистрировать новый профиль?")) {
                     await setDoc(doc(db, "requests", nameInput), { password: finalSecret, date: new Date().toISOString() });
                     alert("Заявка отправлена!");
-                    window.resetCanvas();
-                } else { window.resetCanvas(); }
+                    resetCanvas();
+                } else { resetCanvas(); }
             }
         };
 
@@ -218,7 +206,7 @@
             for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
         }
 
-        window.resetCanvas = () => {
+        function resetCanvas() {
             patternResult = "";
             initDots();
             draw();
@@ -240,13 +228,13 @@
             });
         }
 
-        canvas.onmousedown = canvas.ontouchstart = (e) => { e.preventDefault(); window.resetCanvas(); drawing = true; };
+        canvas.onmousedown = canvas.ontouchstart = (e) => { e.preventDefault(); resetCanvas(); drawing = true; };
         window.onmouseup = window.ontouchend = () => {
             if(!drawing) return;
             drawing = false;
             if(patternResult.length >= 4) {
                 if(document.getElementById('auth-username').value.toLowerCase() !== 'admin') window.handleAuthSubmit();
-            } else { window.resetCanvas(); }
+            } else { resetCanvas(); }
         };
         canvas.onmousemove = canvas.ontouchmove = (e) => {
             if(!drawing) return;
@@ -275,8 +263,8 @@
                     <div class="notif-badge">!</div>
                     <b>Запрос доступа</b><p>Имя: ${d.id}</p>
                     <div style="display:flex; gap:5px; margin-top:10px;">
-                        <button class="btn" style="background:#2ecc71; flex:1" onclick="window.approveUser('${d.id}', '${d.data().password}')">✅</button>
-                        <button class="btn" style="background:#c0392b; flex:1" onclick="window.rejectUser('${d.id}')">❌</button>
+                        <button class="btn" style="background:#2ecc71; flex:1" onclick="approveUser('${d.id}', '${d.data().password}')">✅</button>
+                        <button class="btn" style="background:#c0392b; flex:1" onclick="rejectUser('${d.id}')">❌</button>
                     </div>`;
                 list.appendChild(item);
             });
@@ -285,13 +273,15 @@
         window.closeAdminPanel = () => document.getElementById('admin-sidebar').classList.remove('active');
 
         window.approveUser = async (uId, uPass) => {
-            document.getElementById(`req-${uId}`)?.remove(); 
+            const el = document.getElementById(`req-${uId}`);
+            if(el) el.remove(); 
             await setDoc(doc(db, "users", uId), { password: uPass });
             await deleteDoc(doc(db, "requests", uId));
         };
 
         window.rejectUser = async (uId) => {
-            document.getElementById(`req-${uId}`)?.remove();
+            const el = document.getElementById(`req-${uId}`);
+            if(el) el.remove();
             await deleteDoc(doc(db, "requests", uId));
         };
 
@@ -310,7 +300,7 @@
                 }
                 const card = document.createElement('div');
                 card.className = `month-card ${i === thisMonth ? 'current-month' : ''}`;
-                card.onclick = () => window.openMonth(i);
+                card.onclick = () => openMonth(i);
                 card.innerHTML = `<h3>${months[i]}</h3>${hasData ? '<div class="activity-line"></div>' : ''}<div class="last-edit">${lastUser ? 'ред: ' + lastUser : ''}</div>`;
                 grid.appendChild(card);
             }
