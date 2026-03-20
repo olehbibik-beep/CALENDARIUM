@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Календарь 2026</title>
+    <style>
+        /* Скопируй сюда стили из секции --- ИНТЕРФЕЙС --- твоего кода */
+        body { background: white; margin: 0; display: flex; }
+        .sidebar { width: 280px; height: 100vh; background: #bdc3c7; padding: 20px; box-sizing: border-box; }
+        .main-view { flex: 1; padding: 40px; overflow-y: auto; }
+        .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .month-card { border: 1px solid #eee; border-radius: 15px; height: 120px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .month-card:hover { border-color: #0984e3; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 id="user-name">USER</h2>
+        <button onclick="location.href='index.html'">Выйти</button>
+    </div>
+    <div class="main-view">
+        <h1>2026</h1>
+        <div class="year-grid" id="year-grid"></div>
+    </div>
+
+    <script type="module">
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const user = localStorage.getItem('currentUser');
+        if(!user) window.location.href = 'index.html';
+        document.getElementById('user-name').innerText = user.toUpperCase();
+
+        const grid = document.getElementById('year-grid');
+        months.forEach((m, i) => {
+            const card = document.createElement('div');
+            card.className = 'month-card';
+            card.innerHTML = `<h3>${m}</h3>`;
+            card.onclick = () => {
+                localStorage.setItem('selectedMonth', i);
+                window.location.href = 'notes.html'; // Переход к заметкам
+            };
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
