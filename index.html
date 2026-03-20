@@ -3,37 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход | Plan 2026</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Вход | CALENDARIUM</title>
     <style>
-        /* Дополнение к твоему style.css для блокировки */
-        #pattern-canvas {
-            transition: opacity 0.3s ease;
-        }
-        #pattern-canvas.disabled {
-            opacity: 0.15; /* Делаем его бледным */
-            pointer-events: none; /* Запрещаем любые клики */
-            cursor: not-allowed;
-        }
+        :root { --accent: #0984e3; --bg: #f4f7f6; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .auth-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 320px; }
+        h1 { font-size: 2rem; margin-bottom: 25px; color: #2d3436; text-transform: uppercase; letter-spacing: 2px; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; background: #fafafa; text-align: center; font-size: 1rem; outline: none; box-sizing: border-box; }
+        canvas { background: #fff; border: 1px solid #eee; border-radius: 20px; cursor: crosshair; transition: all 0.3s; }
+        canvas.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+        #auth-status { font-size: 12px; color: #636e72; margin-top: 15px; text-transform: uppercase; }
+        .hidden { display: none; }
+        .btn-admin { margin-top: 10px; padding: 12px; width: 100%; border-radius: 15px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; }
     </style>
 </head>
-<body class="auth-screen">
-    
-    <div id="auth-page">
-        <h2 id="welcome-text">Добро пожаловать</h2>
+<body>
+    <div class="auth-card">
+        <h1>Calendar</h1>
+        <input type="text" id="username" placeholder="имя пользователя" oninput="handleInput(this.value)">
+        <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
         
-        <input type="text" id="auth-username" placeholder="Ваше имя" oninput="handleInput(this.value)">
-        
-        <canvas id="pattern-canvas" width="260" height="260" class="disabled"></canvas>
-        
-        <div id="admin-secret-wrap" class="hidden">
-            <input type="password" id="admin-pass-input" placeholder="Пароль для админа" 
-                   style="margin-bottom:10px; padding:12px; border-radius:20px; border:1px solid #ddd; width:260px; text-align:center;">
-            <br>
-            <button class="btn" style="background: var(--accent); color:white; width:260px;" onclick="handleAuthSubmit()">Войти как админ</button>
+        <div id="admin-area" class="hidden">
+            <input type="password" id="admin-pass" placeholder="пароль">
+            <button class="btn-admin" onclick="tryLogin()">ВОЙТИ</button>
         </div>
-
-        <p id="auth-status" style="font-size: 11px; color: #636e72; margin-top: 15px;">Введите имя, чтобы начать</p>
+        
+        <p id="auth-status">Введите имя</p>
     </div>
 
     <script type="module">
@@ -49,131 +44,70 @@
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        let patternResult = "";
-        const canvas = document.getElementById('pattern-canvas');
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let dots = [];
-        let drawing = false;
+        let dots = [], pattern = "", drawing = false;
 
-        // ГЛАВНАЯ ФУНКЦИЯ ПРОВЕРКИ ВВОДА
         window.handleInput = (val) => {
-            const name = val.trim();
-            const status = document.getElementById('auth-status');
-            
-            // Проверка на админа (показываем поле пароля)
-            const wrap = document.getElementById('admin-secret-wrap');
-            if (name.toLowerCase() === 'admin') wrap.classList.remove('hidden');
-            else wrap.classList.add('hidden');
-
-            if (name.length > 0) {
-                canvas.classList.remove('disabled');
-                status.innerText = "Теперь нарисуйте ключ";
-                status.style.color = "#636e72";
-            } else {
-                canvas.classList.add('disabled');
-                status.innerText = "Введите имя, чтобы начать";
-                resetCanvas();
-            }
+            const isSet = val.trim().length > 0;
+            canvas.classList.toggle('disabled', !isSet);
+            document.getElementById('auth-status').innerText = isSet ? "Нарисуйте ключ" : "Введите имя";
+            document.getElementById('admin-area').classList.toggle('hidden', val.toLowerCase() !== 'admin');
         };
 
         function initDots() {
             dots = [];
-            for(let i=0; i<3; i++) {
-                for(let j=0; j<3; j++) {
-                    dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-                }
-            }
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
         }
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (patternResult.length > 0) {
-                ctx.beginPath();
-                ctx.strokeStyle = "#0984e3";
-                ctx.lineWidth = 8;
-                ctx.lineJoin = "round";
-                ctx.lineCap = "round";
-                for(let k=0; k < patternResult.length; k+=2) {
-                    const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
-                    if (k === 0) ctx.moveTo(d.x, d.y);
-                    else ctx.lineTo(d.x, d.y);
+            ctx.clearRect(0,0,260,260);
+            if(pattern.length > 0) {
+                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 6; ctx.lineJoin="round"; ctx.lineCap="round";
+                for(let k=0; k<pattern.length; k+=2) {
+                    let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
+                    k===0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
                 }
                 ctx.stroke();
             }
             dots.forEach(d => {
-                ctx.beginPath();
-                ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7";
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
+                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
             });
-        }
-
-        function resetCanvas() {
-            patternResult = "";
-            initDots();
-            draw();
         }
 
         canvas.onmousedown = canvas.ontouchstart = (e) => {
-            if(canvas.classList.contains('disabled')) return;
-            e.preventDefault();
-            patternResult = "";
-            initDots();
-            drawing = true;
-            draw();
+            e.preventDefault(); pattern = ""; initDots(); drawing = true; draw();
         };
-
         window.onmouseup = window.ontouchend = () => {
-            if (!drawing) return;
-            drawing = false;
-            if (patternResult.length >= 4 && document.getElementById('auth-username').value.toLowerCase() !== 'admin') {
-                window.handleAuthSubmit();
-            }
+            if(!drawing) return; drawing = false;
+            if(pattern.length >= 4 && document.getElementById('username').value !== 'admin') window.tryLogin();
         };
-
         canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if (!drawing || canvas.classList.contains('disabled')) return;
+            if(!drawing) return;
             const rect = canvas.getBoundingClientRect();
-            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
-            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
             dots.forEach(d => {
-                const dist = Math.sqrt((x - d.x)**2 + (y - d.y)**2);
-                if (dist < 25 && !d.hit) {
-                    d.hit = true;
-                    patternResult += d.id;
-                    draw();
-                }
+                if(Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 20 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
             });
         };
 
-        window.handleAuthSubmit = async () => {
-            const name = document.getElementById('auth-username').value.trim().toLowerCase();
-            const adminPass = document.getElementById('admin-pass-input').value;
-            const finalSecret = (name === 'admin' && adminPass) ? adminPass : patternResult;
-
-            try {
-                const userSnap = await getDoc(doc(db, "users", name));
-                if (userSnap.exists() && userSnap.data().password === finalSecret) {
-                    localStorage.setItem('currentUser', name);
-                    window.location.href = 'calendar.html';
-                } else {
-                    document.getElementById('auth-status').innerText = "❌ Неверный ключ";
-                    document.getElementById('auth-status').style.color = "red";
-                    resetCanvas();
-                }
-            } catch (e) {
-                console.error(e);
+        window.tryLogin = async () => {
+            const name = document.getElementById('username').value.trim().toLowerCase();
+            const pass = (name === 'admin') ? document.getElementById('admin-pass').value : pattern;
+            const snap = await getDoc(doc(db, "users", name));
+            if(snap.exists() && snap.data().password === pass) {
+                localStorage.setItem('currentUser', name);
+                window.location.href = 'calendar.html';
+            } else {
+                document.getElementById('auth-status').innerText = "Ошибка ключа";
+                pattern = ""; initDots(); draw();
             }
         };
 
-        initDots();
-        draw();
+        initDots(); draw();
     </script>
 </body>
 </html>
