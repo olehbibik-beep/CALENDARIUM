@@ -5,76 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plan 2026 | Cloud Calendar</title>
     <style>
-        :root { 
-            --primary: #2d3436; 
-            --accent: #0984e3; 
-            --bg-sidebar: #bdc3c7; 
-            --admin-red: #d63031; 
-            --pink-line: #fd79a8; 
-            --orange-notif: #f39c12;
-        }
-        
-        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; overflow: hidden; }
-        .hidden { display: none !important; }
+    :root { 
+        --primary: #2d3436; 
+        --accent: #0984e3; 
+        --bg-sidebar: #bdc3c7; 
+        --admin-red: #d63031; 
+        --pink-line: #fd79a8; 
+        --orange-notif: #f39c12;
+    }
+    
+    body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; overflow: hidden; }
+    .hidden { display: none !important; }
 
-        /* --- ВХОД --- */
-        #auth-page { 
-            display: flex; height: 100vh; width: 100vw; background: white; 
-            position: fixed; top: 0; left: 0; z-index: 2000; 
-            flex-direction: column; align-items: center; justify-content: flex-start; 
-            padding-top: 5vh; box-sizing: border-box; 
-        }
-        #auth-username { 
-            width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
-            border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; text-align: center; outline: none; 
-        }
-        #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; }
+    #auth-page { 
+        display: flex; height: 100vh; width: 100vw; background: white; 
+        position: fixed; top: 0; left: 0; z-index: 2000; 
+        flex-direction: column; align-items: center; justify-content: flex-start; 
+        padding-top: 5vh; box-sizing: border-box; 
+    }
+    #auth-username { 
+        width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; 
+        border: 1px solid #ddd; background: #f8f9fa; font-size: 1rem; text-align: center; outline: none; 
+    }
+    #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; }
 
-        /* --- ИНТЕРФЕЙС --- */
-        .app-container { display: flex; height: 100vh; width: 100vw; }
-        .sidebar { 
-            width: 280px; background: var(--bg-sidebar); 
-            display: flex; flex-direction: column; padding: 30px 20px; 
-            box-sizing: border-box; border-right: 1px solid #95a5a6; 
-        }
-        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: auto; }
-        .user-avatar { 
-            width: 45px; height: 45px; background: var(--accent); color: white; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 1.2rem; 
-        }
-        .main-view { flex: 1; padding: 40px 60px; display: flex; flex-direction: column; background: white; overflow-y: auto; }
-        .main-view h1 { font-size: 4rem; margin: 0 0 30px 0; font-weight: 300; color: #2d3436; }
+    .app-container { display: flex; height: 100vh; width: 100vw; }
+    .sidebar { 
+        width: 280px; background: var(--bg-sidebar); 
+        display: flex; flex-direction: column; padding: 30px 20px; 
+        box-sizing: border-box; border-right: 1px solid #95a5a6; 
+    }
+    .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: auto; }
+    .user-avatar { 
+        width: 45px; height: 45px; background: var(--accent); color: white; 
+        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+        font-weight: bold; font-size: 1.2rem; 
+    }
+    .main-view { flex: 1; padding: 40px 60px; display: flex; flex-direction: column; background: white; overflow-y: auto; }
+    .main-view h1 { font-size: 4rem; margin: 0 0 30px 0; font-weight: 300; color: #2d3436; }
 
-        .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; flex-grow: 1; }
-        .month-card { 
-            background: white; border: 1px solid #eee; border-radius: 15px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; transition: 0.2s; position: relative; min-height: 120px;
-        }
-        .month-card:hover { transform: translateY(-3px); border-color: var(--accent); }
-        .month-card.current-month { border: 2.5px solid var(--accent); background: #f0f7ff; }
-        
-        .activity-line { width: 40px; height: 5px; background: var(--pink-line); border-radius: 3px; margin-top: 10px; }
-        .last-edit { font-size: 9px; color: #b2bec3; position: absolute; bottom: 10px; text-transform: uppercase; }
+    .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; flex-grow: 1; }
+    .month-card { 
+        background: white; border: 1px solid #eee; border-radius: 15px; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        cursor: pointer; transition: 0.2s; position: relative; min-height: 120px;
+    }
+    .month-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .month-card.current-month { border: 2.5px solid var(--accent); background: #f0f7ff; }
+    
+    .activity-line { width: 40px; height: 5px; background: var(--pink-line); border-radius: 3px; margin-top: 10px; }
+    .last-edit { font-size: 9px; color: #b2bec3; position: absolute; bottom: 10px; text-transform: uppercase; }
 
-        /* --- ОРАНЖЕВАЯ ПАНЕЛЬ --- */
-        .notifications-sidebar {
-            width: 320px; background: var(--orange-notif); height: 100vh; 
-            position: fixed; right: 0; top: 0; z-index: 1500;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; color: white;
-            transform: translateX(100%); transition: transform 0.3s ease;
-        }
-        .notifications-sidebar.active { transform: translateX(0); }
-        .notif-item { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
-        .notif-badge { position: absolute; top: -8px; left: -8px; background: #d63031; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
+    .notifications-sidebar {
+        width: 320px; background: var(--orange-notif); height: 100vh; 
+        position: fixed; right: 0; top: 0; z-index: 1500;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; color: white;
+        transform: translateX(100%); transition: transform 0.3s ease;
+    }
+    .notifications-sidebar.active { transform: translateX(0); }
+    .notif-item { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
+    .notif-badge { position: absolute; top: -8px; left: -8px; background: #d63031; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
 
-        .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        .btn-exit { background: #636e72; color: white; }
-        .btn-admin { background: var(--admin-red); color: white; }
-        
-        #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; padding: 40px; box-sizing: border-box; overflow-y: auto; }
-    </style>
+    .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
+    .btn-exit { background: #636e72; color: white; }
+    .btn-admin { background: var(--admin-red); color: white; }
+    
+    #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+</style>
 </head>
 <body>
 
