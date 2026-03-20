@@ -12,9 +12,10 @@
         }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
         
+        /* КАРТОЧКА ВХОДА */
         .auth-card { 
             background: white; padding: 40px; border-radius: 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 320px; z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 320px; 
         }
         
         h1 { font-size: 2rem; margin-bottom: 25px; color: #2d3436; text-transform: uppercase; letter-spacing: 2px; }
@@ -28,17 +29,34 @@
         canvas { background: #fff; border: 1px solid #eee; border-radius: 20px; cursor: crosshair; transition: all 0.3s; }
         canvas.disabled { opacity: 0.15; pointer-events: none; filter: grayscale(1); }
         
-        /* --- ШТОРКА УВЕДОМЛЕНИЙ --- */
+        /* --- ОРАНЖЕВАЯ ШТОРКА (SYSTEM LOG) --- */
         .notifications-sidebar {
-            width: 320px; background: var(--orange-notif); height: 100vh; 
-            position: fixed; right: 0; top: 0; z-index: 1500;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; color: white;
-            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 320px; 
+            background: var(--orange-notif); 
+            height: 100vh; 
+            position: fixed; 
+            right: 0; 
+            top: 0; 
+            z-index: 9999; /* Поверх всего */
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
+            padding: 25px; 
+            box-sizing: border-box; 
+            color: white;
+            /* Спрятана вправо */
+            transform: translateX(100%); 
+            transition: transform 0.3s ease-in-out;
         }
-        .notifications-sidebar.active { transform: translateX(0); }
-        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .notif-item { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-        .close-notif { cursor: pointer; font-size: 20px; }
+        
+        /* Класс, который выдвигает шторку */
+        .notifications-sidebar.active { 
+            transform: translateX(0); 
+        }
+
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 10px; }
+        .notif-item { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; animation: fadeIn 0.3s ease; }
+        .close-notif { cursor: pointer; font-size: 24px; line-height: 1; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         #auth-status { font-size: 11px; color: #636e72; margin-top: 15px; text-transform: uppercase; }
         .hidden { display: none; }
@@ -49,7 +67,7 @@
 
     <div id="notif-sidebar" class="notifications-sidebar">
         <div class="notif-header">
-            <span style="font-weight: bold; letter-spacing: 1px;">SYSTEM LOG</span>
+            <span style="font-weight: 800; letter-spacing: 1px;">SYSTEM LOG</span>
             <span class="close-notif" onclick="toggleNotif(false)">×</span>
         </div>
         <div id="notif-content">
@@ -68,6 +86,8 @@
         </div>
         
         <p id="auth-status">Введите имя</p>
+        
+        <button onclick="showNotification('Тестовое уведомление!')" style="margin-top:20px; opacity:0.3; font-size:10px; border:none; background:none; cursor:pointer;">проверить шторку</button>
     </div>
 
     <script type="module">
@@ -88,22 +108,25 @@
         const ctx = canvas.getContext('2d');
         let dots = [], pattern = "", drawing = false;
 
-        // --- ЛОГИКА ШТОРКИ ---
+        // --- ФУНКЦИИ ШТОРКИ ---
         window.toggleNotif = (show) => {
-            document.getElementById('notif-sidebar').classList.toggle('active', show);
+            const sidebar = document.getElementById('notif-sidebar');
+            if(show) sidebar.classList.add('active');
+            else sidebar.classList.remove('active');
         };
 
         window.showNotification = (text) => {
             const content = document.getElementById('notif-content');
-            content.innerHTML = `<div class="notif-item"><b>Внимание</b><br>${text}</div>`;
+            content.innerHTML = `<div class="notif-item"><b>Система:</b><br>${text}</div>`;
             window.toggleNotif(true);
             
-            // АВТО-ЗАКРЫТИЕ через 3 секунды
+            // Авто-закрытие через 4 секунды
             setTimeout(() => {
                 window.toggleNotif(false);
-            }, 3000);
+            }, 4000);
         };
 
+        // Остальная логика (имя, канвас, вход)
         window.handleInput = (val) => {
             const isSet = val.trim().length > 0;
             canvas.classList.toggle('disabled', !isSet);
@@ -166,16 +189,16 @@
                         localStorage.setItem('currentUser', name);
                         window.location.href = 'calendar.html';
                     } else {
-                        showNotification("Неверный графический ключ!"); // Вызываем шторку
+                        showNotification("Ошибка: Неверный ключ для доступа!");
                     }
                 } else {
                     if (confirm(`Отправить заявку для "${name}"?`)) {
                         await setDoc(doc(db, "requests", name), { password: finalSecret, date: new Date().toISOString() });
-                        showNotification("Заявка успешно отправлена!"); // Вызываем шторку
+                        showNotification("Запрос отправлен! Ожидайте активации.");
                     }
                 }
             } catch (e) {
-                showNotification("Ошибка связи с базой!");
+                showNotification("Ошибка: Проверьте интернет!");
             }
             pattern = ""; initDots(); draw();
         };
