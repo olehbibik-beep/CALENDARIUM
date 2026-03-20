@@ -7,25 +7,45 @@
     <style>
         :root { --accent: #0984e3; --bg: #f4f7f6; }
         body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .auth-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 320px; }
+        
+        .auth-card { 
+            background: white; padding: 40px; border-radius: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; width: 320px; 
+        }
+        
         h1 { font-size: 2rem; margin-bottom: 25px; color: #2d3436; text-transform: uppercase; letter-spacing: 2px; }
-        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; background: #fafafa; text-align: center; font-size: 1rem; outline: none; box-sizing: border-box; }
+        
+        input { 
+            width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 15px; 
+            border: 1px solid #eee; background: #fafafa; text-align: center; 
+            font-size: 1rem; outline: none; box-sizing: border-box; 
+        }
+        
         canvas { background: #fff; border: 1px solid #eee; border-radius: 20px; cursor: crosshair; transition: all 0.3s; }
-        canvas.disabled { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
-        #auth-status { font-size: 12px; color: #636e72; margin-top: 15px; text-transform: uppercase; }
+        canvas.disabled { opacity: 0.15; pointer-events: none; filter: grayscale(1); }
+        
+        #auth-status { font-size: 11px; color: #636e72; margin-top: 15px; text-transform: uppercase; min-height: 14px; }
+        
         .hidden { display: none; }
-        .btn-admin { margin-top: 10px; padding: 12px; width: 100%; border-radius: 15px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; }
+        
+        .btn-admin { 
+            margin-top: 10px; padding: 12px; width: 100%; border-radius: 15px; 
+            border: none; background: var(--accent); color: white; 
+            font-weight: bold; cursor: pointer; 
+        }
     </style>
 </head>
 <body>
+
     <div class="auth-card">
         <h1>Calendar</h1>
         <input type="text" id="username" placeholder="имя пользователя" oninput="handleInput(this.value)">
+        
         <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
         
         <div id="admin-area" class="hidden">
             <input type="password" id="admin-pass" placeholder="пароль">
-            <button class="btn-admin" onclick="tryLogin()">ВОЙТИ</button>
+            <button class="btn-admin" onclick="tryLogin()">ВОЙТИ КАК АДМИН</button>
         </div>
         
         <p id="auth-status">Введите имя</p>
@@ -33,7 +53,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -44,11 +64,14 @@
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
-        const db = getFirestore(initializeApp(firebaseConfig));
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let dots = [], pattern = "", drawing = false;
 
+        // 1. ПРОВЕРКА ВВОДА ИМЕНИ
         window.handleInput = (val) => {
             const isSet = val.trim().length > 0;
             canvas.classList.toggle('disabled', !isSet);
@@ -56,54 +79,98 @@
             document.getElementById('admin-area').classList.toggle('hidden', val.toLowerCase() !== 'admin');
         };
 
+        // 2. ИНИЦИАЛИЗАЦИЯ ТОЧЕК
         function initDots() {
             dots = [];
-            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+            for(let i=0; i<3; i++) {
+                for(let j=0; j<3; j++) {
+                    dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+                }
+            }
         }
 
+        // 3. ОТРИСОВКА
         function draw() {
-            ctx.clearRect(0,0,260,260);
+            ctx.clearRect(0, 0, 260, 260);
             if(pattern.length > 0) {
-                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 6; ctx.lineJoin="round"; ctx.lineCap="round";
-                for(let k=0; k<pattern.length; k+=2) {
+                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 6; 
+                ctx.lineJoin = "round"; ctx.lineCap = "round";
+                for(let k=0; k < pattern.length; k+=2) {
                     let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
-                    k===0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
+                    if (k === 0) ctx.moveTo(d.x, d.y);
+                    else ctx.lineTo(d.x, d.y);
                 }
                 ctx.stroke();
             }
             dots.forEach(d => {
                 ctx.beginPath(); ctx.arc(d.x, d.y, 12, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
+                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9";
+                ctx.fill();
             });
         }
 
+        // 4. СОБЫТИЯ МЫШИ/ТАЧА
         canvas.onmousedown = canvas.ontouchstart = (e) => {
             e.preventDefault(); pattern = ""; initDots(); drawing = true; draw();
         };
+
         window.onmouseup = window.ontouchend = () => {
-            if(!drawing) return; drawing = false;
-            if(pattern.length >= 4 && document.getElementById('username').value !== 'admin') window.tryLogin();
+            if(!drawing) return;
+            drawing = false;
+            // Обычный вход (не админ) после рисования ключа
+            if(pattern.length >= 4 && document.getElementById('username').value.toLowerCase() !== 'admin') {
+                window.tryLogin();
+            }
         };
+
         canvas.onmousemove = canvas.ontouchmove = (e) => {
             if(!drawing) return;
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
             dots.forEach(d => {
-                if(Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 20 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
+                if(Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 20 && !d.hit) {
+                    d.hit = true; pattern += d.id; draw();
+                }
             });
         };
 
+        // 5. ЛОГИКА ВХОДА И ОТПРАВКИ ЗАЯВКИ
         window.tryLogin = async () => {
             const name = document.getElementById('username').value.trim().toLowerCase();
-            const pass = (name === 'admin') ? document.getElementById('admin-pass').value : pattern;
-            const snap = await getDoc(doc(db, "users", name));
-            if(snap.exists() && snap.data().password === pass) {
-                localStorage.setItem('currentUser', name);
-                window.location.href = 'calendar.html';
-            } else {
-                document.getElementById('auth-status').innerText = "Ошибка ключа";
-                pattern = ""; initDots(); draw();
+            const adminPass = document.getElementById('admin-pass').value;
+            const finalSecret = (name === 'admin' && adminPass) ? adminPass : pattern;
+
+            if(!name || !finalSecret) return;
+
+            try {
+                const userRef = doc(db, "users", name);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    if (userSnap.data().password === finalSecret) {
+                        localStorage.setItem('currentUser', name);
+                        window.location.href = 'calendar.html';
+                    } else {
+                        document.getElementById('auth-status').innerText = "❌ Ошибка ключа";
+                        pattern = ""; initDots(); draw();
+                    }
+                } else {
+                    // Регистрация нового
+                    if (confirm(`Пользователь "${name}" не найден. Отправить заявку?`)) {
+                        await setDoc(doc(db, "requests", name), { 
+                            password: finalSecret, 
+                            date: new Date().toISOString() 
+                        });
+                        alert("Заявка отправлена! Ждите одобрения.");
+                        pattern = ""; initDots(); draw();
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка базы данных. Проверьте подключение.");
             }
         };
 
