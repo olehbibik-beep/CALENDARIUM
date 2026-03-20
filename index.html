@@ -2,33 +2,42 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход | Plan 2026</title>
-    <style>
-        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
-        #auth-page { display: flex; flex-direction: column; align-items: center; padding-top: 10vh; }
-        #auth-username { width: 260px; padding: 12px; margin-bottom: 10px; border-radius: 20px; border: 1px solid #ddd; background: #f8f9fa; text-align: center; outline: none; }
-        #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; margin-bottom: 10px; border-radius: 15px; border: 1px solid #eee; }
-        .hidden { display: none !important; }
-        .btn { padding: 10px 15px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; background: #636e72; color: white; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="auth-screen">
+    
     <div id="auth-page">
         <h2>Добро пожаловать</h2>
         <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
+        
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
+        
         <div id="admin-secret-wrap" class="hidden">
-            <input type="password" id="admin-pass-input" placeholder="Пароль" style="margin-bottom:10px; padding:8px; border-radius:10px; border:1px solid #ddd;"><br>
-            <button class="btn" onclick="handleAuthSubmit()">Войти как админ</button>
+            <input type="password" id="admin-pass-input" placeholder="Пароль для админа" 
+                   style="margin-bottom:10px; padding:12px; border-radius:20px; border:1px solid #ddd; width:260px; text-align:center;">
+            <br>
+            <button class="btn" style="background: var(--accent); color:white; width:260px;" onclick="handleAuthSubmit()">Войти как админ</button>
         </div>
-        <p id="auth-status" style="font-size: 11px; color: #636e72;">Нарисуйте графический ключ</p>
+
+        <p id="auth-status" style="font-size: 11px; color: #636e72; margin-top: 15px;">Нарисуйте графический ключ</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { /* ТВОЙ КОНФИГ */ };
+        // Твой актуальный конфиг
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -38,63 +47,120 @@
         let dots = [];
         let drawing = false;
 
+        // Показ поля пароля только для admin
         window.checkAdmin = (val) => {
             const wrap = document.getElementById('admin-secret-wrap');
-            val.toLowerCase() === 'admin' ? wrap.classList.remove('hidden') : wrap.classList.add('hidden');
+            if (val.toLowerCase() === 'admin') {
+                wrap.classList.remove('hidden');
+            } else {
+                wrap.classList.add('hidden');
+            }
         };
 
         function initDots() {
             dots = [];
-            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+            for(let i=0; i<3; i++) {
+                for(let j=0; j<3; j++) {
+                    dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+                }
+            }
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисуем линии ключа
             if (patternResult.length > 0) {
-                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 8; ctx.lineJoin = "round";
+                ctx.beginPath();
+                ctx.strokeStyle = "#0984e3";
+                ctx.lineWidth = 8;
+                ctx.lineJoin = "round";
+                ctx.lineCap = "round";
                 for(let k=0; k < patternResult.length; k+=2) {
                     const d = dots.find(dot => dot.id === patternResult.substring(k, k+2));
-                    k === 0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
+                    if (k === 0) ctx.moveTo(d.x, d.y);
+                    else ctx.lineTo(d.x, d.y);
                 }
                 ctx.stroke();
             }
+
+            // Рисуем точки
             dots.forEach(d => {
-                ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7"; ctx.fill();
+                ctx.beginPath();
+                ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
+                ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7";
+                ctx.fill();
             });
         }
 
-        canvas.onmousedown = canvas.ontouchstart = (e) => { e.preventDefault(); patternResult = ""; initDots(); drawing = true; };
-        window.onmouseup = window.ontouchend = () => {
-            drawing = false;
-            if(patternResult.length >= 4 && document.getElementById('auth-username').value.toLowerCase() !== 'admin') window.handleAuthSubmit();
+        // События мыши и тача
+        canvas.onmousedown = canvas.ontouchstart = (e) => {
+            e.preventDefault();
+            patternResult = "";
+            initDots();
+            drawing = true;
+            draw();
         };
+
+        window.onmouseup = window.ontouchend = () => {
+            if (!drawing) return;
+            drawing = false;
+            // Если не админ — пробуем войти сразу после рисования
+            if (patternResult.length >= 4 && document.getElementById('auth-username').value.toLowerCase() !== 'admin') {
+                window.handleAuthSubmit();
+            }
+        };
+
         canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if(!drawing) return;
+            if (!drawing) return;
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
-            const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+            const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
             dots.forEach(d => {
-                if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) { d.hit = true; patternResult += d.id; draw(); }
+                const dist = Math.sqrt((x - d.x)**2 + (y - d.y)**2);
+                if (dist < 25 && !d.hit) {
+                    d.hit = true;
+                    patternResult += d.id;
+                    draw();
+                }
             });
         };
 
         window.handleAuthSubmit = async () => {
             const name = document.getElementById('auth-username').value.trim().toLowerCase();
-            const pass = document.getElementById('admin-pass-input').value || patternResult;
-            if(!name || !pass) return;
+            const adminPass = document.getElementById('admin-pass-input').value;
+            
+            // Если в поле имени "admin", приоритет текстовому паролю, иначе графическому
+            const finalSecret = (name === 'admin' && adminPass) ? adminPass : patternResult;
 
-            const userSnap = await getDoc(doc(db, "users", name));
-            if (userSnap.exists() && userSnap.data().password === pass) {
-                localStorage.setItem('currentUser', name);
-                window.location.href = 'calendar.html'; // Переход
-            } else {
-                alert("Ошибка доступа");
-                patternResult = ""; initDots(); draw();
+            if (!name || !finalSecret) {
+                document.getElementById('auth-status').innerText = "Введите имя и ключ!";
+                return;
+            }
+
+            try {
+                const userSnap = await getDoc(doc(db, "users", name));
+                if (userSnap.exists() && userSnap.data().password === finalSecret) {
+                    localStorage.setItem('currentUser', name);
+                    window.location.href = 'calendar.html';
+                } else {
+                    document.getElementById('auth-status').innerText = "❌ Ошибка доступа";
+                    document.getElementById('auth-status').style.color = "red";
+                    patternResult = ""; 
+                    initDots(); 
+                    draw();
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Ошибка связи с базой");
             }
         };
 
-        initDots(); draw();
+        initDots();
+        draw();
     </script>
 </body>
 </html>
