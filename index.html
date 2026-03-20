@@ -6,229 +6,100 @@
     <title>Plan 2026 | Cloud Calendar</title>
     
     <style>
-        /* --- CSS ПЕРЕМЕННЫЕ (Тема) --- */
         :root { 
-            /* Цвета */
             --color-bg-main: #ffffff;
             --color-text-main: #2d3436;
-            --color-accent: #0984e3; /* Основной синий */
-            --color-accent-light: #f0f7ff; /* Фон текущего месяца */
-            
-            --color-bg-sidebar: #bdc3c7; /* Серый сайдбар */
+            --color-accent: #0984e3;
+            --color-accent-light: #f0f7ff;
+            --color-bg-sidebar: #bdc3c7;
             --color-border-sidebar: #95a5a6;
-            
-            --color-admin: #d63031; /* Красный для админа */
-            --color-approve: #2ecc71; /* Зеленый для кнопок одобрения */
-            
-            --color-activity-line: #fd79a8; /* Розовая полоса активности */
-            --color-notification-bg: #f39c12; /* Оранжевая панель */
-            
-            --color-text-muted: #b2bec3; /* Бледный текст */
-            --color-bg-input: #f8f9fa; /* Фон инпутов и карточек */
-            --color-border-light: #eeeeee; /* Светлые границы */
-            
-            /* Размеры и Скругления */
+            --color-admin: #d63031;
+            --color-approve: #2ecc71;
+            --color-activity-line: #fd79a8;
+            --color-notification-bg: #f39c12;
+            --color-text-muted: #b2bec3;
+            --color-bg-input: #f8f9fa;
+            --color-border-light: #eeeeee;
             --sidebar-width: 280px;
             --admin-panel-width: 320px;
             --border-radius-main: 15px;
             --border-radius-input: 20px;
             --border-radius-small: 10px;
-            
-            /* Шрифты */
-            --font-family: 'Inter', sans-serif;
-            --font-weight-light: 300;
-            --font-weight-bold: bold;
-            
-            /* Анимации */
-            --transition-speed: 0.3s;
         }
 
-        /* --- БАЗОВЫЕ СТИЛИ --- */
         body, html { 
             margin: 0; padding: 0; 
-            font-family: var(--font-family); 
+            font-family: 'Inter', sans-serif; 
             background: var(--color-bg-main); 
-            color: var(--color-text-main);
             height: 100vh; overflow: hidden; 
         }
         
-        /* Утилита для скрытия элементов */
         .hidden { display: none !important; }
 
-        /* Общие стили для кнопок */
         .btn { 
-            padding: 10px 15px; 
-            border-radius: 8px; border: none; 
-            font-weight: var(--font-weight-bold); 
-            cursor: pointer; font-size: 0.8rem; 
-            transition: background var(--transition-speed);
+            padding: 10px 15px; border-radius: 8px; border: none; 
+            font-weight: bold; cursor: pointer; font-size: 0.8rem; 
+            transition: 0.3s;
         }
         .btn-exit { background: #636e72; color: white; }
-        .btn-exit:hover { background: #4a5357; }
-        
         .btn-admin { background: var(--color-admin); color: white; }
-        .btn-admin:hover { background: #b32425; }
 
-        /* ========================================= */
-        /* БЛОК 1: СТРАНИЦА ВХОДА (#auth-page) */
-        /* ========================================= */
+        /* ВХОД */
         #auth-page { 
             display: flex; height: 100vh; width: 100vw; 
-            background: var(--color-bg-main); 
-            position: fixed; top: 0; left: 0; z-index: 2000; 
+            background: white; position: fixed; top: 0; left: 0; z-index: 2000; 
             flex-direction: column; align-items: center; justify-content: flex-start; 
             padding-top: 5vh; box-sizing: border-box; 
         }
         #auth-username { 
             width: 260px; padding: 12px; margin-bottom: 10px; 
-            border-radius: var(--border-radius-input); 
-            border: 1px solid #ddd; background: var(--color-bg-input); 
-            font-size: 1rem; text-align: center; outline: none; 
+            border-radius: var(--border-radius-input); border: 1px solid #ddd; 
+            background: var(--color-bg-input); text-align: center; outline: none; 
         }
-        /* Canvas для графического ключа */
-        #pattern-canvas { 
-            background: #fafafa; cursor: crosshair; touch-action: none; 
-            margin-bottom: 10px; border-radius: var(--border-radius-main); 
-        }
+        #pattern-canvas { background: #fafafa; cursor: crosshair; touch-action: none; border-radius: var(--border-radius-main); }
 
-        /* Блок секретного входа админа */
-        #admin-secret-wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-
-        /* ========================================= */
-        /* БЛОК 2: ОСНОВНОЕ ПРИЛОЖЕНИЕ (#year-page) */
-        /* ========================================= */
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
         .app-container { display: flex; height: 100vh; width: 100vw; }
-        
-        /* --- САЙДБАР (Боковая панель) --- */
         .sidebar { 
             width: var(--sidebar-width); background: var(--color-bg-sidebar); 
             display: flex; flex-direction: column; padding: 30px 20px; 
             box-sizing: border-box; border-right: 1px solid var(--color-border-sidebar); 
         }
-        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: auto; }
         .user-avatar { 
-            width: 45px; height: 45px; 
-            background: var(--color-accent); color: white; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-            font-weight: var(--font-weight-bold); font-size: 1.2rem; 
+            width: 45px; height: 45px; background: var(--color-accent); color: white; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; 
         }
-        .sidebar-controls { display: flex; gap: 10px; }
+        .main-view { flex: 1; padding: 40px 60px; overflow-y: auto; }
+        .main-view h1 { font-size: 4rem; margin: 0 0 30px 0; font-weight: 300; }
 
-        /* --- ГЛАВНАЯ ОБЛАСТЬ ПРОСМОТРА (Сетка года) --- */
-        .main-view { 
-            flex: 1; padding: 40px 60px; 
-            display: flex; flex-direction: column; 
-            background: var(--color-bg-main); overflow-y: auto; 
-        }
-        .main-view h1 { 
-            font-size: 4rem; margin: 0 0 30px 0; 
-            font-weight: var(--font-weight-light); 
-            color: var(--color-text-main); 
-        }
-
-        /* Сетка месяцев */
-        .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; flex-grow: 1; }
-        
-        /* Карточка месяца */
+        .year-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
         .month-card { 
-            background: var(--color-bg-main); 
-            border: 1px solid var(--color-border-light); 
-            border-radius: var(--border-radius-main); 
+            background: white; border: 1px solid var(--color-border-light); 
+            border-radius: var(--border-radius-main); padding: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; transition: transform 0.2s, border-color 0.2s; 
-            position: relative; min-height: 120px;
+            cursor: pointer; transition: 0.2s; position: relative; min-height: 120px;
         }
-        .month-card:hover { 
-            transform: translateY(-3px); 
-            border-color: var(--color-accent); 
-        }
-        /* Сгиль для текущего месяца */
-        .month-card.current-month { 
-            border: 2.5px solid var(--color-accent); 
-            background: var(--color-accent-light); 
-        }
+        .month-card:hover { transform: translateY(-3px); border-color: var(--color-accent); }
+        .month-card.current-month { border: 2.5px solid var(--color-accent); background: var(--color-accent-light); }
         
-        /* Индикаторы активности в месяце */
-        .activity-line { 
-            width: 40px; height: 5px; 
-            background: var(--color-activity-line); 
-            border-radius: 3px; margin-top: 10px; 
-        }
-        .last-edit { 
-            font-size: 9px; color: var(--color-text-muted); 
-            position: absolute; bottom: 10px; text-transform: uppercase; 
-        }
+        .activity-line { width: 40px; height: 5px; background: var(--color-activity-line); border-radius: 3px; margin-top: 10px; }
+        .last-edit { font-size: 9px; color: var(--color-text-muted); position: absolute; bottom: 10px; text-transform: uppercase; }
 
-        /* ========================================= */
-        /* БЛОК 3: ПАНЕЛЬ АДМИНА (#admin-sidebar) */
-        /* ========================================= */
+        /* АДМИН ПАНЕЛЬ */
         .notifications-sidebar {
-            width: var(--admin-panel-width); 
-            background: var(--color-notification-bg); 
-            height: 100vh; 
-            position: fixed; right: 0; top: 0; z-index: 1500;
-            box-shadow: -5px 0 15px rgba(0,0,0,0.1); 
-            padding: 25px; box-sizing: border-box; color: white;
-            /* Анимация выдвижения */
-            transform: translateX(100%); 
-            transition: transform var(--transition-speed) ease;
+            width: var(--admin-panel-width); background: var(--color-notification-bg); 
+            height: 100vh; position: fixed; right: 0; top: 0; z-index: 1500;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; color: white;
+            transform: translateX(100%); transition: 0.3s ease;
         }
         .notifications-sidebar.active { transform: translateX(0); }
-        
-        /* Элемент запроса */
-        .notif-item { 
-            background: rgba(255,255,255,0.2); 
-            border-radius: 12px; padding: 15px; margin-bottom: 15px; 
-            position: relative; 
-        }
-        /* Красный значок уведомления */
-        .notif-badge { 
-            position: absolute; top: -8px; left: -8px; 
-            background: var(--color-admin); 
-            width: 22px; height: 22px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: var(--font-weight-bold); font-size: 14px; 
-        }
+        .notif-item { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 15px; margin-bottom: 15px; position: relative; }
 
-        /* ========================================= */
-        /* БЛОК 4: СТРАНИЦА МЕСЯЦА (#month-page) */
-        /* ========================================= */
-        #month-page { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--color-bg-main); z-index: 1000; 
-            padding: 40px; box-sizing: border-box; overflow-y: auto; 
-        }
-        
-        /* Сетка дней */
-        #days-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            gap: 10px; 
-        }
-        
-        /* Стили для ячейки дня */
-        .day-cell {
-            background: var(--color-bg-input); 
-            border: 1px solid var(--color-border-light); 
-            padding: 10px; 
-            border-radius: var(--border-radius-small); 
-            cursor: pointer; min-height: 60px;
-            transition: border-color 0.2s;
-        }
-        .day-cell:hover { border-color: var(--color-accent); }
-        
-        /* Секция редактора дня */
-        #editor-section { 
-            margin-top: 20px; 
-            background: var(--color-bg-input); 
-            padding: 20px; 
-            border-radius: var(--border-radius-main); 
-        }
-        #day-input { 
-            width: 100%; height: 100px; padding: 10px; 
-            border-radius: 10px; border: 1px solid #ddd; 
-            box-sizing: border-box; /* Чтобы padding не ломал ширину */
-        }
+        /* МЕСЯЦ */
+        #month-page { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; padding: 40px; box-sizing: border-box; overflow-y: auto; }
+        #days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .day-cell { background: var(--color-bg-input); border: 1px solid var(--color-border-light); padding: 10px; border-radius: var(--border-radius-small); cursor: pointer; min-height: 60px; }
+        #day-input { width: 100%; height: 100px; padding: 10px; border-radius: 10px; border: 1px solid #ddd; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -236,13 +107,11 @@
     <div id="auth-page">
         <h2>Добро пожаловать</h2>
         <input type="text" id="auth-username" placeholder="Ваше имя">
-        
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
-        
         <div id="admin-secret-wrap" class="hidden">
             <input type="password" id="admin-pass-input" placeholder="Пароль">
             <button id="btn-admin-login" class="btn btn-exit">Войти как админ</button>
-        }
+        </div>
         <p id="auth-status" style="font-size: 11px; color: #636e72;">Нарисуйте графический ключ</p>
     </div>
 
@@ -251,9 +120,9 @@
             <aside class="sidebar">
                 <div class="user-profile">
                     <div class="user-avatar" id="u-avatar">?</div>
-                    <div class="user-tag" id="sidebar-user-name">USER</div>
+                    <div id="sidebar-user-name" style="margin-left:10px; font-weight:bold;">USER</div>
                 </div>
-                <div class="sidebar-controls">
+                <div class="sidebar-controls" style="margin-top:20px; display:flex; gap:10px;">
                     <button id="btn-logout" class="btn btn-exit">Выйти</button>
                     <button id="admin-btn-side" class="btn btn-admin hidden">⚙️</button>
                 </div>
@@ -275,12 +144,9 @@
 
     <div id="month-page" class="hidden">
         <button id="btn-back-to-year" class="btn btn-exit">← К году</button>
-        
         <h2 id="month-title" style="font-size: 3rem; margin: 20px 0;"></h2>
-        
         <div id="days-grid"></div>
-        
-        <div id="editor-section" class="hidden">
+        <div id="editor-section" class="hidden" style="margin-top:20px; background:#f8f9fa; padding:20px; border-radius:15px;">
             <h4 id="selected-day-label"></h4>
             <textarea id="day-input"></textarea>
             <button id="btn-save-day" class="btn btn-exit" style="background:var(--color-accent); margin-top:10px;">Сохранить</button>
@@ -291,36 +157,21 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // -----------------------------------------
-        // МОДУЛЬ 1: КОНФИГУРАЦИЯ (Config)
-        // Изменения здесь не ломают логику функций
-        // -----------------------------------------
         const CONFIG = {
             firebase: {
-                apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE", // !!! ЗАМЕНИТЕ НА СВОЙ ДЛЯ БЕЗОПАСНОСТИ !!!
+                apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
                 authDomain: "calendarium-1f7d7.firebaseapp.com",
                 projectId: "calendarium-1f7d7",
                 storageBucket: "calendarium-1f7d7.firebasestorage.app",
                 messagingSenderId: "204240857105",
                 appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
             },
-            year: 2026,
-            monthsRu: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
-            collections: {
-                users: "users",
-                requests: "requests",
-                data: "data"
-            }
+            months: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
         };
 
-        // Инициализация Firebase
         const app = initializeApp(CONFIG.firebase);
         const db = getFirestore(app);
 
-        // -----------------------------------------
-        // МОДУЛЬ 2: СОСТОЯНИЕ (State)
-        // Хранит текущие данные приложения
-        // -----------------------------------------
         let AppState = {
             currentUser: "",
             patternResult: "",
@@ -329,482 +180,171 @@
             currentMonthData: {}
         };
 
-        // -----------------------------------------
-        // МОДУЛЬ 3: ИНТЕРФЕЙС (UI Router)
-        // Отвечает только за переключение экранов
-        // Изменение дизайна не ломает базу данных
-        // -----------------------------------------
         const UI = {
-            // Элементы-страницы
             pages: {
                 auth: document.getElementById('auth-page'),
                 year: document.getElementById('year-page'),
                 month: document.getElementById('month-page'),
-                adminPanel: document.getElementById('admin-sidebar')
+                admin: document.getElementById('admin-sidebar')
             },
-            
-            // Скрыть все страницы
-            hideAll: function() {
-                Object.values(this.pages).forEach(page => page.classList.add('hidden'));
+            show: function(key) {
+                Object.keys(this.pages).forEach(p => this.pages[p].classList.add('hidden'));
+                this.pages[key].classList.remove('hidden');
             },
-            
-            // Показать конкретную страницу
-            showPage: function(pageName) {
-                this.hideAll();
-                if (this.pages[pageName]) {
-                    this.pages[pageName].classList.remove('hidden');
-                }
-            },
-            
-            // Управление панелью админа (выдвижение)
-            toggleAdminPanel: function(show) {
-                if (show) this.pages.adminPanel.classList.add('active');
-                else this.pages.adminPanel.classList.remove('active');
+            toggleAdmin: function(open) {
+                this.pages.admin.classList.toggle('active', open);
             }
         };
 
-        // -----------------------------------------
-        // МОДУЛЬ 4: БАЗА ДАННЫХ (Database API)
-        // Чистые функции для работы с Firestore
-        // Не знают про UI
-        // -----------------------------------------
-        const DB = {
-            // Проверить существование пользователя
-            getUser: async (username) => {
-                const snap = await getDoc(doc(db, CONFIG.collections.users, username));
-                return snap.exists() ? snap.data() : null;
-            },
-            // Отправить заявку на регистрацию
-            dataRequest: async (username, password) => {
-                await setDoc(doc(db, CONFIG.collections.requests, username), { 
-                    password: password, 
-                    date: new Date().toISOString() 
-                });
-            },
-            // Получить данные месяца
-            getMonthData: async (mIdx) => {
-                const snap = await getDoc(doc(db, CONFIG.collections.data, `month_${mIdx}`));
-                return snap.exists() ? snap.data() : null;
-            },
-            // Подписаться на изменения месяца (Realtime)
-            subscribeMonth: (mIdx, callback) => {
-                return onSnapshot(doc(db, CONFIG.collections.data, `month_${mIdx}`), callback);
-            },
-            // Сохранить данные дня
-            saveDay: async (mIdx, monthData) => {
-                await setDoc(doc(db, CONFIG.collections.data, `month_${mIdx}`), monthData);
-            },
-            // Получить все заявки (для админа)
-            getRequests: async () => {
-                return await getDocs(collection(db, CONFIG.collections.requests));
-            },
-            // Одобрить пользователя
-            approveUser: async (uId, uPass) => {
-                await setDoc(doc(db, CONFIG.collections.users, uId), { password: uPass });
-                await deleteDoc(doc(db, CONFIG.collections.requests, uId));
-            },
-            // Отклонить пользователя
-            rejectUser: async (uId) => {
-                await deleteDoc(doc(db, CONFIG.collections.requests, uId));
-            }
-        };
-
-        // -----------------------------------------
-        // МОДУЛЬ 5: ГРАФИЧЕСКИЙ КЛЮЧ (Pattern Lock)
-        // Логика canvas, полностью изолирована
-        // -----------------------------------------
         const PatternLock = {
             canvas: document.getElementById('pattern-canvas'),
             ctx: null,
             dots: [],
             drawing: false,
-            
             init: function() {
                 this.ctx = this.canvas.getContext('2d');
-                this.initDots();
+                this.createDots();
+                this.bind();
                 this.draw();
-                this.bindEvents();
             },
-            
-            initDots: function() {
+            createDots: function() {
                 this.dots = [];
-                for(let i=0; i<3; i++) {
-                    for(let j=0; j<3; j++) {
-                        this.dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-                    }
-                }
+                for(let i=0; i<3; i++) for(let j=0; j<3; j++) 
+                    this.dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
             },
-            
-            reset: function() {
-                AppState.patternResult = "";
-                this.initDots();
-                this.draw();
-            },
-            
             draw: function() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                // Отрисовка линий
+                this.ctx.clearRect(0, 0, 260, 260);
                 if (AppState.patternResult.length > 0) {
-                    this.ctx.beginPath(); 
-                    this.ctx.strokeStyle = "#0984e3"; // var(--color-accent)
-                    this.ctx.lineWidth = 8; this.ctx.lineJoin = "round";
+                    this.ctx.beginPath(); this.ctx.strokeStyle = "#0984e3"; this.ctx.lineWidth = 8;
                     for(let k=0; k < AppState.patternResult.length; k+=2) {
                         const d = this.dots.find(dot => dot.id === AppState.patternResult.substring(k, k+2));
-                        if (k === 0) this.ctx.moveTo(d.x, d.y); else this.ctx.lineTo(d.x, d.y);
+                        if(k===0) this.ctx.moveTo(d.x, d.y); else this.ctx.lineTo(d.x, d.y);
                     }
                     this.ctx.stroke();
                 }
-                // Отрисовка точек
                 this.dots.forEach(d => {
                     this.ctx.beginPath(); this.ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
                     this.ctx.fillStyle = d.hit ? "#0984e3" : "#bdc3c7"; this.ctx.fill();
                 });
             },
-            
-            // Привязка событий мыши/тача к canvas
-            bindEvents: function() {
-                const getCoords = (e) => {
+            bind: function() {
+                const handleMove = (e) => {
+                    if(!this.drawing) return;
                     const rect = this.canvas.getBoundingClientRect();
-                    return {
-                        x: (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left,
-                        y: (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top
-                    };
-                };
-
-                const startDrawing = (e) => {
-                    e.preventDefault();
-                    this.reset();
-                    this.drawing = true;
-                };
-
-                const stopDrawing = () => {
-                    if(!this.drawing) return;
-                    this.drawing = false;
-                    // Если ключ нарисован, вызываем логику входа
-                    if(AppState.patternResult.length >= 4) { 
-                        Auth.handleAuthSubmit(); 
-                    } else {
-                        this.reset();
-                    }
-                };
-
-                const moveDrawing = (e) => {
-                    if(!this.drawing) return;
-                    const coords = getCoords(e);
+                    const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+                    const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
                     this.dots.forEach(d => {
-                        // Проверка попадания в точку
-                        if (Math.sqrt((coords.x-d.x)**2 + (coords.y-d.y)**2) < 25 && !d.hit) {
-                            d.hit = true; 
-                            AppState.patternResult += d.id; 
-                            this.draw();
+                        if (Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) {
+                            d.hit = true; AppState.patternResult += d.id; this.draw();
                         }
                     });
                 };
-
-                this.canvas.addEventListener('mousedown', startDrawing);
-                this.canvas.addEventListener('touchstart', startDrawing);
-                window.addEventListener('mouseup', stopDrawing);
-                window.addEventListener('touchend', stopDrawing);
-                this.canvas.addEventListener('mousemove', moveDrawing);
-                this.canvas.addEventListener('touchmove', moveDrawing);
+                this.canvas.onmousedown = this.canvas.ontouchstart = (e) => { 
+                    AppState.patternResult = ""; this.createDots(); this.drawing = true; 
+                };
+                window.onmouseup = window.ontouchend = () => {
+                    if(this.drawing && AppState.patternResult.length >= 4) Auth.submit();
+                    this.drawing = false;
+                };
+                this.canvas.onmousemove = this.canvas.ontouchmove = handleMove;
             }
         };
 
-        // -----------------------------------------
-        // МОДУЛЬ 6: АВТОРИЗАЦИЯ (Auth Core)
-        // Связывает UI, DB и PatternLock для входа
-        // -----------------------------------------
         const Auth = {
-            // Проверка, является ли пользователь админом (для показа инпута пароля)
-            checkAdminVisiblity: function(val) {
-                const secretBox = document.getElementById('admin-secret-wrap');
-                if(val.toLowerCase() === 'admin') secretBox.classList.remove('hidden');
-                else secretBox.classList.add('hidden');
-            },
-            
-            // Основная логика отправки формы
-            handleAuthSubmit: async function() {
-                const nameInput = document.getElementById('auth-username').value.trim().toLowerCase();
-                const textPass = document.getElementById('admin-pass-input').value;
-                const statusEl = document.getElementById('auth-status');
-                
-                // Ключ берется либо из инпута (админ), либо из canvas
-                let finalSecret = textPass || AppState.patternResult;
-                
-                if(!nameInput || !finalSecret) { PatternLock.reset(); return; }
+            submit: async function() {
+                const name = document.getElementById('auth-username').value.trim().toLowerCase();
+                const pass = document.getElementById('admin-pass-input').value || AppState.patternResult;
+                if(!name) return;
 
-                statusEl.innerText = "Проверка..."; statusEl.style.color = "#636e72";
-
-                try {
-                    const userData = await DB.getUser(nameInput);
-
-                    if (userData) {
-                        // Пользователь есть, проверяем пароль
-                        if (userData.password === finalSecret) {
-                            AppState.currentUser = nameInput;
-                            this.loginSuccess();
-                        } else {
-                            statusEl.innerText = "❌ Неверный ключ!";
-                            statusEl.style.color = "red";
-                            PatternLock.reset();
-                        }
-                    } else {
-                        // Пользователя нет, предлагаем регистрацию
-                        if(confirm(`Зарегистрировать новый профиль "${nameInput}"?`)) {
-                            await DB.dataRequest(nameInput, finalSecret);
-                            alert("Заявка отправлена админу!");
-                            PatternLock.reset();
-                        } else { PatternLock.reset(); }
+                const userSnap = await getDoc(doc(db, "users", name));
+                if (userSnap.exists()) {
+                    if (userSnap.data().password === pass) {
+                        AppState.currentUser = name;
+                        this.success();
+                    } else { alert("Неверный ключ"); PatternLock.init(); }
+                } else {
+                    if(confirm("Регистрация нового пользователя?")) {
+                        await setDoc(doc(db, "requests", name), { password: pass });
+                        alert("Заявка отправлена!");
                     }
-                } catch (error) {
-                    console.error("Ошибка авт.:", error);
-                    statusEl.innerText = "Ошибка сервера";
+                    PatternLock.init();
                 }
             },
-            
-            // Действия при успешном входе
-            loginSuccess: function() {
-                UI.showPage('year');
-                
-                // Обновляем профиль в сайдбаре
+            success: function() {
+                UI.show('year');
                 document.getElementById('sidebar-user-name').innerText = AppState.currentUser.toUpperCase();
-                document.getElementById('u-avatar').innerText = AppState.currentUser.charAt(0).toUpperCase();
-                
-                // Показываем кнопку админа, если зашел admin
-                if (AppState.currentUser === 'admin') {
-                    document.getElementById('admin-btn-side').classList.remove('hidden');
-                }
-                
-                // Рендерим сетку года
-                Calendar.renderYearGrid();
+                document.getElementById('u-avatar').innerText = AppState.currentUser[0].toUpperCase();
+                if(AppState.currentUser === 'admin') document.getElementById('admin-btn-side').classList.remove('hidden');
+                Calendar.renderYear();
             }
         };
 
-        // -----------------------------------------
-        // МОДУЛЬ 7: КАЛЕНДАРЬ И ДАННЫЕ (Calendar Core)
-        // Логика отрисовки года, месяца и сохранения данных
-        // -----------------------------------------
         const Calendar = {
-            // Отрисовка сетки года (12 месяцев)
-            renderYearGrid: async function() {
+            renderYear: async function() {
                 const grid = document.getElementById('year-grid');
-                grid.innerHTML = 'Загрузка месяцев...';
-                
-                const thisMonthIdx = new Date().getMonth(); // Текущий месяц в реальности
-                const fragment = document.createDocumentFragment(); // Для оптимизации отрисовки
-
-                for(let i=0; i<CONFIG.monthsRu.length; i++) {
-                    const card = document.createElement('div');
-                    card.className = `month-card ${i === thisMonthIdx ? 'current-month' : ''}`;
-                    
-                    // Используем addeventListener вместо onclick в HTML
-                    card.addEventListener('click', () => this.openMonth(i));
-                    
-                    // Базовая структура карточки (без данных)
-                    card.innerHTML = `<h3>${CONFIG.monthsRu[i]}</h3><div class="status-area">...</div>`;
-                    fragment.appendChild(card);
-                    
-                    // Асинхронно загружаем статус (ред.: автор)
-                    this.loadMonthStatus(i, card.querySelector('.status-area'));
-                }
-                
                 grid.innerHTML = '';
-                grid.appendChild(fragment);
+                const today = new Date().getMonth();
+                for(let i=0; i<12; i++) {
+                    const card = document.createElement('div');
+                    card.className = `month-card ${i === today ? 'current-month' : ''}`;
+                    card.innerHTML = `<h3>${CONFIG.months[i]}</h3><div id="stat-${i}"></div>`;
+                    card.onclick = () => this.openMonth(i);
+                    grid.appendChild(card);
+                    this.loadStat(i);
+                }
             },
-            
-            // Вспомогательная функция: загрузка автора последней правки для карточки года
-            loadMonthStatus: async function(mIdx, containerEl) {
-                try {
-                    const data = await DB.getMonthData(mIdx);
-                    if(data) {
-                        const entries = Object.values(data);
-                        if(entries.length > 0) {
-                            const lastUser = entries[entries.length - 1].author || "";
-                            containerEl.innerHTML = `<div class="activity-line"></div><div class="last-edit">ред: ${lastUser}</div>`;
-                            return;
-                        }
-                    }
-                    containerEl.innerHTML = ''; // Нет данных
-                } catch (e) { containerEl.innerHTML = ''; }
+            loadStat: async function(i) {
+                const s = await getDoc(doc(db, "data", `month_${i}`));
+                if(s.exists()) {
+                    const vals = Object.values(s.data());
+                    if(vals.length) document.getElementById(`stat-${i}`).innerHTML = `<div class="activity-line"></div><div class="last-edit">ред: ${vals[vals.length-1].author}</div>`;
+                }
             },
-
-            // Открытие страницы конкретного месяца
-            unsubscribeMonth: null, // Хранит функцию отписки от realtime
-            openMonth: function(mIdx) {
-                AppState.currentMonthIdx = mIdx;
-                UI.showPage('month');
-                
-                document.getElementById('month-title').innerText = CONFIG.monthsRu[mIdx];
-                document.getElementById('editor-section').classList.add('hidden'); // Скрыть редактор
-
-                // Отписываемся от предыдущего месяца, если был открыт
-                if(this.unsubscribeMonth) this.unsubscribeMonth();
-                
-                // Подписываемся на Realtime изменения Firestore
-                this.unsubscribeMonth = DB.subscribeMonth(mIdx, (snap) => {
-                    AppState.currentMonthData = snap.exists() ? snap.data() : {};
-                    this.renderDaysGrid();
+            openMonth: function(i) {
+                AppState.currentMonthIdx = i;
+                UI.show('month');
+                document.getElementById('month-title').innerText = CONFIG.months[i];
+                onSnapshot(doc(db, "data", `month_${i}`), (s) => {
+                    AppState.currentMonthData = s.exists() ? s.data() : {};
+                    this.renderDays();
                 });
             },
-
-            // Отрисовка сетки дней месяца
-            renderDaysGrid: function() {
-                const grid = document.getElementById('days-grid');
-                grid.innerHTML = '';
-                
-                // Вычисляем к-во дней в месяце 2026 года
-                const daysInMonth = new Date(CONFIG.year, AppState.currentMonthIdx + 1, 0).getDate();
-                
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dayData = AppState.currentMonthData[d] || { text: "" };
-                    
+            renderDays: function() {
+                const grid = document.getElementById('days-grid'); grid.innerHTML = '';
+                const days = new Date(2026, AppState.currentMonthIdx + 1, 0).getDate();
+                for(let d=1; d<=days; d++) {
                     const div = document.createElement('div');
                     div.className = 'day-cell';
-                    
-                    // Обрезаем текст для предпросмотра
-                    const previewText = dayData.text.substring(0, 20);
-                    
-                    div.innerHTML = `
-                        <b>${d}</b>
-                        <div style="font-size:10px; color:#999; margin-top:5px;">
-                            ${previewText}${dayData.text.length > 20 ? '...' : ''}
-                        </div>
-                    `;
-                    
-                    div.addEventListener('click', () => this.openDayEditor(d, dayData.text));
+                    div.innerHTML = `<b>${d}</b><div style="font-size:9px">${(AppState.currentMonthData[d]?.text || "").substring(0,10)}</div>`;
+                    div.onclick = () => {
+                        AppState.currentDay = d;
+                        document.getElementById('editor-section').classList.remove('hidden');
+                        document.getElementById('day-input').value = AppState.currentMonthData[d]?.text || "";
+                    };
                     grid.appendChild(div);
                 }
             },
-            
-            // Открытие редактора для конкретного дня
-            openDayEditor: function(day, text) {
-                AppState.currentDay = day;
-                document.getElementById('editor-section').classList.remove('hidden');
-                document.getElementById('selected-day-label').innerText = `${day} ${CONFIG.monthsRu[AppState.currentMonthIdx]}`;
-                document.getElementById('day-input').value = text;
-                document.getElementById('day-input').focus();
-            },
-
-            // Сохранение данных дня в базу
-            saveDayData: async function() {
-                const val = document.getElementById('day-input').value.trim();
-                const btn = document.getElementById('btn-save-day');
-                
-                btn.innerText = "Сохранение..."; btn.disabled = true;
-
-                // Обновляем локальное состояние
-                AppState.currentMonthData[AppState.currentDay] = { 
-                    text: val, 
-                    author: AppState.currentUser 
-                };
-                
-                try {
-                    // Отправляем в базу
-                    await DB.saveDay(AppState.currentMonthIdx, AppState.currentMonthData);
-                    alert("Сохранено!");
-                } catch (e) {
-                    alert("Ошибка сохранения");
-                    console.error(e);
-                } finally {
-                    btn.innerText = "Сохранить"; btn.disabled = false;
-                }
+            save: async function() {
+                const txt = document.getElementById('day-input').value;
+                AppState.currentMonthData[AppState.currentDay] = { text: txt, author: AppState.currentUser };
+                await setDoc(doc(db, "data", `month_${AppState.currentMonthIdx}`), AppState.currentMonthData);
+                alert("Сохранено");
             }
         };
 
-        // -----------------------------------------
-        // МОДУЛЬ 8: АДМИНКА (Admin Panel UI)
-        // Логика управления уведомлениями
-        // -----------------------------------------
-        const AdminPanel = {
-            // Открыть панель и загрузить запросы
-            open: async function() {
-                UI.toggleAdminPanel(showPage;
-                const list = document.getElementById('requests-list');
-                list.innerHTML = "Загрузка...";
-                
-                try {
-                    const snap = await DB.getRequests();
-                    list.innerHTML = snap.empty ? "Новых заявок нет" : "";
-                    
-                    snap.forEach(d => {
-                        const item = this.createRequestItem(d.id, d.data().password);
-                        list.appendChild(item);
-                    });
-                } catch (e) { list.innerHTML = "Ошибка загрузки."; }
-            },
-            
-            // Создание HTML элемента запроса
-            createRequestItem: function(uId, uPass) {
-                const item = document.createElement('div');
-                item.className = 'notif-item';
-                item.id = `req-${uId}`;
-                
-                item.innerHTML = `
-                    <div class="notif-badge">!</div>
-                    <b>Запрос доступа</b><p style="margin:5px 0">Имя: ${uId}</p>
-                    <div style="display:flex; gap:5px; margin-top:10px;">
-                        <button class="btn btn-approve" style="flex:1; background:var(--color-approve); color:white;">✅</button>
-                        <button class="btn btn-reject" style="flex:1; background:var(--color-admin); color:white;">❌</button>
-                    </div>`;
-                
-                // Назначаем обработчики кнопкам
-                item.querySelector('.btn-approve').addEventListener('click', () => this.handleApprove(uId, uPass));
-                item.querySelector('.btn-reject').addEventListener('click', () => this.handleReject(uId));
-                
-                return item;
-            },
-            
-            handleApprove: async function(uId, uPass) {
-                if(!confirm(`Одобрить пользователя ${uId}?`)) return;
-                try {
-                    await DB.approveUser(uId, uPass);
-                    document.getElementById(`req-${uId}`).remove();
-                } catch (e) { alert("Ошибка"); }
-            },
-            
-            handleReject: async function(uId) {
-                if(!confirm(`Отклонить пользователя ${uId}?`)) return;
-                try {
-                    await DB.rejectUser(uId);
-                    document.getElementById(`req-${uId}`).remove();
-                } catch (e) { alert("Ошибка"); }
-            }
+        // Инициализация кнопок
+        document.getElementById('auth-username').oninput = (e) => {
+            document.getElementById('admin-secret-wrap').classList.toggle('hidden', e.target.value.toLowerCase() !== 'admin');
         };
+        document.getElementById('btn-admin-login').onclick = () => Auth.submit();
+        document.getElementById('btn-logout').onclick = () => location.reload();
+        document.getElementById('btn-save-day').onclick = () => Calendar.save();
+        document.getElementById('btn-back-to-year').onclick = () => UI.show('year');
+        document.getElementById('admin-btn-side').onclick = () => UI.toggleAdmin(true);
+        document.getElementById('btn-close-admin').onclick = () => UI.toggleAdmin(false);
 
-
-        // -----------------------------------------
-        // МОДУЛЬ 9: ИНИЦИАЛИЗАЦИЯ (Event Bindings)
-        // Привязка JS к HTML элементам при запуске
-        // -----------------------------------------
-        
-        // 1. Вход: Инпут имени (проверка на admin)
-        document.getElementById('auth-username').addEventListener('input', (e) => Auth.checkAdminVisiblity(e.target.value));
-        
-        // 2. Вход: Кнопка логина админа
-        document.getElementById('btn-admin-login').addEventListener('click', () => Auth.handleAuthSubmit());
-        
-        // 3. Сайдбар: Кнопка Выйти (простая перезагрузка)
-        document.getElementById('btn-logout').addEventListener('click', () => location.reload());
-        
-        // 4. Сайдбар: Кнопка открытия админки
-        document.getElementById('admin-btn-side').addEventListener('click', () => AdminPanel.open());
-        
-        // 5. Админка: Кнопка закрытия
-        document.getElementById('btn-close-admin').addEventListener('click', () => UI.toggleAdminPanel(false));
-        
-        // 6. Месяц: Кнопка возврата к году
-        document.getElementById('btn-back-to-year').addEventListener('click', () => {
-            if(Calendar.unsubscribeMonth) Calendar.unsubscribeMonth(); // Отписываемся от Realtime
-            UI.showPage('year');
-            Calendar.renderYearGrid(); // Обновляем статусы на год
-        });
-        
-        // 7. Месяц: Кнопка сохранения дня
-        document.getElementById('btn-save-day').addEventListener('click', () => Calendar.saveDayData());
-
-        // ЗАПУСК ГРАФИЧЕСКОГО КЛЮЧА
+        // Запуск ключа
         PatternLock.init();
-
     </script>
 </body>
 </html>
