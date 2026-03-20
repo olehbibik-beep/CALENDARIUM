@@ -83,8 +83,7 @@
         <input type="text" id="auth-username" placeholder="Ваше имя" oninput="checkAdmin(this.value)">
         <canvas id="pattern-canvas" width="260" height="260"></canvas>
         <div id="admin-secret-wrap" class="hidden">
-            <input type="password" id="admin-pass-input" placeholder="Пароль" style="margin-bottom:10px; padding:8px; border-radius:10px; border:1px solid #ddd;">
-            <br>
+            <input type="password" id="admin-pass-input" placeholder="Пароль">
             <button class="btn btn-exit" onclick="handleAuthSubmit()">Войти как админ</button>
         </div>
         <p id="auth-status" style="font-size: 11px; color: #636e72;">Нарисуйте графический ключ</p>
@@ -232,7 +231,7 @@
         window.onmouseup = window.ontouchend = () => {
             if(!drawing) return;
             drawing = false;
-            if(patternResult.length >= 4) {
+            if(patternResult.length >= 4) { // Нужно минимум 2 соединения
                 if(document.getElementById('auth-username').value.toLowerCase() !== 'admin') window.handleAuthSubmit();
             } else { resetCanvas(); }
         };
