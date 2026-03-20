@@ -1,128 +1,96 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDARIUM</title>
-    <style>
-        :root { --accent: #0984e3; --orange: #f39c12; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        /* ЦЕНТРАЛЬНАЯ КАРТОЧКА */
-        .auth-card { background: white; padding: 40px; border-radius: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); text-align: center; width: 340px; }
-        h1 { font-size: 2.5rem; margin: 0 0 20px; color: #444; font-weight: 800; text-transform: uppercase; }
-        input#username { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 20px; border: 1px solid #eee; background: #fafafa; text-align: center; font-size: 1rem; outline: none; box-sizing: border-box; }
-        
-        canvas { background: #fff; border: 1px solid #eee; border-radius: 30px; cursor: crosshair; }
-        canvas.disabled { opacity: 0.1; pointer-events: none; }
-        .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+        authDomain: "calendarium-1f7d7.firebaseapp.com",
+        projectId: "calendarium-1f7d7",
+        storageBucket: "calendarium-1f7d7.firebasestorage.app",
+        messagingSenderId: "204240857105",
+        appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+    };
 
-        /* ОРАНЖЕВАЯ ШТОРКА (SYSTEM LOG) */
-        #notif-sidebar { 
-            position: fixed; right: 0; top: 0; width: 350px; height: 100vh; 
-            background: var(--orange); color: white; z-index: 9999;
-            transform: translateX(100%); transition: transform 0.4s ease;
-            padding: 30px; box-sizing: border-box;
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const sidebar = document.getElementById('notif-sidebar');
+    let dots = [], pattern = "", drawing = false;
+
+    // --- ФУНКЦИИ ЗАКРЫТИЯ И СБРОСА ---
+    window.closeLog = () => {
+        sidebar.classList.remove('active');
+        resetCanvas(); // Сбрасываем ключ при закрытии
+    };
+
+    function resetCanvas() {
+        pattern = "";
+        initDots();
+        draw();
+    }
+
+    // Закрытие по клику вне шторки
+    window.addEventListener('click', (e) => {
+        // Проверяем: если шторка открыта И клик был НЕ по шторке И НЕ по канвасу (чтобы не мешать рисованию)
+        if (sidebar.classList.contains('active') && 
+            !sidebar.contains(e.target) && 
+            e.target !== canvas && 
+            e.target.id !== 'username') {
+            closeLog();
         }
-        #notif-sidebar.active { transform: translateX(0); }
-        
-        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: 900; }
-        .close-x { cursor: pointer; font-size: 24px; }
+    });
 
-        /* ВНУТРЕННЯЯ КАРТОЧКА ИЗ СКРИНШОТА */
-        .log-card { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-        .log-card h3 { margin: 0 0 5px; font-size: 1.1rem; }
-        .log-card p { margin: 0; font-size: 0.9rem; opacity: 0.9; }
-        
-        .orange-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; background: white; color: var(--orange); font-weight: bold; cursor: pointer; font-size: 1rem; }
-    </style>
-</head>
-<body>
+    window.checkName = (val) => {
+        canvas.classList.toggle('disabled', val.trim().length === 0);
+        document.getElementById('status').innerText = val.trim().length > 0 ? "Нарисуйте ключ" : "Введите имя";
+    };
 
-    <div id="notif-sidebar">
-        <div class="notif-header">
-            <span>SYSTEM LOG</span>
-            <span class="close-x" onclick="closeLog()">×</span>
-        </div>
-        <div id="log-container">
-            </div>
-    </div>
+    function initDots() {
+        dots = [];
+        for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
+    }
 
-    <div class="auth-card">
-        <h1>CALENDAR</h1>
-        <input type="text" id="username" placeholder="Ваше имя" oninput="checkName(this.value)">
-        <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
-        <p class="status-text" id="status">Введите имя</p>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-            authDomain: "calendarium-1f7d7.firebaseapp.com",
-            projectId: "calendarium-1f7d7",
-            storageBucket: "calendarium-1f7d7.firebasestorage.app",
-            messagingSenderId: "204240857105",
-            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
-        };
-
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const sidebar = document.getElementById('notif-sidebar');
-        let dots = [], pattern = "", drawing = false;
-
-        // Открытие/закрытие шторки
-        window.closeLog = () => sidebar.classList.remove('active');
-
-        window.checkName = (val) => {
-            canvas.classList.toggle('disabled', val.trim().length === 0);
-            document.getElementById('status').innerText = val.trim().length > 0 ? "Нарисуйте ключ" : "Введите имя";
-        };
-
-        // Инициализация точек
-        function initDots() {
-            dots = [];
-            for(let i=0; i<3; i++) for(let j=0; j<3; j++) dots.push({id: i+""+j, x: 50+i*80, y: 50+j*80, hit: false});
-        }
-
-        function draw() {
-            ctx.clearRect(0,0,260,260);
-            if(pattern.length > 0) {
-                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 8; ctx.lineCap="round"; ctx.lineJoin="round";
-                for(let k=0; k<pattern.length; k+=2) {
-                    let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
-                    k===0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
-                }
-                ctx.stroke();
+    function draw() {
+        ctx.clearRect(0,0,260,260);
+        if(pattern.length > 0) {
+            ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 8; ctx.lineCap="round"; ctx.lineJoin="round";
+            for(let k=0; k<pattern.length; k+=2) {
+                let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
+                k===0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
             }
-            dots.forEach(d => {
-                ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
-            });
+            ctx.stroke();
         }
+        dots.forEach(d => {
+            ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
+            ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9"; ctx.fill();
+        });
+    }
 
-        canvas.onmousedown = canvas.ontouchstart = (e) => {
-            e.preventDefault(); pattern = ""; initDots(); drawing = true; draw();
-        };
-        window.onmouseup = window.ontouchend = () => {
-            if(!drawing) return; drawing = false;
-            if(pattern.length >= 4) handleLogin();
-        };
-        canvas.onmousemove = canvas.ontouchmove = (e) => {
-            if(!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const y = (e.clientY || e.touches[0].clientY) - rect.top;
-            dots.forEach(d => {
-                if(Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
-            });
-        };
+    canvas.onmousedown = canvas.ontouchstart = (e) => {
+        if (canvas.classList.contains('disabled')) return;
+        e.preventDefault(); pattern = ""; initDots(); drawing = true; draw();
+    };
 
-        async function handleLogin() {
-            const name = document.getElementById('username').value.trim().toLowerCase();
+    window.onmouseup = window.ontouchend = () => {
+        if(!drawing) return; drawing = false;
+        if(pattern.length >= 4) handleLogin();
+    };
+
+    canvas.onmousemove = canvas.ontouchmove = (e) => {
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - rect.left;
+        const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - rect.top;
+        dots.forEach(d => {
+            if(Math.sqrt((x-d.x)**2 + (y-d.y)**2) < 25 && !d.hit) { d.hit = true; pattern += d.id; draw(); }
+        });
+    };
+
+    async function handleLogin() {
+        const name = document.getElementById('username').value.trim().toLowerCase();
+        if (!name) return;
+
+        try {
             const snap = await getDoc(doc(db, "users", name));
 
             if(snap.exists()) {
@@ -130,11 +98,18 @@
                     localStorage.setItem('currentUser', name);
                     window.location.href = 'calendar.html';
                 } else {
-                    alert("Ключ не подходит");
-                    pattern = ""; initDots(); draw();
+                    // Можно вызвать шторку с ошибкой вместо alert
+                    document.getElementById('log-container').innerHTML = `
+                        <div class="log-card">
+                            <h3>Ошибка</h3>
+                            <p>Ключ не подходит для пользователя ${name}</p>
+                        </div>
+                    `;
+                    sidebar.classList.add('active');
+                    setTimeout(() => closeLog(), 3000);
                 }
             } else {
-                // ПОКАЗ ШТОРКИ КАК НА СКРИНЕ
+                // ПОКАЗ ШТОРКИ ДЛЯ РЕГИСТРАЦИИ
                 document.getElementById('log-container').innerHTML = `
                     <div class="log-card">
                         <h3>Новый профиль</h3>
@@ -146,14 +121,16 @@
                 
                 document.getElementById('send-req').onclick = async () => {
                     await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
-                    document.getElementById('log-container').innerHTML = `<p>Заявка отправлена!</p>`;
+                    document.getElementById('log-container').innerHTML = `
+                         <div class="log-card"><h3>Готово!</h3><p>Заявка ушла.</p></div>
+                    `;
                     setTimeout(() => closeLog(), 2000);
-                    pattern = ""; initDots(); draw();
                 };
             }
+        } catch (e) {
+            console.error(e);
         }
+    }
 
-        initDots(); draw();
-    </script>
-</body>
-</html>
+    initDots(); draw();
+</script>
