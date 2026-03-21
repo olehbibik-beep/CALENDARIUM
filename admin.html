@@ -3,97 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TERMINAL | Admin Mobile</title>
+    <title>TERMINAL | Admin Panel</title>
     <style>
         :root { 
             --bg: #0a0a0a; 
-            --card: #161616;
+            --card: #141414;
             --accent: #fdcb6e; 
             --orange: #f39c12; 
             --text: #ffffff;
-            --muted: #555;
+            --muted: #444;
+            --border: #222;
         }
         
         body { 
             margin: 0; font-family: 'Inter', sans-serif; 
             background: var(--bg); color: var(--text); 
-            min-height: 100vh; display: flex; flex-direction: column;
-            overflow-x: hidden;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
         }
 
         /* HEADER */
         header { 
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222; position: sticky; top: 0; background: var(--bg); z-index: 100;
+            padding: 12px 25px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); background: #000; z-index: 100;
         }
-        .logo { font-weight: 900; color: var(--accent); font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
+        .logo { font-weight: 900; color: var(--accent); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
         .exit-btn { 
-            background: #fff; color: #000; padding: 6px 15px; border-radius: 20px; 
-            text-decoration: none; font-weight: 900; font-size: 0.65rem; 
+            background: #fff; color: #000; padding: 5px 15px; border-radius: 15px; 
+            text-decoration: none; font-weight: 900; font-size: 0.65rem; transition: 0.3s;
+        }
+        .exit-btn:hover { background: var(--accent); }
+
+        /* ОСНОВНАЯ СЕТКА */
+        main { 
+            flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; 
+            background: var(--border); overflow: hidden; 
         }
 
-        /* КОНТЕНТ */
-        main { flex: 1; padding: 20px; width: 100%; max-width: 600px; margin: 0 auto; }
-        h1 { font-size: 1.8rem; font-weight: 900; margin: 0 0 20px; letter-spacing: -1px; text-transform: uppercase; }
+        .column { 
+            background: var(--bg); padding: 25px; overflow-y: auto; 
+            display: flex; flex-direction: column;
+        }
 
-        .section-label { font-size: 0.6rem; font-weight: 900; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; display: block; letter-spacing: 2px; }
+        h2 { font-size: 1.2rem; font-weight: 900; margin: 0 0 20px; text-transform: uppercase; letter-spacing: -1px; }
+        .section-label { font-size: 0.55rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
 
-        /* СПИСОК КАРТОЧЕК */
-        .cards-list { 
-            display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px;
+        /* СЕТКА КАРТОЧЕК */
+        .cards-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; 
         }
 
         .user-card { 
-            background: var(--card); padding: 15px; border-radius: 20px;
-            border: 1px solid #222; display: flex; align-items: center; justify-content: space-between;
-            transition: 0.3s;
+            background: var(--card); padding: 12px; border-radius: 15px;
+            border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+            transition: 0.2s;
         }
+        .user-card:hover { border-color: #444; }
         
-        .user-info { display: flex; align-items: center; gap: 12px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar { 
-            width: 40px; height: 40px; background: #222; border-radius: 50%; 
+            width: 32px; height: 32px; background: #1a1a1a; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 1rem; color: var(--accent); font-weight: 900;
+            font-size: 0.8rem; color: var(--accent); font-weight: 900; border: 1px solid var(--border);
         }
-        .user-details { display: flex; flex-direction: column; }
-        .user-name { font-weight: 900; font-size: 1rem; }
-        .user-status { font-size: 0.55rem; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+        .user-name { font-weight: 800; font-size: 0.85rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
         .card-btn { 
-            padding: 8px 12px; border-radius: 12px; border: none;
-            font-weight: 900; cursor: pointer; font-size: 0.6rem; text-transform: uppercase;
+            padding: 6px 10px; border-radius: 8px; border: none;
+            font-weight: 900; cursor: pointer; font-size: 0.55rem; text-transform: uppercase;
         }
         .btn-approve { background: var(--accent); color: #000; }
-        .btn-delete { background: #222; color: #777; }
+        .btn-delete { background: transparent; color: #555; border: 1px solid #333; }
+        .btn-delete:hover { color: #ff7675; border-color: #ff7675; }
 
-        /* ОРАНЖЕВАЯ ШТОРКА (АДАПТИВНАЯ) */
+        /* ШТОРКА */
         #confirm-sidebar { 
-            position: fixed; right: 0; top: 0; width: 100%; height: 100%; 
+            position: fixed; right: 0; top: 0; width: 320px; height: 100vh; 
             background: var(--orange); color: white; z-index: 2000;
             transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
-            padding: 40px 30px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;
+            padding: 40px 30px; box-sizing: border-box; display: flex; flex-direction: column;
         }
         #confirm-sidebar.active { transform: translateX(0); }
-        .sh-title { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; line-height: 0.9; }
-        .sh-desc { font-size: 1rem; opacity: 0.9; margin-bottom: 40px; font-weight: 600; text-transform: uppercase; }
+        .sh-title { font-size: 2rem; font-weight: 900; margin-bottom: 10px; line-height: 0.9; }
+        .sh-desc { font-size: 0.8rem; opacity: 0.9; margin-bottom: 30px; font-weight: 600; text-transform: uppercase; }
         .sh-btn { 
-            width: 100%; padding: 18px; border-radius: 20px; border: none; 
-            font-weight: 900; cursor: pointer; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase;
+            width: 100%; padding: 15px; border-radius: 15px; border: none; 
+            font-weight: 900; cursor: pointer; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;
         }
         .sh-confirm { background: white; color: var(--orange); }
         .sh-cancel { background: rgba(0,0,0,0.1); color: white; }
 
-        /* Плейсхолдер пустоты */
-        .empty-msg { padding: 20px; text-align: center; color: var(--muted); font-size: 0.6rem; border: 1px dashed #222; border-radius: 15px; text-transform: uppercase; font-weight: 800; }
-
+        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
+        @media (max-width: 800px) {
+            main { grid-template-columns: 1fr; overflow-y: auto; }
+            .column { height: auto; overflow: visible; padding: 20px; }
+            #confirm-sidebar { width: 100%; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
     <div id="confirm-sidebar">
-        <div class="sh-title">SYSTEM<br>AUTH</div>
-        <p class="sh-desc" id="confirm-text">...</p>
-        
+        <div class="sh-title">SYSTEM<br>CONFIRM</div>
+        <p class="sh-desc" id="confirm-text">Выполнить действие?</p>
         <button class="sh-btn sh-confirm" id="main-confirm-btn">ПОДТВЕРДИТЬ</button>
         <button class="sh-btn sh-cancel" onclick="closeSidebar()">ОТМЕНА</button>
     </div>
@@ -104,13 +116,17 @@
     </header>
 
     <main>
-        <span class="section-label">Запросы на доступ</span>
-        <h1>Входящие</h1>
-        <div class="cards-list" id="request-list"></div>
+        <div class="column">
+            <span class="section-label">Signal Inbound</span>
+            <h2>Запросы</h2>
+            <div class="cards-grid" id="request-list"></div>
+        </div>
 
-        <span class="section-label" style="margin-top: 30px;">База данных</span>
-        <h1>Активные</h1>
-        <div class="cards-list" id="user-list"></div>
+        <div class="column" style="border-left: 1px solid var(--border);">
+            <span class="section-label">Active Users</span>
+            <h2>База данных</h2>
+            <div class="cards-grid" id="user-list"></div>
+        </div>
     </main>
 
     <script type="module">
@@ -146,28 +162,23 @@
             closeSidebar();
         };
 
-        // ЗАПРОСЫ
         onSnapshot(collection(db, "requests"), (snapshot) => {
             const list = document.getElementById('request-list');
-            list.innerHTML = snapshot.empty ? '<div class="empty-msg">Сигналов нет</div>' : '';
+            list.innerHTML = snapshot.empty ? '<p style="color:#222; font-size:0.6rem; font-weight:900;">ПУСТО</p>' : '';
             snapshot.forEach(res => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.innerHTML = `
                     <div class="user-info">
                         <div class="user-avatar">?</div>
-                        <div class="user-details">
-                            <span class="user-name">${res.id}</span>
-                            <span class="user-status">Ожидание</span>
-                        </div>
+                        <span class="user-name">${res.id}</span>
                     </div>
-                    <button class="card-btn btn-approve" onclick="openConfirm('Одобрить доступ для ${res.id}?', () => approveUser('${res.id}'))">OK</button>
+                    <button class="card-btn btn-approve" onclick="openConfirm('Одобрить ${res.id}?', () => approveUser('${res.id}'))">OK</button>
                 `;
                 list.appendChild(card);
             });
         });
 
-        // ПОЛЬЗОВАТЕЛИ
         onSnapshot(collection(db, "users"), (snapshot) => {
             const list = document.getElementById('user-list');
             list.innerHTML = '';
@@ -178,12 +189,9 @@
                 card.innerHTML = `
                     <div class="user-info">
                         <div class="user-avatar">${res.id[0].toUpperCase()}</div>
-                        <div class="user-details">
-                            <span class="user-name">${res.id}</span>
-                            <span class="user-status">Допущен</span>
-                        </div>
+                        <span class="user-name">${res.id}</span>
                     </div>
-                    <button class="card-btn btn-delete" onclick="openConfirm('Заблокировать ${res.id}?', () => deleteDocById('users', '${res.id}'))">Блок</button>
+                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${res.id}?', () => deleteDocById('users', '${res.id}'))">DEL</button>
                 `;
                 list.appendChild(card);
             });
