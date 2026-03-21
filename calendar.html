@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 | CALENDARIUM</title>
+    <title>2026 | CALENDARIUM Terminal</title>
     <style>
         :root { 
             --accent: #0984e3; 
-            --bg: #f0f2f5; 
+            --bg: #fff; /* Фон белый, как на картинке */
             --orange: #f39c12; 
             --text: #2d3436; 
-            --card-bg: rgba(255, 255, 255, 0.85);
             --ev-work: #0984e3;
             --ev-important: #d63031;
             --ev-personal: #27ae60;
@@ -18,109 +17,115 @@
         
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
 
-        /* ЕДИНЫЙ САЙДБАР */
+        /* ИСПРАВЛЕННЫЙ ЕДИНЫЙ САЙДБАР */
         .sidebar { 
-            width: 360px; background: #fff; display: flex; flex-direction: column;
-            padding: 40px 30px; border-right: 1px solid #e0e0e0; z-index: 10; 
-            flex-shrink: 0; box-sizing: border-box; align-items: flex-end; text-align: right;
+            width: 420px; /* Ширина, чтобы элементы влезли комфортно */
+            padding: 50px 40px; 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1px solid #eee; 
+            z-index: 10; flex-shrink: 0; box-sizing: border-box; 
+            align-items: flex-end; /* Весь контент прижат вправо */
+            text-align: right;
         }
 
-        /* БЛОК ПОЛЬЗОВАТЕЛЯ */
-        .user-container { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .user-info { display: flex; flex-direction: column; align-items: flex-end; }
-        .user-name { font-size: 1rem; font-weight: 900; color: var(--text); text-transform: uppercase; }
-        .user-icon { color: var(--accent); display: flex; align-items: center; }
-
-        .logout-btn { 
-            background: #000; color: #fff; border: none; padding: 5px 12px; 
-            border-radius: 6px; font-size: 0.65rem; font-weight: 800; cursor: pointer; 
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
-            margin-top: 5px;
-        }
-        .logout-btn:hover { background: #333; transform: translateY(-1px); }
-
-        .user-role { font-size: 0.55rem; color: #b2bec3; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 30px; }
-
-        /* ГОД */
-        #display-year { 
-            font-size: 5rem; font-weight: 900; color: #dfe6e9; 
-            letter-spacing: -5px; line-height: 0.8; margin-bottom: 40px; 
-        }
-
-        /* СЕКЦИИ */
-        .side-section { width: 100%; margin-bottom: 30px; }
-        .side-label { font-size: 0.65rem; font-weight: 900; color: #b2bec3; margin-bottom: 15px; letter-spacing: 1.5px; text-transform: uppercase; }
+        /* --- ВЕРХНИЙ БЛОК ПРОФИЛЯ --- */
+        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 60px; }
         
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #636e72; margin-bottom: 8px; }
-        .color-dot { width: 10px; height: 10px; border-radius: 3px; }
+        /* Черная кнопка EXIT */
+        .logout-btn { 
+            background: #000; color: #fff; border: none; 
+            padding: 6px 14px; border-radius: 8px; /* Сильное скругление */
+            font-size: 0.75rem; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+        }
+        .logout-btn:hover { background: #333; }
 
-        /* КОНТЕЙНЕР ЛОГОВ */
-        .logs-container { width: 100%; max-height: 300px; overflow-y: auto; }
+        /* Имя ADMIN */
+        .user-name { font-size: 1.1rem; font-weight: 800; color: #2d3436; text-transform: uppercase; letter-spacing: -0.5px; }
+
+        /* Иконка (синяя) */
+        .user-icon { color: #0088cc; display: flex; align-items: center; }
+
+        /* --- ОГРОМНЫЙ ГОД (Светлый) --- */
+        #display-year { 
+            font-size: 8rem; /* Ещё больше */
+            font-weight: 200; /* Тонкий */
+            color: #dfe6e9; /* Светлый серый */
+            letter-spacing: -12px; /* Супер-плотный */
+            line-height: 0.7; margin: 0 0 60px 0; 
+        }
+
+        /* --- СЕКЦИИ --- */
+        .side-section { width: 100%; margin-bottom: 40px; }
+        .side-label { font-size: 0.7rem; font-weight: 700; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+        
+        /* Легенда с ПОЛОСКАМИ */
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.95rem; font-weight: 600; color: #636e72; margin-bottom: 12px; }
+        
+        /* Полоска-маркер */
+        .color-bar { width: 4px; height: 16px; border-radius: 2px; }
+
+        /* --- ЛОГИ (Розовый блок со скобкой) --- */
+        .logs-container { width: 100%; }
+        
         .log-entry { 
-            font-size: 0.75rem; background: #f8f9fa; padding: 12px; border-radius: 12px; 
-            margin-bottom: 8px; border-right: 4px solid var(--accent); line-height: 1.4; color: #636e72;
+            font-size: 0.85rem; 
+            background: #ffe6f2; /* Нежно-розовый фон */
+            padding: 16px 20px; 
+            border-radius: 15px 0 0 15px; /* Скругление только слева */
+            position: relative;
+            line-height: 1.4; color: #636e72;
+            box-sizing: border-box;
         }
-        .log-time { font-size: 0.6rem; opacity: 0.5; display: block; margin-top: 4px; }
-
-        /* СЕТКА (ПО ЦЕНТРУ) */
-        .main-view { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-        .months-grid { display: grid; grid-template-columns: repeat(4, 180px); gap: 20px; }
-
-        .month-card { 
-            background: var(--card-bg); backdrop-filter: blur(10px);
-            border-radius: 20px; height: 130px; position: relative;
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 700; font-size: 1.1rem; color: #636e72;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.5);
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+        
+        /* Ярко-розовая скобка */
+        .log-entry::after {
+            content: '';
+            position: absolute;
+            right: -10px; top: -5px; bottom: -5px; width: 10px;
+            border-right: 3px solid #e6007e; /* Яркая розовая скобка */
+            border-top: 3px solid #e6007e;
+            border-bottom: 3px solid #e6007e;
+            border-radius: 0 10px 10px 0;
         }
-        .month-card:hover { transform: scale(1.05); background: #fff; color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
 
+        /* footer: поверх шторки, если она открыта */
         footer { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 6px 20px; font-size: 9px; color: #b2bec3; border-top: 1px solid #eee; text-align: right; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="user-container">
-            <div class="user-info">
-                <div class="user-name" id="display-name">...</div>
-                <button class="logout-btn" onclick="logout()">Exit</button>
-            </div>
+        <div class="user-header">
+            <button class="logout-btn" onclick="logout()">Exit</button>
+            <div class="user-name" id="display-name">...</div>
             <div class="user-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
             </div>
         </div>
-        <div class="user-role" id="display-role">Security Level 1</div>
 
         <div id="display-year">2026</div>
 
         <div class="side-section">
             <div class="side-label">Категории</div>
-            <div class="legend-item">Работа <div class="color-dot" style="background: var(--ev-work);"></div></div>
-            <div class="legend-item">Важное <div class="color-dot" style="background: var(--ev-important);"></div></div>
-            <div class="legend-item">Личное <div class="color-dot" style="background: var(--ev-personal);"></div></div>
+            <div class="legend-item">Работа <div class="color-bar" style="background: var(--ev-work);"></div></div>
+            <div class="legend-item">Важное <div class="color-bar" style="background: var(--ev-important);"></div></div>
+            <div class="legend-item">Личное <div class="color-bar" style="background: var(--ev-personal);"></div></div>
         </div>
 
         <div class="side-section">
             <div class="side-label">Логи записей</div>
             <div class="logs-container" id="logs-container">
-                <div class="log-entry">Подключение к базе...</div>
+                <div class="log-entry">Подключение к базе..</div>
             </div>
         </div>
-
-        <div class="side-section admin-only" style="display:none;">
-            <div class="side-label">Заявки</div>
-            <div id="requests-list"></div>
-        </div>
     </div>
 
-    <div class="main-view">
-        <div class="months-grid" id="months"></div>
-    </div>
+    <div style="flex:1; background:#f0f2f5;"></div>
 
     <footer>Cloud Plan Ecosystem — Secure Terminal 2.0</footer>
 
@@ -143,23 +148,8 @@
         if (!currentUser) window.location.href = 'index.html';
         document.getElementById('display-name').innerText = currentUser;
 
-        if (currentUser === 'admin') {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            document.getElementById('display-role').innerText = 'System Administrator';
-            initAdminRequests();
-        }
-
-        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const grid = document.getElementById('months');
-        monthsNames.forEach((m, i) => {
-            const card = document.createElement('div');
-            card.className = 'month-card';
-            card.innerText = m;
-            card.onclick = () => { localStorage.setItem('selectedMonth', i); window.location.href = 'notes.html'; };
-            grid.appendChild(card);
-        });
-
-        const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(8));
+        // Логи
+        const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(1)); // На картинке только 1
         onSnapshot(qLogs, (snapshot) => {
             const container = document.getElementById('logs-container');
             if (snapshot.empty) return;
@@ -168,26 +158,11 @@
                 const data = doc.data();
                 const div = document.createElement('div');
                 div.className = 'log-entry';
-                div.innerHTML = `<b>${data.user}</b>: ${data.action} в ${data.month}<span class="log-time">${new Date(data.timestamp?.toDate()).toLocaleTimeString()}</span>`;
+                div.innerHTML = `${data.action} в ${data.month}`; // Без времени
                 container.appendChild(div);
             });
         });
 
-        function initAdminRequests() {
-            onSnapshot(collection(db, "requests"), (s) => {
-                const list = document.getElementById('requests-list');
-                list.innerHTML = '';
-                s.forEach(d => {
-                    const item = document.createElement('div');
-                    item.className = 'log-entry';
-                    item.style.borderRightColor = 'var(--orange)';
-                    item.innerHTML = `${d.id} <button onclick="approve('${d.id}', '${d.data().password}')" style="border:none; color:var(--orange); background:none; cursor:pointer; font-weight:bold; font-size:10px;">[OK]</button>`;
-                    list.appendChild(item);
-                });
-            });
-        }
-
-        window.approve = async (n, p) => { await setDoc(doc(db, "users", n), {password: p}); await deleteDoc(doc(db, "requests", n)); };
         window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
     </script>
 </body>
