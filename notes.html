@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDARIUM | Dark Elements on Light</title>
+    <title>CALENDARIUM | Pro Edition</title>
     <style>
         :root {
-            --bg-page: #f4f7f6;    /* Светлый фон всей страницы */
-            --sidebar-bg: #1e2122; /* Темный сайдбар */
-            --card-bg: #2d3436;    /* Темные плитки */
+            --bg-page: #f4f7f6;    
+            --sidebar-bg: #1e2122; 
+            --card-bg: #2d3436;    
+            --weekend-card: #34495e; /* Чуть светлее для выходных */
             --accent: #0088cc;
             --text-white: #ffffff;
             --text-dark: #2d3436;
@@ -36,11 +37,23 @@
         #month-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; color: #fff; }
         #user-name { font-weight: 800; color: #636e72; margin-bottom: 5px; text-transform: uppercase; }
 
+        /* СПИСОК ЗАМЕТОК В САЙДБАРЕ */
         #live-info { 
-            width: 100%; min-height: 100px; background: rgba(255,255,255,0.05); border-radius: 15px; 
-            padding: 15px; border-right: 5px solid #e6007e; color: #ff9fcf;
-            margin-top: 30px; font-size: 0.9rem; box-sizing: border-box;
+            width: 100%; min-height: 120px; background: rgba(255,255,255,0.05); border-radius: 15px; 
+            padding: 15px; border-right: 5px solid #e6007e; color: #fff;
+            margin-top: 30px; font-size: 0.9rem; box-sizing: border-box; overflow-y: auto;
         }
+
+        .note-item { 
+            background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; 
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 10px; text-align: left;
+        }
+        .del-btn { 
+            color: #ff7675; cursor: pointer; font-weight: 900; border: none; 
+            background: none; padding: 0 5px; font-size: 1.1rem;
+        }
+        .del-btn:hover { color: #d63031; }
 
         /* КОНТЕНТ (СВЕТЛЫЙ) */
         .main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -57,19 +70,25 @@
             cursor: pointer; transition: 0.3s; position: relative;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-        .day:hover { transform: translateY(-5px); background: #000; box-shadow: 0 12px 25px rgba(0, 136, 204, 0.3); }
+        /* СТИЛЬ ДЛЯ ВЫХОДНЫХ */
+        .day.weekend { 
+            background: var(--weekend-card); 
+            box-shadow: 0 0 15px rgba(0, 136, 204, 0.4); 
+        }
+        
+        .day:hover { transform: translateY(-5px); background: #000; }
         .day.empty { background: transparent; box-shadow: none; cursor: default; }
 
         .day-num { font-size: 1.8rem; font-weight: 900; color: #fff; }
 
-        /* ИНДИКАТОР ЗАМЕТКИ (ТОЧКИ) */
+        /* ИНДИКАТОР ЗАМЕТКИ */
         .dots { display: flex; gap: 4px; margin-top: 8px; height: 6px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
         /* МОДАЛКА */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
         .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 350px; text-align: right; color: #000; }
-        textarea { width: 100%; height: 80px; margin-top: 15px; border-radius: 10px; padding: 10px; border: 1px solid #ddd; }
+        textarea { width: 100%; height: 80px; margin-top: 15px; border-radius: 10px; padding: 10px; border: 1px solid #ddd; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -132,14 +151,15 @@
             const totalDays = new Date(2026, mIdx + 1, 0).getDate();
 
             for(let i=0; i<shift; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'day empty';
-                grid.appendChild(empty);
+                grid.innerHTML += `<div class="day empty"></div>`;
             }
 
             for(let i=1; i<=totalDays; i++) {
+                const dayDate = new Date(2026, mIdx, i);
+                const dayOfWeek = dayDate.getDay(); // 0 - Вс, 6 - Сб
+                
                 const day = document.createElement('div');
-                day.className = 'day';
+                day.className = 'day' + (dayOfWeek === 0 || dayOfWeek === 6 ? ' weekend' : '');
                 
                 const num = document.createElement('div');
                 num.className = 'day-num';
@@ -158,12 +178,7 @@
                 day.appendChild(dotsCont);
 
                 day.onmouseover = () => {
-                    const info = document.getElementById('live-info');
-                    if(dbData[i] && dbData[i].length > 0) {
-                        info.innerHTML = dbData[i].map(d => `<b>${d.user}:</b> ${d.text}`).join('<br>');
-                    } else {
-                        info.innerText = 'Событий нет';
-                    }
+                    updatePreview(i);
                 };
 
                 day.onclick = () => {
@@ -174,6 +189,43 @@
 
                 grid.appendChild(day);
             }
+        }
+
+        function updatePreview(dayNum) {
+            const info = document.getElementById('live-info');
+            if(dbData[dayNum] && dbData[dayNum].length > 0) {
+                info.innerHTML = '';
+                dbData[dayNum].forEach((note, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'note-item';
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = `<b>${note.user}:</b> ${note.text}`;
+                    item.appendChild(textSpan);
+
+                    // Удалять можно только свои заметки
+                    if(note.user === user) {
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'del-btn';
+                        delBtn.innerText = '×';
+                        delBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            deleteNote(dayNum, index);
+                        };
+                        item.appendChild(delBtn);
+                    }
+                    info.appendChild(item);
+                });
+            } else {
+                info.innerText = 'Событий нет';
+            }
+        }
+
+        async function deleteNote(day, index) {
+            const list = dbData[day];
+            list.splice(index, 1); // Удаляем элемент из массива
+            await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[day]: list}, {merge:true});
+            updatePreview(day);
         }
 
         onSnapshot(doc(db, "calendar", `2026_${mIdx}`), (snap) => {
