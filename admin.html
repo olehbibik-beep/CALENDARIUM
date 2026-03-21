@@ -2,108 +2,43 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL | Admin Control</title>
+    <title>ADMIN | System Monitor</title>
     <style>
-        :root { 
-            --bg: #1a1a1a; 
-            --card: #252525;
-            --accent: #fdcb6e; 
-            --text: #ffffff;
-            --danger: #d63031;
-            --success: #2ecc71;
-            --muted: #555;
-        }
-        
-        * { box-sizing: border-box; }
-        body { 
-            margin: 0; font-family: 'Inter', sans-serif; 
-            background: var(--bg); color: var(--text); 
-            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-        }
-
-        header { 
-            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #333; background: #111;
-        }
-        .logo { font-size: 1.2rem; font-weight: 900; color: var(--accent); text-transform: uppercase; }
-        .back-btn { 
-            background: #fff; color: #000; border: none; padding: 8px 18px; 
-            border-radius: 20px; font-weight: 900; cursor: pointer; text-decoration: none; font-size: 0.75rem;
-        }
-
-        main { flex: 1; padding: 40px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; }
-        h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -2px; }
-        .subtitle { color: var(--muted); margin-bottom: 30px; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
-
-        .section-label { font-size: 0.7rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
-
-        /* ТАБЛИЦА */
-        .table-container { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #333; margin-bottom: 40px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px 20px; background: #2d2d2d; color: #777; font-size: 0.65rem; text-transform: uppercase; }
-        td { padding: 15px 20px; border-bottom: 1px solid #333; font-size: 0.9rem; font-weight: 600; }
-        
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; background: #444; }
-
-        .btn { 
-            border: none; padding: 8px 15px; border-radius: 10px; font-weight: 900; 
-            font-size: 0.65rem; cursor: pointer; text-transform: uppercase; transition: 0.2s;
-        }
-        .btn-ok { background: var(--success); color: #000; }
-        .btn-no { background: var(--danger); color: #fff; }
-        .btn:hover { opacity: 0.8; transform: scale(1.05); }
-
-        .empty-msg { padding: 30px; text-align: center; color: var(--muted); font-size: 0.8rem; font-weight: 800; }
+        body { background: #1a1a1a; color: white; font-family: 'Inter', sans-serif; padding: 40px; }
+        .panel { max-width: 900px; margin: 0 auto; background: #252525; padding: 30px; border-radius: 30px; border: 1px solid #333; }
+        h1 { color: #fdcb6e; text-transform: uppercase; letter-spacing: -1px; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: #555; font-size: 0.7rem; text-transform: uppercase; padding: 10px 20px; }
+        td { padding: 15px 20px; border-top: 1px solid #333; font-weight: bold; }
+        .btn { border: none; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-weight: 900; text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
+        .btn-ok { background: #2ecc71; color: #000; margin-right: 5px; }
+        .btn-no { background: #d63031; color: #fff; }
+        .btn:hover { transform: scale(1.05); opacity: 0.8; }
+        .empty { text-align: center; padding: 40px; color: #444; text-transform: uppercase; font-size: 0.8rem; }
+        .section-title { font-size: 0.7rem; color: #fdcb6e; font-weight: 900; margin-top: 40px; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo">Terminal_Control</div>
-        <a href="calendar.html" class="back-btn">Выход</a>
-    </header>
+    <div class="panel">
+        <h1>Входящие запросы</h1>
+        <table>
+            <thead>
+                <tr><th>Имя (ID)</th><th>Действие</th></tr>
+            </thead>
+            <tbody id="request-list"></tbody>
+        </table>
+        <div id="no-req" class="empty">Сигналов нет</div>
 
-    <main>
-        <div class="section-label">System Inbound</div>
-        <h1>Запросы на доступ</h1>
-        <p class="subtitle">Новые пользователи, ожидающие активации ключа</p>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Имя (ID)</th>
-                        <th>Дата запроса</th>
-                        <th>Действие</th>
-                    </tr>
-                </thead>
-                <tbody id="request-list">
-                    </tbody>
-            </table>
-            <div id="req-loader" class="empty-msg">Ожидание новых сигналов...</div>
-        </div>
-
-        <div class="section-label">Active Database</div>
-        <h1>Активные профили</h1>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Пользователь</th>
-                        <th>Статус</th>
-                        <th>Управление</th>
-                    </tr>
-                </thead>
-                <tbody id="user-list">
-                    </tbody>
-            </table>
-        </div>
-    </main>
+        <div class="section-title">Активные пользователи</div>
+        <table>
+            <tbody id="user-list"></tbody>
+        </table>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -116,25 +51,23 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
 
-        // 1. СЛУШАЕМ ЗАПРОСЫ (requests)
+        // 1. ПОЛУЧАЕМ ЗАПРОСЫ
         onSnapshot(collection(db, "requests"), (snapshot) => {
             const list = document.getElementById('request-list');
-            const loader = document.getElementById('req-loader');
+            const empty = document.getElementById('no-req');
             list.innerHTML = '';
             
             if (snapshot.empty) {
-                loader.style.display = 'block';
+                empty.style.display = 'block';
             } else {
-                loader.style.display = 'none';
-                snapshot.forEach((reqDoc) => {
-                    const data = reqDoc.data();
+                empty.style.display = 'none';
+                snapshot.forEach(res => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td style="color: var(--accent)">${reqDoc.id}</td>
-                        <td style="font-size: 0.7rem; color: #777;">${data.date ? data.date.split('T')[0] : '---'}</td>
+                        <td style="color:#0984e3">${res.id}</td>
                         <td>
-                            <button class="btn btn-ok" onclick="approveUser('${reqDoc.id}')">Допустить</button>
-                            <button class="btn btn-no" onclick="rejectUser('${reqDoc.id}')">Отклонить</button>
+                            <button class="btn btn-ok" onclick="approveUser('${res.id}')">Допустить</button>
+                            <button class="btn btn-no" onclick="deleteDocById('requests', '${res.id}')">Удалить</button>
                         </td>
                     `;
                     list.appendChild(tr);
@@ -142,46 +75,44 @@
             }
         });
 
-        // 2. СЛУШАЕМ ДЕЙСТВУЮЩИХ (users)
+        // 2. ПОЛУЧАЕМ ТЕХ КТО УЖЕ В СИСТЕМЕ
         onSnapshot(collection(db, "users"), (snapshot) => {
             const list = document.getElementById('user-list');
             list.innerHTML = '';
-            snapshot.forEach((userDoc) => {
-                if (userDoc.id === 'admin') return;
+            snapshot.forEach(res => {
+                if (res.id === 'admin') return;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${userDoc.id}</td>
-                    <td><span class="badge">Active</span></td>
-                    <td><button class="btn btn-no" onclick="deleteUser('${userDoc.id}')">Удалить</button></td>
+                    <td>${res.id}</td>
+                    <td style="text-align:right">
+                        <button class="btn btn-no" onclick="deleteDocById('users', '${res.id}')">Забанить</button>
+                    </td>
                 `;
                 list.appendChild(tr);
             });
         });
 
-        // ФУНКЦИЯ ОДОБРЕНИЯ: Перенос из requests в users
+        // ЛОГИКА ОДОБРЕНИЯ
         window.approveUser = async (id) => {
             const reqRef = doc(db, "requests", id);
-            const reqSnap = await getDoc(reqRef);
-            
-            if (reqSnap.exists()) {
-                const userData = reqSnap.data();
-                // Создаем юзера в основной коллекции
+            const snap = await getDoc(reqRef);
+            if (snap.exists()) {
+                const data = snap.data();
+                // Создаем в users с тем же ID и тем же паролем (ключом)
                 await setDoc(doc(db, "users", id), {
-                    password: userData.password,
+                    password: data.password,
                     role: "user"
                 });
                 // Удаляем из запросов
                 await deleteDoc(reqRef);
-                alert(`Доступ для ${id} активирован!`);
+                alert(id + " теперь в системе!");
             }
         };
 
-        window.rejectUser = async (id) => {
-            if(confirm("Удалить запрос?")) await deleteDoc(doc(db, "requests", id));
-        };
-
-        window.deleteUser = async (id) => {
-            if(confirm("Аннулировать доступ пользователя?")) await deleteDoc(doc(db, "users", id));
+        window.deleteDocById = async (coll, id) => {
+            if(confirm("Удалить " + id + "?")) {
+                await deleteDoc(doc(db, coll, id));
+            }
         };
     </script>
 </body>
