@@ -16,7 +16,7 @@
         
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        /* САЙДБАР (Твой стиль) */
+        /* САЙДБАР */
         .sidebar { 
             width: 400px; background: var(--sidebar-bg); padding: 50px 40px; 
             display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; 
@@ -30,24 +30,38 @@
             border-radius: 8px; font-size: 0.7rem; font-weight: 900; cursor: pointer; 
             text-transform: uppercase; transition: 0.3s;
         }
+        
+        /* Исправленные титры */
+        #display-year-static { font-size: 5rem; font-weight: 200; color: #dfe6e9; letter-spacing: -8px; line-height: 0.6; margin-bottom: 5px; }
         #month-title { 
-            font-size: 6rem; font-weight: 800; color: #eceff1; 
-            letter-spacing: -6px; line-height: 0.8; margin-bottom: 40px; text-transform: uppercase;
+            font-size: 3.5rem; font-weight: 800; color: #2d3436; 
+            letter-spacing: -3px; line-height: 0.8; margin-bottom: 40px; text-transform: uppercase;
         }
 
-        .side-label { font-size: 0.75rem; font-weight: 800; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 12px; font-size: 0.9rem; color: #636e72; margin-bottom: 12px; }
-        .color-bar { width: 5px; height: 18px; border-radius: 3px; }
+        .side-section { width: 100%; margin-bottom: 30px; }
+        .side-label { font-size: 0.7rem; font-weight: 800; color: #b2bec3; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.85rem; color: #636e72; margin-bottom: 8px; }
+        .color-bar { width: 4px; height: 15px; border-radius: 2px; }
+
+        /* Динамический блок просмотра (Твоя розовая скобка) */
+        #live-preview { 
+            font-size: 0.9rem; background: #ffe6f2; padding: 20px; 
+            border-radius: 15px 0 0 15px; position: relative;
+            line-height: 1.4; color: #2d3436; text-align: right; width: 100%; box-sizing: border-box;
+            min-height: 100px; transition: 0.2s;
+        }
+        #live-preview::after {
+            content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
+            border-right: 4px solid #e6007e; border-top: 4px solid #e6007e;
+            border-bottom: 4px solid #e6007e; border-radius: 0 10px 10px 0;
+        }
+        #preview-user { font-size: 0.65rem; font-weight: 900; color: #e6007e; text-transform: uppercase; display: block; margin-bottom: 5px; }
 
         /* СЕТКА КАЛЕНДАРЯ */
         .main-content { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
-        
-        /* Заголовки дней недели */
-        .weekdays { 
-            display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; 
-            margin-bottom: 15px; text-align: center;
-        }
-        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 15px; text-align: center; }
+        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; }
 
         .days-grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
 
@@ -55,37 +69,26 @@
             background: #fff; height: 110px; border-radius: 20px; 
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 1.1rem; color: #2d3436; cursor: pointer;
-            transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.02);
+            transition: 0.3s; border: 1px solid rgba(0,0,0,0.02);
             position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
-        .day-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.07); border-color: var(--accent); }
+        .day-card:hover { transform: translateY(-5px); border-color: var(--accent); z-index: 5; }
         .day-card.empty { background: transparent; box-shadow: none; cursor: default; border: none; }
         
-        /* Индикатор заметки */
-        .day-mark { position: absolute; bottom: 15px; width: 6px; height: 6px; border-radius: 50%; }
+        .day-mark { position: absolute; bottom: 12px; width: 6px; height: 6px; border-radius: 50%; }
 
-        /* МОДАЛКА */
+        /* МОДАЛКА (для редактирования) */
         .modal { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); z-index: 100;
             align-items: center; justify-content: center;
         }
-        .modal-content { 
-            background: #fff; padding: 40px; border-radius: 30px; width: 450px; 
-            box-shadow: 0 30px 60px rgba(0,0,0,0.15); text-align: right;
-        }
-        textarea { 
-            width: 100%; height: 150px; border: 1px solid #f0f0f0; border-radius: 15px; 
-            padding: 20px; font-family: inherit; font-size: 1rem; resize: none; box-sizing: border-box; 
-            margin: 20px 0; background: #fafafa; outline: none;
-        }
-        .cat-select { display: flex; gap: 10px; margin-bottom: 25px; direction: rtl; }
-        .cat-btn { 
-            flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #f0f0f0; 
-            cursor: pointer; font-size: 0.65rem; font-weight: 900;
-        }
+        .modal-content { background: #fff; padding: 40px; border-radius: 30px; width: 450px; text-align: right; }
+        textarea { width: 100%; height: 120px; border: 1px solid #f0f0f0; border-radius: 15px; padding: 15px; font-family: inherit; margin: 15px 0; outline: none; }
+        .cat-select { display: flex; gap: 8px; margin-bottom: 20px; direction: rtl; }
+        .cat-btn { flex: 1; padding: 10px; border-radius: 8px; border: 2px solid #f0f0f0; cursor: pointer; font-size: 0.6rem; font-weight: 900; }
         .cat-btn.active { border-color: var(--accent); background: #f0f9ff; }
-        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 18px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 0.9rem; }
+        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -95,7 +98,18 @@
             <button class="back-btn" onclick="location.href='calendar.html'">Назад</button>
             <div class="user-name" id="user-display">ADMIN</div>
         </div>
-        <div id="month-title">...</div>
+        
+        <div id="display-year-static">2026</div>
+        <div id="month-title">МАРТ</div>
+
+        <div class="side-section">
+            <div class="side-label">Просмотр события</div>
+            <div id="live-preview">
+                <span id="preview-user">System</span>
+                <span id="preview-text">Наведите на день, чтобы увидеть детали...</span>
+            </div>
+        </div>
+
         <div class="side-section">
             <div class="side-label">Категории</div>
             <div class="legend-item">Работа <div class="color-bar" style="background: var(--ev-work);"></div></div>
@@ -114,15 +128,15 @@
 
     <div class="modal" id="note-modal">
         <div class="modal-content">
-            <h2 id="modal-date-title" style="margin:0; font-weight:900; letter-spacing:-1px;">Дата</h2>
+            <h2 id="modal-date-title" style="margin:0; font-weight:900;">Дата</h2>
             <textarea id="note-text" placeholder="Что планируем?"></textarea>
             <div class="cat-select">
                 <div class="cat-btn" id="btn-personal" onclick="selectCat('personal')">ЛИЧНОЕ</div>
                 <div class="cat-btn" id="btn-important" onclick="selectCat('important')">ВАЖНОЕ</div>
                 <div class="cat-btn" id="btn-work" onclick="selectCat('work')">РАБОТА</div>
             </div>
-            <button class="save-btn" onclick="saveNote()">СОХРАНИТЬ ПЛАН</button>
-            <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#b2bec3; cursor:pointer; font-weight:700;">Отмена</button>
+            <button class="save-btn" onclick="saveNote()">ОБНОВИТЬ</button>
+            <button onclick="closeModal()" style="margin-top:10px; background:none; border:none; color:#b2bec3; cursor:pointer;">Отмена</button>
         </div>
     </div>
 
@@ -150,9 +164,8 @@
         let selectedDay = null;
         let activeCat = 'work';
 
-        // Логика построения сетки
         const firstDay = new Date(2026, monthIdx, 1).getDay();
-        const shift = firstDay === 0 ? 6 : firstDay - 1; // Коррекция под Пн-Вс
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
         const daysInMonth = new Date(2026, monthIdx + 1, 0).getDate();
         const container = document.getElementById('days-container');
 
@@ -160,24 +173,38 @@
             container.innerHTML = '';
             const data = snap.exists() ? snap.data() : {};
             
-            // Пустые ячейки
             for(let s=0; s<shift; s++) {
                 const empty = document.createElement('div');
                 empty.className = 'day-card empty';
                 container.appendChild(empty);
             }
 
-            // Дни месяца
             for (let i = 1; i <= daysInMonth; i++) {
                 const card = document.createElement('div');
                 card.className = 'day-card';
                 card.innerHTML = i;
+                
                 if (data[i]) {
                     const dot = document.createElement('div');
                     dot.className = 'day-mark';
                     dot.style.background = `var(--ev-${data[i].category})`;
                     card.appendChild(dot);
                 }
+
+                // СОБЫТИЯ НАВЕДЕНИЯ
+                card.onmouseover = () => {
+                    if (data[i]) {
+                        document.getElementById('preview-user').innerText = data[i].user || 'System';
+                        document.getElementById('preview-text').innerText = data[i].text;
+                        document.getElementById('live-preview').style.background = '#fff5f9';
+                    } else {
+                        document.getElementById('preview-user').innerText = 'Пусто';
+                        document.getElementById('preview-text').innerText = 'Нет запланированных событий';
+                        document.getElementById('live-preview').style.background = '#f9f9f9';
+                    }
+                };
+
+                // Открытие модалки по клику
                 card.onclick = () => openModal(i, data[i]);
                 container.appendChild(card);
             }
