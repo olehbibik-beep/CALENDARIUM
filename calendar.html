@@ -10,18 +10,11 @@
             --sidebar-bg: #ffffff;
             --main-bg: #f0f3f5;
             --text-main: #2d3436; 
-            --ev-work: #0984e3;
-            --ev-important: #d63031;
-            --ev-personal: #27ae60;
-            --online: #2ecc71;
+            --online-green: #2ecc71;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            margin: 0; font-family: 'Inter', sans-serif; display: flex; 
-            height: 100vh; background: var(--main-bg); overflow: hidden; 
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
         /* --- САЙДБАР --- */
         .sidebar { 
@@ -30,68 +23,53 @@
             z-index: 10; flex-shrink: 0; align-items: flex-end; text-align: right;
         }
 
-        .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .user-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .user-name { font-size: 1.1rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
-        .logout-btn { background: #000; color: #fff; border: none; padding: 5px 12px; border-radius: 6px; font-size: 0.6rem; cursor: pointer; font-weight: 900; }
+        .logout-btn { background: #000; color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; font-weight: 900; }
 
         /* ВЫБОР ГОДА */
-        .year-selector { 
-            display: flex; align-items: center; gap: 15px; justify-content: flex-end; 
-            margin-bottom: 30px; color: #dfe6e9;
-        }
-        #display-year { 
-            font-size: 5.5rem; font-weight: 900; color: #dfe6e9; 
-            letter-spacing: -4px; line-height: 0.8; cursor: pointer; transition: 0.3s;
-        }
-        #display-year:hover { color: var(--accent); }
-        .year-btn { 
-            background: none; border: 1px solid #dfe6e9; color: #b2bec3; 
-            border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold;
-        }
+        .year-selector { display: flex; align-items: center; gap: 15px; justify-content: flex-end; margin-bottom: 40px; }
+        #display-year { font-size: 5.5rem; font-weight: 900; color: #dfe6e9; letter-spacing: -4px; line-height: 0.8; }
+        .year-btn { background: #fff; border: 1px solid #eee; color: #999; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .year-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        /* ПОЛЬЗОВАТЕЛИ В СЕТИ */
+        /* КТО В СЕТИ */
         .online-box { width: 100%; margin-top: auto; padding-top: 20px; border-top: 1px solid #f1f1f1; }
-        .online-title { font-size: 0.7rem; font-weight: 800; color: #b2bec3; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-        .online-dot { width: 8px; height: 8px; background: var(--online); border-radius: 50%; box-shadow: 0 0 8px var(--online); animation: pulse 1.5s infinite; }
+        .online-title { font-size: 0.75rem; font-weight: 800; color: #b2bec3; text-transform: uppercase; margin-bottom: 15px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .online-dot { width: 8px; height: 8px; background: var(--online-green); border-radius: 50%; box-shadow: 0 0 10px var(--online-green); }
         
-        .user-online-item { font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-        .user-online-item::before { content: ''; width: 4px; height: 4px; background: #dfe6e9; border-radius: 50%; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .user-list { display: flex; flex-direction: column; gap: 10px; }
+        .user-badge { font-size: 0.9rem; font-weight: 700; color: var(--text-main); text-transform: lowercase; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+        .user-badge::after { content: ''; width: 4px; height: 4px; background: var(--online-green); border-radius: 50%; }
 
         /* --- СЕТКА МЕСЯЦЕВ --- */
-        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 25px; height: 100vh; }
-        .months-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; width: 100%; max-width: 1000px; 
-        }
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 1000px; }
 
         .month-card { 
-            background: #fff; border-radius: 20px; position: relative; overflow: hidden;
+            background: #fff; border-radius: 24px; position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: center; 
             font-weight: 800; font-size: 1.1rem; color: var(--text-main);
             cursor: pointer; border: 1px solid rgba(0,0,0,0.05);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             aspect-ratio: 1.2 / 1;
         }
-        .month-card::before { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 5px; background: var(--accent); }
-        .month-card:nth-child(3n+1)::before { background: var(--ev-work); }
-        .month-card:nth-child(3n+2)::before { background: var(--ev-important); }
-        .month-card:nth-child(3n+3)::before { background: var(--ev-personal); }
+        /* Одинаковая синяя полоска для всех как в заметках */
+        .month-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 6px; background: var(--accent); }
 
-        .month-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.06); border-color: var(--accent); }
+        .month-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); border-color: var(--accent); }
 
         /* МОБИЛКИ */
         @media (max-width: 850px) {
             body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; padding: 15px; align-items: center; text-align: center; border-right: none; border-bottom: 1px solid #eee; }
-            .year-selector { margin-bottom: 10px; gap: 10px; }
-            #display-year { font-size: 3rem; letter-spacing: -2px; }
-            .online-box { display: none; } /* На мобилках скрываем список юзеров для места */
-            .main-content { padding: 10px; height: calc(100vh - 150px); }
-            .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; height: 100%; }
-            .month-card { aspect-ratio: auto; font-size: 0.85rem; border-radius: 12px; }
+            .sidebar { width: 100%; height: auto; padding: 15px; align-items: center; border-right: none; border-bottom: 1px solid #eee; }
+            .year-selector { margin-bottom: 10px; }
+            #display-year { font-size: 3.5rem; }
+            .online-box { padding: 10px 0; }
+            .user-list { flex-direction: row; justify-content: center; flex-wrap: wrap; }
+            .main-content { padding: 15px; height: calc(100vh - 200px); }
+            .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%; }
+            .month-card { aspect-ratio: auto; font-size: 0.9rem; border-radius: 16px; }
         }
     </style>
 </head>
@@ -110,12 +88,8 @@
         </div>
 
         <div class="online-box">
-            <div class="online-title">
-                Users Online
-                <div class="online-dot"></div>
-            </div>
-            <div id="online-list">
-                <div class="user-online-item" id="me-status">Вы в сети</div>
+            <div class="online-title">Terminal Users <div class="online-dot"></div></div>
+            <div id="user-list" class="user-list">
                 </div>
         </div>
     </div>
@@ -125,24 +99,65 @@
     </div>
 
     <script type="module">
-        /* Названия месяцев */
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) window.location.href = 'index.html';
+        document.getElementById('display-name').innerText = currentUser;
+
+        // 1. ОТМЕЧАЕМ СЕБЯ В СЕТИ
+        const userStatusRef = doc(db, "online_users", currentUser);
+        const setOnline = async () => {
+            await setDoc(userStatusRef, { name: currentUser, lastSeen: Date.now() });
+        };
+        setOnline();
+
+        // Удаляем статус при выходе
+        window.logout = async () => {
+            await deleteDoc(userStatusRef);
+            localStorage.clear();
+            window.location.href = 'index.html';
+        };
+
+        // 2. СЛУШАЕМ, КТО ЕЩЕ В СЕТИ
+        onSnapshot(collection(db, "online_users"), (snapshot) => {
+            const list = document.getElementById('user-list');
+            list.innerHTML = '';
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                const div = document.createElement('div');
+                div.className = 'user-badge';
+                div.innerText = user.name;
+                list.appendChild(div);
+            });
+        });
+
+        // 3. КАЛЕНДАРЬ
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const grid = document.getElementById('months');
         const yearTitle = document.getElementById('display-year');
-        
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
         yearTitle.innerText = currentYear;
 
-        const currentUser = localStorage.getItem('currentUser') || 'Guest';
-        document.getElementById('display-name').innerText = currentUser;
-
-        /* Отрисовка сетки */
         function renderMonths() {
             grid.innerHTML = '';
             monthsNames.forEach((m, i) => {
                 const card = document.createElement('div');
                 card.className = 'month-card';
-                card.innerHTML = `<span>${m}</span>`;
+                card.innerText = m;
                 card.onclick = () => { 
                     localStorage.setItem('selectedMonth', i);
                     localStorage.setItem('selectedYear', currentYear);
@@ -152,7 +167,6 @@
             });
         }
 
-        /* Функция смены года */
         window.changeYear = (dir) => {
             currentYear += dir;
             yearTitle.innerText = currentYear;
@@ -160,9 +174,12 @@
             renderMonths();
         };
 
-        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
-
         renderMonths();
+
+        // Удаление статуса при закрытии вкладки
+        window.addEventListener('beforeunload', () => {
+            deleteDoc(userStatusRef);
+        });
     </script>
 </body>
 </html>
