@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDARIUM | Final Stable</title>
+    <title>CALENDARIUM | Ultra Stable</title>
     <style>
         :root {
             --bg-page: #f4f7f6;    
             --sidebar-bg: #1e2122; 
             --card-bg: #2d3436;    
-            --weekend-text: #ff9f43; 
+            --weekend-color: #ff9f43; 
             --accent: #0088cc;
         }
 
@@ -20,15 +20,16 @@
             width: 380px; background: var(--sidebar-bg); padding: 40px; 
             display: flex; flex-direction: column; align-items: flex-end; 
             text-align: right; flex-shrink: 0; box-sizing: border-box; color: white;
-            z-index: 10;
+            z-index: 100; box-shadow: 5px 0 15px rgba(0,0,0,0.2);
         }
 
         .back-btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-bottom: 20px; }
-        #month-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; }
+        #month-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; line-height: 1; }
+        #user-name { color: #636e72; font-weight: 800; margin-bottom: 10px; }
 
         #live-info { 
             width: 100%; min-height: 150px; background: rgba(255,255,255,0.05); border-radius: 15px; 
-            padding: 15px; border-right: 5px solid #ff9f43; color: #fff;
+            padding: 15px; border-right: 5px solid var(--weekend-color); color: #fff;
             margin-top: 30px; font-size: 0.9rem; box-sizing: border-box; overflow-y: auto;
         }
 
@@ -42,27 +43,32 @@
         }
 
         /* КОНТЕНТ */
-        .main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
+        .main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* ЖЕСТКАЯ СЕТКА ДНЕЙ НЕДЕЛИ */
+        /* ДНИ НЕДЕЛЕИ (СТАТИКА) */
         .weekdays { 
             display: grid; grid-template-columns: repeat(7, 110px); 
-            gap: 15px; margin-bottom: 15px; width: fit-content;
+            gap: 15px; margin-bottom: 15px;
         }
         .weekday { color: #2d3436; font-weight: 900; text-transform: uppercase; text-align: center; font-size: 0.8rem; }
+        .weekday.we { color: var(--weekend-color); }
 
-        .grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; width: fit-content; }
+        /* СЕТКА */
+        .grid { 
+            display: grid; grid-template-columns: repeat(7, 110px); 
+            gap: 15px; min-height: 610px; /* Чтобы не прыгало при загрузке */
+        }
 
         .day { 
             width: 110px; height: 110px; background: var(--card-bg); border-radius: 20px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; transition: 0.2s; position: relative; box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            cursor: pointer; transition: 0.2s; position: relative;
         }
         .day:hover { background: #000; transform: translateY(-3px); }
-        .day.empty { background: transparent; box-shadow: none; cursor: default; pointer-events: none; }
+        .day.empty { background: transparent; cursor: default; pointer-events: none; }
 
         .day-num { font-size: 1.8rem; font-weight: 900; color: #fff; }
-        .day.weekend .day-num { color: var(--weekend-text); }
+        .day.weekend .day-num { color: var(--weekend-color); }
 
         .dots { display: flex; gap: 4px; margin-top: 8px; height: 6px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
@@ -76,23 +82,23 @@
 
     <div class="sidebar">
         <button class="back-btn" onclick="location.href='calendar.html'">НАЗАД</button>
-        <div id="user-name" style="color: #636e72; font-weight: 800;">ADMIN</div>
-        <h1 id="month-title">АПРЕЛЬ</h1>
-        <div id="live-info">Наведите на дату...</div>
+        <div id="user-name">ADMIN</div>
+        <h1 id="month-title">МЕСЯЦ</h1>
+        <div id="live-info">Загрузка...</div>
     </div>
 
     <div class="main">
         <div class="weekdays">
             <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
-            <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday" style="color: var(--weekend-text)">Сб</div><div class="weekday" style="color: var(--weekend-text)">Вс</div>
+            <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday we">Сб</div><div class="weekday we">Вс</div>
         </div>
         <div id="grid" class="grid"></div>
     </div>
 
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h2 id="m-date" style="margin:0">Дата</h2>
-            <textarea id="m-input" style="width:100%; height:80px; margin-top:15px; border-radius:10px; padding:10px; border:1px solid #ddd; font-family: inherit;"></textarea>
+            <h2 id="m-date" style="margin:0; color: #000;">Дата</h2>
+            <textarea id="m-input" style="width:100%; height:80px; margin-top:15px; border-radius:10px; padding:10px; border:1px solid #ddd;"></textarea>
             <button onclick="save()" style="width:100%; padding:15px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:900; margin-top:10px; cursor:pointer;">СОХРАНИТЬ</button>
             <button onclick="closeM()" style="background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Закрыть</button>
         </div>
@@ -120,103 +126,94 @@
         document.getElementById('user-name').innerText = currentUser;
 
         let dbData = {};
-        let activeHoverDay = null;
+        let activeDay = null;
 
         function render() {
             const grid = document.getElementById('grid');
+            if(!grid) return;
             grid.innerHTML = '';
             
-            const first = new Date(2026, mIdx, 1).getDay();
-            const shift = first === 0 ? 6 : first - 1;
-            const totalDays = new Date(2026, mIdx + 1, 0).getDate();
+            const firstDay = new Date(2026, mIdx, 1).getDay();
+            const shift = firstDay === 0 ? 6 : firstDay - 1;
+            const daysInMonth = new Date(2026, mIdx + 1, 0).getDate();
 
             for(let i=0; i<shift; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'day empty';
-                grid.appendChild(empty);
+                grid.appendChild(Object.assign(document.createElement('div'), {className: 'day empty'}));
             }
 
-            for(let i=1; i<=totalDays; i++) {
-                const dDate = new Date(2026, mIdx, i);
-                const isWeekend = dDate.getDay() === 0 || dDate.getDay() === 6;
+            for(let i=1; i<=daysInMonth; i++) {
+                const date = new Date(2026, mIdx, i);
+                const isWE = (date.getDay() === 0 || date.getDay() === 6);
                 
                 const day = document.createElement('div');
-                day.className = 'day' + (isWeekend ? ' weekend' : '');
+                day.className = 'day' + (isWE ? ' weekend' : '');
                 day.innerHTML = `<div class="day-num">${i}</div>`;
 
-                const dotsCont = document.createElement('div');
-                dotsCont.className = 'dots';
+                const dots = document.createElement('div');
+                dots.className = 'dots';
                 if(dbData[i]) dbData[i].forEach(() => {
-                    const d = document.createElement('div');
-                    d.className = 'dot';
-                    dotsCont.appendChild(d);
+                    dots.appendChild(Object.assign(document.createElement('div'), {className: 'dot'}));
                 });
-                day.appendChild(dotsCont);
+                day.appendChild(dots);
 
-                day.onmouseover = () => {
-                    activeHoverDay = i;
-                    showNotes(i);
-                };
-
-                day.onclick = () => {
-                    activeHoverDay = i;
-                    document.getElementById('m-date').innerText = i + ' ' + months[mIdx];
-                    document.getElementById('modal').style.display = 'flex';
-                };
+                day.onmouseover = () => { activeDay = i; updatePreview(i); };
+                day.onclick = () => { activeDay = i; openModal(i); };
                 grid.appendChild(day);
             }
         }
 
-        window.showNotes = (day) => {
+        function updatePreview(day) {
             const info = document.getElementById('live-info');
+            if(!dbData[day] || dbData[day].length === 0) {
+                info.innerText = 'Нет заметок';
+                return;
+            }
             info.innerHTML = '';
-            if(dbData[day] && dbData[day].length > 0) {
-                dbData[day].forEach((n, idx) => {
-                    const item = document.createElement('div');
-                    item.className = 'note-item';
-                    item.innerHTML = `<span><b>${n.user}:</b> ${n.text}</span>`;
-                    
-                    if(n.user === currentUser) {
-                        const btn = document.createElement('button');
-                        btn.className = 'del-btn';
-                        btn.innerText = 'Удалить свою';
-                        btn.onclick = (e) => {
-                            e.stopPropagation();
-                            deleteNote(day, idx);
-                        };
-                        item.appendChild(btn);
-                    }
-                    info.appendChild(item);
-                });
-            } else { info.innerText = 'Нет заметок'; }
-        };
-
-        async function deleteNote(day, idx) {
-            const newList = [...dbData[day]];
-            newList.splice(idx, 1);
-            await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[day]: newList}, {merge:true});
-            // После удаления принудительно обновляем превью для этого дня
-            setTimeout(() => showNotes(day), 100);
+            dbData[day].forEach((n, idx) => {
+                const item = document.createElement('div');
+                item.className = 'note-item';
+                item.innerHTML = `<span><b>${n.user}:</b> ${n.text}</span>`;
+                if(n.user === currentUser) {
+                    const btn = document.createElement('button');
+                    btn.className = 'del-btn';
+                    btn.innerText = 'Удалить';
+                    btn.onclick = (e) => { e.stopPropagation(); deleteNote(day, idx); };
+                    item.appendChild(btn);
+                }
+                info.appendChild(item);
+            });
         }
 
-        onSnapshot(doc(db, "calendar", `2026_${mIdx}`), (snap) => {
-            dbData = snap.exists() ? snap.data() : {};
-            render();
-            if(activeHoverDay) showNotes(activeHoverDay);
-        });
+        async function deleteNote(day, idx) {
+            const list = [...dbData[day]];
+            list.splice(idx, 1);
+            await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[day]: list}, {merge:true});
+        }
+
+        function openModal(day) {
+            document.getElementById('m-date').innerText = day + ' ' + months[mIdx];
+            document.getElementById('modal').style.display = 'flex';
+        }
 
         window.closeM = () => document.getElementById('modal').style.display = 'none';
-        
+
         window.save = async () => {
-            const text = document.getElementById('m-input').value;
-            if(!text) return;
-            const list = dbData[activeHoverDay] || [];
-            list.push({text, user: currentUser});
-            await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[activeHoverDay]: list}, {merge:true});
+            const val = document.getElementById('m-input').value;
+            if(!val) return;
+            const list = dbData[activeDay] || [];
+            list.push({text: val, user: currentUser});
+            await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[activeDay]: list}, {merge:true});
             document.getElementById('m-input').value = '';
             closeM();
         };
 
+        onSnapshot(doc(db, "calendar", `2026_${mIdx}`), (snap) => {
+            dbData = snap.exists() ? snap.data() : {};
+            render();
+            if(activeDay) updatePreview(activeDay);
+        });
+
+        // Первый запуск
         render();
     </script>
 </body>
