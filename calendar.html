@@ -10,7 +10,8 @@
             --main-bg: #f4f4f4;    
             --card-bg: #2d3436;    
             --text-white: #ffffff;
-            --accent-blue: #0984e3;
+            --ev-important: #d63031; /* Красный */
+            --ev-work: #0984e3;      /* Синий */
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -24,76 +25,64 @@
             color: var(--text-white);
         }
 
-        .user-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .user-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
         .logout-btn { background: #fff; color: #000; border: none; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
         .user-name { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; }
 
-        #display-year { 
-            font-size: 8rem; font-weight: 900; color: #252525; 
-            letter-spacing: -5px; line-height: 0.7; margin-bottom: 20px;
+        /* СЕЛЕКТОР ГОДА */
+        .year-switcher { 
+            display: flex; align-items: baseline; gap: 20px; justify-content: flex-end; 
+            margin-bottom: 50px; width: 100%;
         }
-        .year-controls { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 40px; }
-        .year-btn { background: #333; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .year-btn:hover { background: var(--accent-blue); }
+        .year-side { font-size: 1.5rem; font-weight: 900; color: #333; cursor: pointer; transition: 0.3s; }
+        #display-year { font-size: 6rem; font-weight: 900; color: var(--text-white); letter-spacing: -4px; line-height: 0.8; }
 
         /* БЛИЖАЙШЕЕ СОБЫТИЕ */
         .upcoming-box { width: 100%; margin-top: auto; text-align: right; }
         .side-label { font-size: 0.75rem; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        
         .event-card-mini { 
             background: #252525; padding: 20px; border-radius: 20px; 
-            border-right: 4px solid var(--accent-blue);
+            transition: 0.3s; position: relative; overflow: hidden;
         }
+        /* Динамический индикатор цвета в тулбаре */
+        .event-card-mini.important { border-right: 5px solid var(--ev-important); }
+        .event-card-mini.work { border-right: 5px solid var(--ev-work); }
+
         .ev-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
-        .ev-date { font-size: 0.8rem; font-weight: 700; color: var(--accent-blue); }
+        .ev-date { font-size: 0.8rem; font-weight: 700; opacity: 0.8; }
 
-        /* --- СЕТКА (МЕНЬШЕ ПЛИТКИ, БОЛЬШЕ ОТСТУП) --- */
-        .main-content { 
-            flex: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 80px; /* Большой отступ от краев экрана */
-        }
-
-        .months-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 30px; /* Больше расстояние между плитками */
-            width: 100%; 
-            max-width: 800px; /* Ограничил ширину, чтобы плитки стали меньше */
-        }
-
+        /* --- СЕТКА МЕСЯЦЕВ --- */
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 80px; }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; width: 100%; max-width: 750px; }
+        
         .month-card { 
-            background: var(--card-bg); 
-            border-radius: 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: 900; 
-            font-size: 1rem; /* Чуть меньше шрифт для баланса */
-            color: #fff;
-            cursor: pointer; 
-            aspect-ratio: 1 / 1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg); border-radius: 20px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-weight: 900; font-size: 0.9rem; color: #fff;
+            cursor: pointer; aspect-ratio: 1 / 1;
+            transition: 0.3s; text-transform: uppercase;
+            position: relative;
         }
-
-        .month-card:hover { 
-            transform: scale(1.1); 
-            background: #000; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        
+        /* Точки уведомлений на плитках месяцев */
+        .month-indicator { 
+            position: absolute; top: 15px; right: 15px; display: flex; gap: 4px; 
         }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot.red { background: var(--ev-important); box-shadow: 0 0 5px var(--ev-important); }
+        .dot.blue { background: var(--ev-work); box-shadow: 0 0 5px var(--ev-work); }
 
-        /* МОБИЛКИ */
+        .month-card:hover { transform: scale(1.1); background: #000; }
+
         @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; }
+            body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; }
-            #display-year { font-size: 4rem; margin-bottom: 10px; }
+            .year-switcher { justify-content: center; margin-bottom: 20px; }
+            #display-year { font-size: 4rem; }
             .upcoming-box { display: none; }
-            .main-content { padding: 40px 20px; height: auto; }
-            .months-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
-            .month-card { font-size: 0.8rem; border-radius: 12px; }
+            .main-content { padding: 30px; }
+            .months-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -105,18 +94,16 @@
             <div class="user-name" id="display-name">...</div>
         </div>
 
-        <div class="year-selector">
-            <div id="display-year">2026</div>
-            <div class="year-controls">
-                <button class="year-btn" onclick="changeYear(-1)">‹</button>
-                <button class="year-btn" onclick="changeYear(1)">›</button>
-            </div>
+        <div class="year-switcher">
+            <div class="year-side" id="prev-year" onclick="changeYear(-1)"></div>
+            <div id="display-year"></div>
+            <div class="year-side" id="next-year" onclick="changeYear(1)"></div>
         </div>
 
         <div class="upcoming-box">
-            <div class="side-label">Ближайшее</div>
+            <div class="side-label">Ближайший приоритет</div>
             <div id="next-event-container">
-                <div style="color: #444; font-size: 0.8rem; font-weight: 900;">ЗАГРУЗКА...</div>
+                <div style="color: #444; font-size: 0.8rem; font-weight: 900;">СВОБОДНО</div>
             </div>
         </div>
     </div>
@@ -127,7 +114,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -142,30 +129,67 @@
         const currentUser = localStorage.getItem('currentUser') || 'ADMIN';
         document.getElementById('display-name').innerText = currentUser;
 
-        // Ближайшее событие
+        // 1. ПОИСК БЛИЖАЙШЕГО СОБЫТИЯ (КРАСНОЕ ИЛИ СИНЕЕ)
         const now = new Date().toISOString().split('T')[0];
-        const q = query(collection(db, "events"), where("date", ">=", now), orderBy("date", "asc"), limit(1));
-        onSnapshot(q, (snapshot) => {
+        const qEvents = query(collection(db, "events"), where("date", ">=", now), orderBy("date", "asc"));
+
+        onSnapshot(qEvents, (snapshot) => {
             const container = document.getElementById('next-event-container');
-            if (snapshot.empty) { container.innerHTML = '<div style="color:#444; font-weight:900;">ПЛАНОВ НЕТ</div>'; return; }
-            snapshot.forEach(doc => {
-                const ev = doc.data();
-                container.innerHTML = `<div class="event-card-mini"><div class="ev-title">${ev.title}</div><div class="ev-date">${ev.date.split('-').reverse().join('.')}</div></div>`;
-            });
+            let events = [];
+            snapshot.forEach(doc => events.push(doc.data()));
+
+            // Фильтруем только красные и синие
+            const priority = events.find(e => e.type === 'important' || e.type === 'work');
+            
+            if (priority) {
+                const typeClass = priority.type === 'important' ? 'important' : 'work';
+                container.innerHTML = `
+                    <div class="event-card-mini ${typeClass}">
+                        <div class="ev-title">${priority.title}</div>
+                        <div class="ev-date" style="color: var(--ev-${priority.type})">${priority.date.split('-').reverse().join('.')}</div>
+                    </div>
+                `;
+            } else if (events[0]) { // Если приоритетных нет, берем любое ближайшее
+                container.innerHTML = `
+                    <div class="event-card-mini">
+                        <div class="ev-title">${events[0].title}</div>
+                        <div class="ev-date">${events[0].date.split('-').reverse().join('.')}</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<div style="color:#444; font-weight:900;">НЕТ СОБЫТИЙ</div>';
+            }
+
+            // 2. ОБНОВЛЕНИЕ ИНДИКАТОРОВ НА ПЛИТКАХ МЕСЯЦЕВ
+            renderMonths(events);
         });
 
-        // Сетка месяцев
+        // 3. СЕТКА МЕСЯЦЕВ
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const grid = document.getElementById('months');
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
-        document.getElementById('display-year').innerText = currentYear;
 
-        function renderMonths() {
+        function renderMonths(allEvents = []) {
             grid.innerHTML = '';
             monthsNames.forEach((m, i) => {
                 const card = document.createElement('div');
                 card.className = 'month-card';
-                card.innerText = m;
+                card.innerHTML = `<span>${m}</span>`;
+
+                // Проверяем наличие красных/синих событий в этом месяце
+                const monthEvents = allEvents.filter(e => {
+                    const d = new Date(e.date);
+                    return d.getMonth() === i && d.getFullYear() === currentYear;
+                });
+
+                if (monthEvents.length > 0) {
+                    const indicators = document.createElement('div');
+                    indicators.className = 'month-indicator';
+                    if (monthEvents.some(e => e.type === 'important')) indicators.innerHTML += '<div class="dot red"></div>';
+                    if (monthEvents.some(e => e.type === 'work')) indicators.innerHTML += '<div class="dot blue"></div>';
+                    card.appendChild(indicators);
+                }
+
                 card.onclick = () => { 
                     localStorage.setItem('selectedMonth', i);
                     localStorage.setItem('selectedYear', currentYear);
@@ -178,12 +202,18 @@
         window.changeYear = (dir) => {
             currentYear += dir;
             document.getElementById('display-year').innerText = currentYear;
+            document.getElementById('prev-year').innerText = currentYear - 1;
+            document.getElementById('next-year').innerText = currentYear + 1;
             localStorage.setItem('selectedYear', currentYear);
-            renderMonths();
+            // Месяцы перерисуются через onSnapshot
         };
 
         window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
-        renderMonths();
+        
+        // Initial setup
+        document.getElementById('display-year').innerText = currentYear;
+        document.getElementById('prev-year').innerText = currentYear - 1;
+        document.getElementById('next-year').innerText = currentYear + 1;
     </script>
 </body>
 </html>
