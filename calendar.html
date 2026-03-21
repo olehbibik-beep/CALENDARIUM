@@ -7,24 +7,26 @@
     <style>
         :root { 
             --accent: #0088cc; 
-            --bg: #f8f9fa; 
-            --text: #2d3436; 
-            --card-bg: #ffffff;
+            --sidebar-bg: #ffffff;
+            --main-bg: #f4f7f6; /* Светло-серый фон для контраста с сайдбаром */
+            --text-main: #2d3436; 
+            --text-muted: #636e72;
             --ev-work: #0984e3;
             --ev-important: #d63031;
             --ev-personal: #27ae60;
         }
         
-        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        /* САЙДБАР (ПО КАРТИНКЕ) */
+        /* УЛУЧШЕННЫЙ САЙДБАР */
         .sidebar { 
             width: 400px; 
-            background: #fff; 
+            background: var(--sidebar-bg); 
             padding: 50px 40px; 
             display: flex; 
             flex-direction: column; 
-            border-right: 1px solid #eee; 
+            border-right: 1px solid #e0e0e0; 
+            box-shadow: 10px 0 30px rgba(0,0,0,0.03); /* Тень для отделения от контента */
             z-index: 10; flex-shrink: 0; box-sizing: border-box; 
             align-items: flex-end; 
             text-align: right;
@@ -34,63 +36,64 @@
         .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
         .logout-btn { 
             background: #000; color: #fff; border: none; 
-            padding: 6px 14px; border-radius: 8px; 
-            font-size: 0.75rem; font-weight: 900; cursor: pointer; 
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+            padding: 7px 16px; border-radius: 8px; 
+            font-size: 0.7rem; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
         }
-        .user-name { font-size: 1.1rem; font-weight: 800; color: #2d3436; text-transform: uppercase; }
+        .logout-btn:hover { background: #333; transform: scale(1.05); }
+        .user-name { font-size: 1.1rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
         .user-icon { color: var(--accent); display: flex; align-items: center; }
 
-        /* ГОД */
+        /* ГОД (Более читабельный) */
         #display-year { 
-            font-size: 8rem; font-weight: 200; color: #dfe6e9; 
-            letter-spacing: -12px; line-height: 0.7; margin-bottom: 60px; 
+            font-size: 8rem; font-weight: 800; 
+            color: #eceff1; /* Чуть темнее и насыщеннее */
+            letter-spacing: -10px; line-height: 0.7; margin-bottom: 60px; 
+            text-shadow: 1px 1px 0px #fff; 
         }
 
         /* СЕКЦИИ */
-        .side-section { width: 100%; margin-bottom: 40px; }
-        .side-label { font-size: 0.7rem; font-weight: 700; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.95rem; font-weight: 600; color: #636e72; margin-bottom: 12px; }
-        .color-bar { width: 4px; height: 16px; border-radius: 2px; }
+        .side-section { width: 100%; margin-bottom: 40px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; }
+        .side-section:last-of-type { border: none; }
 
-        /* ЛОГИ (РОЗОВЫЙ БЛОК) */
+        .side-label { font-size: 0.75rem; font-weight: 800; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 12px; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+        .color-bar { width: 5px; height: 18px; border-radius: 3px; }
+
+        /* ЛОГИ (Яркий акцент) */
         .log-entry { 
-            font-size: 0.85rem; background: #ffe6f2; padding: 16px 20px; 
+            font-size: 0.85rem; background: #fff5f9; padding: 18px 20px; 
             border-radius: 15px 0 0 15px; position: relative;
-            line-height: 1.4; color: #636e72; text-align: right; width: 100%; box-sizing: border-box;
+            line-height: 1.5; color: #4b4b4b; text-align: right; width: 100%; box-sizing: border-box;
+            box-shadow: -5px 5px 15px rgba(230, 0, 126, 0.05);
         }
         .log-entry::after {
             content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
-            border-right: 3px solid #e6007e; border-top: 3px solid #e6007e;
-            border-bottom: 3px solid #e6007e; border-radius: 0 10px 10px 0;
+            border-right: 4px solid #e6007e; border-top: 4px solid #e6007e;
+            border-bottom: 4px solid #e6007e; border-radius: 0 10px 10px 0;
         }
 
         /* ЦЕНТРАЛЬНАЯ ЧАСТЬ */
-        .main-content { 
-            flex: 1; display: flex; align-items: center; justify-content: center; 
-            padding: 40px; position: relative; 
-        }
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
 
-        .months-grid { 
-            display: grid; grid-template-columns: repeat(4, 180px); gap: 20px; 
-        }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 190px); gap: 25px; }
 
         .month-card { 
-            background: #fff; border-radius: 20px; height: 130px; 
+            background: #fff; border-radius: 24px; height: 140px; 
             display: flex; align-items: center; justify-content: center; 
-            font-weight: 800; font-size: 1.1rem; color: #2d3436;
-            cursor: pointer; border: 1px solid transparent;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            font-weight: 800; font-size: 1.1rem; color: var(--text-main);
+            cursor: pointer; border: 1px solid rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
         }
 
         .month-card:hover { 
-            transform: scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.05);
-            color: var(--accent); border-color: #eee;
+            transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            color: var(--accent); border-color: var(--accent);
         }
 
-        footer { position: fixed; bottom: 0; width: 100%; padding: 10px 40px; font-size: 10px; color: #b2bec3; text-align: right; background: #fff; border-top: 1px solid #eee; }
+        footer { position: fixed; bottom: 0; width: 100%; padding: 12px 40px; font-size: 10px; color: #b2bec3; text-align: right; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -119,7 +122,7 @@
         <div class="side-section">
             <div class="side-label">Логи записей</div>
             <div id="logs-container">
-                <div class="log-entry">Подключение к базе..</div>
+                <div class="log-entry">Система готова к работе..</div>
             </div>
         </div>
     </div>
@@ -148,10 +151,9 @@
         if (!currentUser) window.location.href = 'index.html';
         document.getElementById('display-name').innerText = currentUser;
 
-        // Отрисовка месяцев
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const grid = document.getElementById('months');
-        months.forEach((m, i) => {
+        monthsNames.forEach((m, i) => {
             const card = document.createElement('div');
             card.className = 'month-card';
             card.innerText = m;
@@ -159,7 +161,6 @@
             grid.appendChild(card);
         });
 
-        // Живые логи (только 1 последний, как на скрине)
         const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(1));
         onSnapshot(qLogs, (snapshot) => {
             const container = document.getElementById('logs-container');
