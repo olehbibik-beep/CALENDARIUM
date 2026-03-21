@@ -5,6 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Планы | CALENDARIUM Terminal</title>
     <style>
+        /* АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ (Экран меньше 800px) */
+@media (max-width: 800px) {
+    body { 
+        flex-direction: column; /* Сайдбар теперь сверху, календарь снизу */
+        overflow-y: auto; 
+    }
+
+    .sidebar { 
+        width: 100%; 
+        height: auto; 
+        padding: 20px; 
+        align-items: center; 
+        text-align: center;
+        flex-shrink: 1;
+    }
+
+    #display-year-static { font-size: 3rem; letter-spacing: -2px; }
+    #month-title { font-size: 1.8rem; margin-bottom: 15px; }
+    
+    #live-preview { 
+        border-radius: 10px; 
+        border-right: none; 
+        border-bottom: 3px solid var(--accent);
+        min-height: auto;
+        padding: 10px;
+    }
+
+    .main-content { 
+        padding: 10px; 
+        justify-content: flex-start; 
+    }
+
+    /* Сетка становится резиновой */
+    .weekdays-fixed, .days-grid { 
+        grid-template-columns: repeat(7, 1fr); 
+        gap: 5px; 
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .day-card { 
+        width: auto; 
+        height: 60px; /* Уменьшаем высоту, чтобы не скроллить вечно */
+        border-radius: 10px;
+        font-size: 1rem;
+    }
+
+    .day-mark-rect {
+        width: 15px; /* Полоски поменьше */
+        height: 3px;
+    }
+
+    .modal-content {
+        width: 90%; /* Модалка на весь экран */
+        padding: 20px;
+    }
+    
+    .cat-btn {
+        padding: 6px;
+        font-size: 8px;
+    }
+}
         :root { 
             --accent: #0088cc; 
             --main-bg: #f4f7f6;
