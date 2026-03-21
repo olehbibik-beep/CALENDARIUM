@@ -7,11 +7,9 @@
     <style>
         :root { 
             --accent: #0088cc; 
-            --main-bg: #f4f7f6; /* СВЕТЛЫЙ ФОН */
-            --sidebar-bg: #1e2122; /* ТЕМНЫЙ САЙДБАР */
-            --dark-card: #2d3436; /* ТЕМНЫЕ ДНИ */
-            --text-white: #ffffff;
-            --text-dim: #b2bec3;
+            --main-bg: #f4f7f6; /* Светлый фон всей страницы */
+            --sidebar-bg: #1e2122; /* Темный сайдбар как на скрине */
+            --dark-card: #2d3436; /* Темные плитки дней */
             --ev-work: #0984e3;
             --ev-important: #d63031;
             --ev-personal: #27ae60;
@@ -29,43 +27,46 @@
 
         .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .back-btn { 
-            background: #fff; color: #000; border: none; padding: 6px 14px; border-radius: 8px; 
+            background: #fff; color: #000; border: none; padding: 6px 16px; border-radius: 8px; 
             font-size: 0.75rem; font-weight: 900; cursor: pointer; text-transform: uppercase;
         }
-        .user-name { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; }
+        .user-name { font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; }
 
         #display-year-static { 
-            font-size: 8rem; font-weight: 200; color: #2d3436; 
+            font-size: 8rem; font-weight: 200; color: rgba(255,255,255,0.05); /* Полупрозрачный год */
             letter-spacing: -12px; line-height: 0.7; margin: 0; 
         }
         #month-title { 
-            font-size: 2.8rem; font-weight: 800; color: #fff; 
-            letter-spacing: -2px; line-height: 1; margin-bottom: 40px; text-transform: uppercase;
+            font-size: 3.5rem; font-weight: 900; color: #fff; 
+            letter-spacing: -2px; line-height: 1; margin-top: -20px; margin-bottom: 40px; text-transform: uppercase;
         }
 
-        /* ПРОСМОТР СОБЫТИЙ */
+        /* РОЗОВЫЙ БЛОК (СОБЫТИЯ) */
         #live-preview { 
-            font-size: 0.85rem; background: #2d1a24; padding: 20px; 
+            font-size: 0.85rem; background: rgba(230, 0, 126, 0.1); padding: 20px; 
             border-radius: 15px 0 0 15px; position: relative;
-            line-height: 1.5; color: #fab1a0; text-align: right; width: 100%; box-sizing: border-box;
-            min-height: 100px; border: 1px solid #4a2334; margin-bottom: 20px;
+            line-height: 1.5; color: #ff9fcf; text-align: right; width: 100%; box-sizing: border-box;
+            min-height: 100px; border: 1px solid rgba(230, 0, 126, 0.3); margin-bottom: 20px;
         }
         #live-preview::after {
-            content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
-            border-right: 3px solid #e6007e; border-top: 3px solid #e6007e; border-bottom: 3px solid #e6007e; border-radius: 0 10px 10px 0;
+            content: ''; position: absolute; right: -5px; top: 0; bottom: 0; width: 5px;
+            background: #e6007e; border-radius: 0 10px 10px 0;
         }
 
-        .side-label { font-size: 0.7rem; font-weight: 700; color: var(--text-dim); margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.9rem; color: var(--text-dim); margin-bottom: 8px; }
+        .side-label { font-size: 0.7rem; font-weight: 700; color: #636e72; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.9rem; color: #b2bec3; margin-bottom: 8px; }
         .color-bar { width: 4px; height: 16px; border-radius: 2px; }
 
-        /* СЕТКА (Светлая область / Темные карточки) */
-        .main-content { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 15px; }
-        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; text-align: center; }
+        /* ГЛАВНАЯ СЕТКА */
+        .main-content { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+        
+        /* ДНИ НЕДЕЛИ (ТЕПЕРЬ ВИДИМЫЕ) */
+        .weekdays { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 20px; }
+        .weekday { font-size: 0.8rem; font-weight: 900; color: #2d3436; text-transform: uppercase; text-align: center; }
         
         .days-grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
 
+        /* ТЕМНЫЕ КАРТОЧКИ */
         .day-card { 
             background: var(--dark-card); 
             height: 110px; border-radius: 20px; 
@@ -73,24 +74,18 @@
             cursor: pointer; transition: 0.3s ease;
             position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-        .day-number { font-weight: 800; font-size: 1.5rem; color: #fff; }
+        .day-number { font-weight: 800; font-size: 1.6rem; color: #fff; pointer-events: none; }
         
         .day-card:hover { transform: translateY(-5px); background: #000; box-shadow: 0 12px 25px rgba(0, 136, 204, 0.3); }
         .day-card.empty { background: transparent; box-shadow: none; cursor: default; }
         
-        .dots-row { margin-top: 8px; display: flex; gap: 4px; }
+        .dots-row { margin-top: 8px; display: flex; gap: 4px; min-height: 6px; }
         .day-mark { width: 6px; height: 6px; border-radius: 50%; }
 
         /* МОДАЛКА */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 100; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
         .modal-content { background: #fff; padding: 35px; border-radius: 30px; width: 450px; text-align: right; color: #333; }
-        .entry-item { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border: 1px solid #eee; }
-        textarea { width: 100%; height: 90px; border: 1px solid #eee; border-radius: 12px; padding: 12px; font-family: inherit; margin: 10px 0; outline: none; background: #fafafa; }
         .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; }
-        .cat-select { display: flex; gap: 6px; margin-bottom: 15px; direction: rtl; }
-        .cat-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; font-size: 0.6rem; font-weight: 900; }
-        .cat-btn.active { border-color: var(--accent); background: #f0f9ff; }
-        .del-x { color: #d63031; border: none; background: none; font-size: 1.2rem; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -98,11 +93,11 @@
     <div class="sidebar">
         <div class="user-header">
             <button class="back-btn" onclick="location.href='calendar.html'">Назад</button>
-            <div class="user-name" id="user-display">...</div>
+            <div class="user-name" id="user-display">ADMIN</div>
         </div>
         
         <div id="display-year-static">2026</div>
-        <div id="month-title">...</div>
+        <div id="month-title">АПРЕЛЬ</div>
 
         <div class="side-section">
             <div class="side-label">События дня</div>
@@ -127,24 +122,17 @@
 
     <div class="modal" id="note-modal">
         <div class="modal-content">
-            <h2 id="modal-date-title" style="margin:0 0 20px 0; font-weight: 900;">Дата</h2>
-            <div id="existing-notes" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
-            <div style="border-top: 1px solid #eee; padding-top: 15px;">
-                <textarea id="note-text" placeholder="Что добавим?"></textarea>
-                <div class="cat-select">
-                    <div class="cat-btn" id="btn-personal" onclick="selectCat('personal')">ЛИЧНОЕ</div>
-                    <div class="cat-btn" id="btn-important" onclick="selectCat('important')">ВАЖНОЕ</div>
-                    <div class="cat-btn" id="btn-work" onclick="selectCat('work')">РАБОТА</div>
-                </div>
-                <button class="save-btn" onclick="saveNote()">ДОБАВИТЬ</button>
-            </div>
-            <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#bbb; cursor:pointer;">Закрыть</button>
+            <h2 id="modal-date-title" style="margin:0 0 20px 0;">Дата</h2>
+            <div id="existing-notes"></div>
+            <textarea id="note-text" style="width:100%; height:80px; margin:10px 0; padding:10px; border-radius:10px; border:1px solid #eee;"></textarea>
+            <button class="save-btn" onclick="saveNote()">ДОБАВИТЬ</button>
+            <button onclick="closeModal()" style="margin-top:10px; border:none; background:none; color:#ccc; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -165,7 +153,6 @@
 
         let currentMonthData = {};
         let selectedDay = null;
-        let activeCat = 'work';
 
         onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
             currentMonthData = snap.exists() ? snap.data() : {};
@@ -217,36 +204,18 @@
         window.openModal = (day) => {
             selectedDay = day;
             document.getElementById('modal-date-title').innerText = day + ' ' + monthsNames[monthIdx];
-            const list = document.getElementById('existing-notes');
-            list.innerHTML = '';
-            (currentMonthData[day] || []).forEach((n, idx) => {
-                const canDel = n.user === currentUser || currentUser === 'admin';
-                list.innerHTML += `<div class="entry-item" style="border-right:4px solid var(--ev-${n.category})">
-                    <span><b>${n.user}:</b> ${n.text}</span>
-                    ${canDel ? `<button class="del-x" onclick="deleteNote(${idx})">×</button>` : '🔒'}
-                </div>`;
-            });
             document.getElementById('note-modal').style.display = 'flex';
         };
-
         window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
-        window.selectCat = (cat) => { activeCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); document.getElementById(`btn-${cat}`).classList.add('active'); };
-
+        
         window.saveNote = async () => {
             const text = document.getElementById('note-text').value;
             if(!text) return;
             const notes = currentMonthData[selectedDay] || [];
-            notes.push({text, category: activeCat, user: currentUser});
+            notes.push({text, category: 'work', user: currentUser});
             await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[selectedDay]: notes}, {merge:true});
-            await addDoc(collection(db, "logs"), {user: currentUser, action: "добавил событие", month: monthsNames[monthIdx], timestamp: serverTimestamp()});
             document.getElementById('note-text').value = '';
-            openModal(selectedDay);
-        };
-
-        window.deleteNote = async (idx) => {
-            currentMonthData[selectedDay].splice(idx, 1);
-            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[selectedDay]: currentMonthData[selectedDay]}, {merge:true});
-            openModal(selectedDay);
+            closeModal();
         };
     </script>
 </body>
