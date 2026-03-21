@@ -1,255 +1,77 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Планы | CALENDARIUM</title>
-    <style>
-        :root { 
-            --accent: #0088cc; 
-            --main-bg: #f4f7f6;
-            --sidebar-bg: #ffffff;
-            --ev-work: #0984e3;
-            --ev-important: #d63031;
-            --ev-personal: #27ae60;
-        }
-        
-        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
+<style>
+    /* ... (предыдущие стили сайдбара остаются) ... */
 
-        /* САЙДБАР */
-        .sidebar { 
-            width: 400px; background: var(--sidebar-bg); padding: 50px 40px; 
-            display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; 
-            box-shadow: 10px 0 30px rgba(0,0,0,0.03); z-index: 10; flex-shrink: 0; 
-            box-sizing: border-box; align-items: flex-end; text-align: right;
-        }
+    /* ТЕМНЫЕ КАРТОЧКИ ДНЕЙ */
+    .day-card { 
+        background: #2d3436; /* Темный цвет */
+        height: 110px; 
+        border-radius: 20px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        font-weight: 800; 
+        font-size: 1.2rem; 
+        color: #ffffff; /* Белый текст */
+        cursor: pointer; 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        border: 1px solid rgba(255,255,255,0.1); 
+        position: relative; 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
 
-        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-        .back-btn { background: #000; color: #fff; border: none; padding: 7px 16px; border-radius: 8px; font-size: 0.7rem; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-        
-        #display-year-static { font-size: 5rem; font-weight: 200; color: #dfe6e9; letter-spacing: -8px; line-height: 0.6; margin-bottom: 5px; }
-        #month-title { font-size: 3.5rem; font-weight: 800; color: #2d3436; letter-spacing: -3px; line-height: 0.8; margin-bottom: 40px; text-transform: uppercase; }
+    .day-card:hover { 
+        transform: translateY(-7px) scale(1.02); 
+        background: #000000; 
+        border-color: var(--accent);
+        box-shadow: 0 15px 30px rgba(0, 136, 204, 0.2); /* Синее свечение при наведении */
+    }
 
-        .side-section { width: 100%; margin-bottom: 30px; }
-        .side-label { font-size: 0.7rem; font-weight: 800; color: #b2bec3; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        /* ПРЕВЬЮ */
-        #live-preview { 
-            font-size: 0.85rem; background: #ffe6f2; padding: 20px; border-radius: 15px 0 0 15px; 
-            position: relative; line-height: 1.4; color: #2d3436; text-align: right; width: 100%; box-sizing: border-box; min-height: 100px; 
-        }
-        #live-preview::after {
-            content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
-            border-right: 4px solid #e6007e; border-top: 4px solid #e6007e; border-bottom: 4px solid #e6007e; border-radius: 0 10px 10px 0;
-        }
+    .day-card.empty { 
+        background: transparent; 
+        box-shadow: none; 
+        cursor: default; 
+        border: none; 
+    }
+    
+    /* ЯРКИЕ ТОЧКИ НА ТЕМНОМ */
+    .dots-row { 
+        position: absolute; 
+        bottom: 15px; 
+        display: flex; 
+        gap: 4px; 
+    }
+    .day-mark { 
+        width: 6px; 
+        height: 6px; 
+        border-radius: 50%; 
+        box-shadow: 0 0 5px rgba(255,255,255,0.2); /* Легкий отсвет точек */
+    }
 
-        /* СЕТКА */
-        .main-content { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 15px; text-align: center; }
-        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; }
-        .days-grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
+    /* СТИЛЬ ВЫХОДНЫХ (Опционально: можно подсветить субботу и воскресенье) */
+    .day-card:nth-child(7n), .day-card:nth-child(7n-1) {
+        color: #ff7675; /* Розоватый цвет для выходных */
+    }
+</style>
 
-        .day-card { 
-            background: #fff; height: 110px; border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.1rem; color: #2d3436; cursor: pointer; transition: 0.3s; 
-            border: 1px solid rgba(0,0,0,0.02); position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-        }
-        .day-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .day-card.empty { background: transparent; box-shadow: none; cursor: default; border: none; }
-        
-        .dots-row { position: absolute; bottom: 12px; display: flex; gap: 3px; }
-        .day-mark { width: 5px; height: 5px; border-radius: 50%; }
-
-        /* МОДАЛКА */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); z-index: 100; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 35px; border-radius: 30px; width: 480px; text-align: right; max-height: 90vh; overflow-y: auto; }
-        
-        .entry-item { background: #f9f9f9; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-right: 4px solid #eee; }
-        .delete-btn { color: #d63031; cursor: pointer; font-size: 0.8rem; font-weight: 800; border: none; background: none; }
-        
-        textarea { width: 100%; height: 80px; border: 1px solid #f0f0f0; border-radius: 12px; padding: 12px; font-family: inherit; margin: 10px 0; outline: none; background: #fff; }
-        .cat-select { display: flex; gap: 5px; margin-bottom: 15px; direction: rtl; }
-        .cat-btn { flex: 1; padding: 8px; border-radius: 6px; border: 2px solid #f0f0f0; cursor: pointer; font-size: 0.55rem; font-weight: 900; }
-        .cat-btn.active { border-color: var(--accent); background: #f0f9ff; }
-        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-    </style>
-</head>
-<body>
-
-    <div class="sidebar">
-        <div class="user-header">
-            <button class="back-btn" onclick="location.href='calendar.html'">Назад</button>
-            <div class="user-name" id="user-display">...</div>
-        </div>
-        <div id="display-year-static">2026</div>
-        <div id="month-title">...</div>
-
-        <div class="side-section">
-            <div class="side-label">События дня</div>
-            <div id="live-preview">
-                <div id="preview-content">Наведите на день...</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="main-content">
-        <div class="weekdays">
-            <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
-            <div class="weekday) weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
-        </div>
-        <div class="days-grid" id="days-container"></div>
-    </div>
-
-    <div class="modal" id="note-modal">
-        <div class="modal-content">
-            <h2 id="modal-date-title" style="margin:0 0 20px 0; font-weight:900;">Дата</h2>
-            
-            <div id="existing-notes" style="margin-bottom: 20px;"></div>
-
-            <div style="border-top: 2px dashed #eee; padding-top: 20px;">
-                <div class="side-label" style="margin-bottom: 10px;">Новое событие</div>
-                <textarea id="note-text" placeholder="Текст заметки..."></textarea>
-                <div class="cat-select">
-                    <div class="cat-btn" id="btn-personal" onclick="selectCat('personal')">ЛИЧНОЕ</div>
-                    <div class="cat-btn" id="btn-important" onclick="selectCat('important')">ВАЖНОЕ</div>
-                    <div class="cat-btn" id="btn-work" onclick="selectCat('work')">РАБОТА</div>
-                </div>
-                <button class="save-btn" onclick="saveNote()">ДОБАВИТЬ ЗАПИСЬ</button>
-            </div>
-            <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#b2bec3; cursor:pointer; font-weight:700;">Закрыть</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-            authDomain: "calendarium-1f7d7.firebaseapp.com",
-            projectId: "calendarium-1f7d7",
-            storageBucket: "calendarium-1f7d7.firebasestorage.app",
-            messagingSenderId: "204240857105",
-            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
-        };
-
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
-        const currentUser = localStorage.getItem('currentUser');
-        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        
-        document.getElementById('month-title').innerText = monthsNames[monthIdx];
-        document.getElementById('user-display').innerText = currentUser;
-
-        let selectedDay = null;
-        let activeCat = 'work';
-        let currentMonthData = {};
-
-        const firstDay = new Date(2026, monthIdx, 1).getDay();
-        const shift = firstDay === 0 ? 6 : firstDay - 1;
-        const daysInMonth = new Date(2026, monthIdx + 1, 0).getDate();
-        const container = document.getElementById('days-container');
-
-        onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
-            container.innerHTML = '';
-            currentMonthData = snap.exists() ? snap.data() : {};
-            
-            for(let s=0; s<shift; s++) {
-                const empty = document.createElement('div');
-                empty.className = 'day-card empty';
-                container.appendChild(empty);
+<script>
+    // В функции renderGrid() убедись, что логика наведения (mouseover) 
+    // меняет цвет текста в превью так же четко.
+    
+    card.onmouseover = () => {
+        const prev = document.getElementById('live-preview');
+        // Добавим небольшую анимацию появления текста в сайдбаре
+        prev.style.opacity = '0';
+        setTimeout(() => {
+            if (currentMonthData[i] && currentMonthData[i].length > 0) {
+                prev.innerHTML = currentMonthData[i].map(n => 
+                    `<div style="margin-bottom:10px; border-bottom:1px solid rgba(230,0,126,0.1); padding-bottom:5px;">
+                        <b style="color:#e6007e; font-size:0.7rem; text-transform:uppercase;">${n.user}:</b><br>${n.text}
+                    </div>`
+                ).join('');
+            } else { 
+                prev.innerHTML = '<span style="opacity:0.5">Событий не запланировано</span>'; 
             }
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const card = document.createElement('div');
-                card.className = 'day-card';
-                card.innerHTML = i;
-                
-                if (currentMonthData[i] && currentMonthData[i].length > 0) {
-                    const row = document.createElement('div');
-                    row.className = 'dots-row';
-                    currentMonthData[i].forEach(note => {
-                        const dot = document.createElement('div');
-                        dot.className = 'day-mark';
-                        dot.style.background = `var(--ev-${note.category})`;
-                        row.appendChild(dot);
-                    });
-                    card.appendChild(row);
-                }
-
-                card.onmouseover = () => {
-                    const preview = document.getElementById('preview-content');
-                    if (currentMonthData[i]) {
-                        preview.innerHTML = currentMonthData[i].map(n => `<div style="margin-bottom:8px"><b>${n.user}:</b> ${n.text}</div>`).join('');
-                    } else {
-                        preview.innerHTML = 'Нет событий';
-                    }
-                };
-
-                card.onclick = () => openModal(i);
-                container.appendChild(card);
-            }
-        });
-
-        window.openModal = (day) => {
-            selectedDay = day;
-            document.getElementById('modal-date-title').innerText = `${day} ${monthsNames[monthIdx]}`;
-            const list = document.getElementById('existing-notes');
-            list.innerHTML = '';
-            
-            const notes = currentMonthData[day] || [];
-            notes.forEach((n, idx) => {
-                const item = document.createElement('div');
-                item.className = 'entry-item';
-                item.style.borderRightColor = `var(--ev-${n.category})`;
-                
-                // Стирать можно только свои или если ты admin
-                const canDelete = (n.user === currentUser || currentUser === 'admin');
-                const delBtn = canDelete ? `<button class="delete-btn" onclick="deleteNote(${idx})">Удалить</button>` : `<span style="font-size:0.6rem; opacity:0.3">🔒</span>`;
-                
-                item.innerHTML = `<div><small>${n.user}</small><br>${n.text}</div> ${delBtn}`;
-                list.appendChild(item);
-            });
-
-            document.getElementById('note-modal').style.display = 'flex';
-        };
-
-        window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
-
-        window.selectCat = (cat) => {
-            activeCat = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn-${cat}`).classList.add('active');
-        };
-
-        window.saveNote = async () => {
-            const text = document.getElementById('note-text').value;
-            if (!text) return;
-            
-            const dayNotes = currentMonthData[selectedDay] || [];
-            dayNotes.push({ text, category: activeCat, user: currentUser });
-
-            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {
-                [selectedDay]: dayNotes
-            }, { merge: true });
-
-            await addDoc(collection(db, "logs"), {
-                user: currentUser, action: "добавил событие", month: monthsNames[monthIdx], timestamp: serverTimestamp()
-            });
-            document.getElementById('note-text').value = '';
-            openModal(selectedDay); // Перерисовать список в модалке
-        };
-
-        window.deleteNote = async (idx) => {
-            const dayNotes = currentMonthData[selectedDay];
-            dayNotes.splice(idx, 1);
-
-            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {
-                [selectedDay]: dayNotes
-            }, { merge: true });
-            
-            openModal(selectedDay);
-        };
-    </script>
-</body>
-</html>
+            prev.style.opacity = '1';
+        }, 50);
+    };
+</script>
