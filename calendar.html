@@ -54,12 +54,27 @@
         .ev-title { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .ev-date { font-size: 0.8rem; font-weight: 700; opacity: 0.7; }
 
+        /* ИСПРАВЛЕННАЯ КНОПКА АДМИНКИ (Fixed для мобилок) */
         #admin-link {
-            display: none; color: var(--accent-gold); text-decoration: none; font-size: 0.75rem; 
-            font-weight: 900; text-transform: uppercase; border: 1px solid var(--accent-gold); 
-            padding: 10px 25px; border-radius: 12px; transition: 0.3s; width: 100%; text-align: center;
+            display: none; 
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent-gold); 
+            color: #000; 
+            text-decoration: none; 
+            font-size: 0.75rem; 
+            font-weight: 900; 
+            text-transform: uppercase; 
+            border: 2px solid #000; 
+            padding: 15px 25px; 
+            border-radius: 50px; 
+            transition: 0.3s; 
+            text-align: center;
+            z-index: 9999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        #admin-link:hover { background: var(--accent-gold); color: #000; }
+        #admin-link:hover { background: #fff; transform: scale(1.05); }
 
         /* --- СЕТКА МЕСЯЦЕВ --- */
         .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px; }
@@ -75,12 +90,23 @@
         .dot.blue { background: var(--ev-work); box-shadow: 0 0 5px var(--ev-work); }
         .month-card:hover { transform: scale(1.08); background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 
+        /* АДАПТАЦИЯ */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
             .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; }
             .year-switcher { margin-bottom: 20px; }
             #display-year { font-size: 3.5rem; }
-            .upcoming-box, #admin-link { display: none !important; }
+            
+            /* Кнопку админки больше НЕ скрываем здесь! */
+            .upcoming-box { display: none !important; } 
+            
+            #admin-link {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                font-size: 0.65rem;
+            }
+
             .main-content { padding: 20px; height: auto; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
         }
@@ -104,9 +130,9 @@
             <div class="side-label">Приоритет</div>
             <div id="next-event-container"></div>
         </div>
-
-        <a href="admin.html" id="admin-link">Admin Terminal</a>
     </div>
+
+    <a href="admin.html" id="admin-link">Admin Terminal</a>
 
     <div class="main-content">
         <div class="months-grid" id="months"></div>
@@ -129,14 +155,15 @@
         const currentUser = localStorage.getItem('currentUser') || 'GUEST';
         document.getElementById('display-name').innerText = currentUser;
 
+        // Показываем кнопку админа с использованием setProperty для надежности
         if (currentUser.toUpperCase() === 'ADMIN') {
-            document.getElementById('admin-link').style.display = 'block';
+            const adminBtn = document.getElementById('admin-link');
+            adminBtn.style.setProperty('display', 'block', 'important');
         }
 
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
         let allEventsGlobal = [];
 
-        // Слушатель событий
         const qEvents = query(collection(db, "events"), orderBy("date", "asc"));
         onSnapshot(qEvents, (snapshot) => {
             allEventsGlobal = [];
@@ -145,7 +172,6 @@
         });
 
         function updateUI() {
-            // 1. Ближайшее в тулбаре
             const container = document.getElementById('next-event-container');
             const now = new Date().toISOString().split('T')[0];
             const futureEvents = allEventsGlobal.filter(e => e.date >= now);
@@ -160,7 +186,6 @@
                 container.innerHTML = '<div style="color:#444; font-weight:900; font-size:0.7rem;">ПЛАНОВ НЕТ</div>';
             }
 
-            // 2. Месяцы
             renderMonths();
         }
 
