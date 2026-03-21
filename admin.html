@@ -22,98 +22,89 @@
             display: flex; flex-direction: column; height: 100vh; overflow: hidden;
         }
 
-        /* ШАПКА */
         header { 
             padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #333; background: #111;
         }
         .logo { font-size: 1.2rem; font-weight: 900; color: var(--accent); text-transform: uppercase; }
-        .nav-btns { display: flex; gap: 15px; align-items: center; }
-        .user-info { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
         .back-btn { 
             background: #fff; color: #000; border: none; padding: 8px 18px; 
             border-radius: 20px; font-weight: 900; cursor: pointer; text-decoration: none; font-size: 0.75rem;
         }
 
-        /* КОНТЕНТ */
         main { flex: 1; padding: 40px; overflow-y: auto; max-width: 1000px; margin: 0 auto; width: 100%; }
-        h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 30px; text-transform: uppercase; letter-spacing: -2px; }
+        h1 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -2px; }
+        .subtitle { color: var(--muted); margin-bottom: 30px; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
 
-        .section-header { 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; 
-        }
-        .label { font-size: 0.7rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; }
+        .section-label { font-size: 0.7rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
 
         /* ТАБЛИЦА */
-        .table-container { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #333; }
+        .table-container { background: var(--card); border-radius: 20px; overflow: hidden; border: 1px solid #333; margin-bottom: 40px; }
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px 20px; background: #2d2d2d; color: #777; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+        th { text-align: left; padding: 15px 20px; background: #2d2d2d; color: #777; font-size: 0.65rem; text-transform: uppercase; }
         td { padding: 15px 20px; border-bottom: 1px solid #333; font-size: 0.9rem; font-weight: 600; }
         
-        /* СТАТУСЫ */
-        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
-        .status-pending { background: var(--accent); color: #000; }
-        .status-approved { background: var(--success); color: #000; }
-        .status-blocked { background: var(--danger); color: #fff; }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; background: #444; }
 
-        /* КНОПКИ ДЕЙСТВИЙ */
-        .actions { display: flex; gap: 8px; }
         .btn { 
-            border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; 
+            border: none; padding: 8px 15px; border-radius: 10px; font-weight: 900; 
             font-size: 0.65rem; cursor: pointer; text-transform: uppercase; transition: 0.2s;
         }
         .btn-ok { background: var(--success); color: #000; }
         .btn-no { background: var(--danger); color: #fff; }
-        .btn-del { background: #444; color: #fff; }
         .btn:hover { opacity: 0.8; transform: scale(1.05); }
 
-        /* ПУСТОЕ СОСТОЯНИЕ */
-        .empty-msg { padding: 40px; text-align: center; color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.8rem; }
-
-        @media (max-width: 600px) {
-            main { padding: 20px; }
-            header { padding: 15px 20px; }
-            .user-info { display: none; }
-        }
+        .empty-msg { padding: 30px; text-align: center; color: var(--muted); font-size: 0.8rem; font-weight: 800; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">Terminal_Admin</div>
-        <div class="nav-btns">
-            <span class="user-info" id="current-user-tag">User: ---</span>
-            <a href="calendar.html" class="back-btn">Exit Admin</a>
-        </div>
+        <div class="logo">Terminal_Control</div>
+        <a href="calendar.html" class="back-btn">Выход</a>
     </header>
 
     <main>
-        <div class="section-header">
-            <div class="label">User Database Control</div>
-        </div>
-        <h1>Управление доступом</h1>
+        <div class="section-label">System Inbound</div>
+        <h1>Запросы на доступ</h1>
+        <p class="subtitle">Новые пользователи, ожидающие активации ключа</p>
 
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Имя пользователя</th>
+                        <th>Имя (ID)</th>
+                        <th>Дата запроса</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="request-list">
+                    </tbody>
+            </table>
+            <div id="req-loader" class="empty-msg">Ожидание новых сигналов...</div>
+        </div>
+
+        <div class="section-label">Active Database</div>
+        <h1>Активные профили</h1>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Пользователь</th>
                         <th>Статус</th>
-                        <th>Действия</th>
+                        <th>Управление</th>
                     </tr>
                 </thead>
                 <tbody id="user-list">
                     </tbody>
             </table>
-            <div id="loader" class="empty-msg">Загрузка данных терминала...</div>
         </div>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Твой конфиг Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
             authDomain: "calendarium-1f7d7.firebaseapp.com",
@@ -123,64 +114,74 @@
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getFirestore(initializeApp(firebaseConfig));
 
-        // Показываем, кто зашел
-        const currentUser = localStorage.getItem('currentUser') || 'Unknown';
-        document.getElementById('current-user-tag').innerText = `Admin: ${currentUser}`;
-
-        // СЛУШАЕМ ПОЛЬЗОВАТЕЛЕЙ В РЕАЛЬНОМ ВРЕМЕНИ
-        onSnapshot(collection(db, "users"), (snapshot) => {
-            const list = document.getElementById('user-list');
-            const loader = document.getElementById('loader');
+        // 1. СЛУШАЕМ ЗАПРОСЫ (requests)
+        onSnapshot(collection(db, "requests"), (snapshot) => {
+            const list = document.getElementById('request-list');
+            const loader = document.getElementById('req-loader');
             list.innerHTML = '';
             
             if (snapshot.empty) {
-                loader.innerText = "Пользователей не найдено";
                 loader.style.display = 'block';
-                return;
+            } else {
+                loader.style.display = 'none';
+                snapshot.forEach((reqDoc) => {
+                    const data = reqDoc.data();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="color: var(--accent)">${reqDoc.id}</td>
+                        <td style="font-size: 0.7rem; color: #777;">${data.date ? data.date.split('T')[0] : '---'}</td>
+                        <td>
+                            <button class="btn btn-ok" onclick="approveUser('${reqDoc.id}')">Допустить</button>
+                            <button class="btn btn-no" onclick="rejectUser('${reqDoc.id}')">Отклонить</button>
+                        </td>
+                    `;
+                    list.appendChild(tr);
+                });
             }
+        });
 
-            loader.style.display = 'none';
-
+        // 2. СЛУШАЕМ ДЕЙСТВУЮЩИХ (users)
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const list = document.getElementById('user-list');
+            list.innerHTML = '';
             snapshot.forEach((userDoc) => {
-                const user = userDoc.data();
-                const userId = userDoc.id;
-
-                // Пропускаем самого админа, чтобы случайно себя не заблочить
-                if (user.username.toUpperCase() === 'ADMIN') return;
-
+                if (userDoc.id === 'admin') return;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${user.username}</td>
-                    <td><span class="badge status-${user.status}">${user.status}</span></td>
-                    <td class="actions">
-                        ${user.status !== 'approved' ? 
-                            `<button class="btn btn-ok" onclick="processUser('${userId}', 'approved')">Допустить</button>` : ''}
-                        ${user.status !== 'blocked' ? 
-                            `<button class="btn btn-no" onclick="processUser('${userId}', 'blocked')">Блок</button>` : ''}
-                        <button class="btn btn-del" onclick="deleteUser('${userId}')">Удалить</button>
-                    </td>
+                    <td>${userDoc.id}</td>
+                    <td><span class="badge">Active</span></td>
+                    <td><button class="btn btn-no" onclick="deleteUser('${userDoc.id}')">Удалить</button></td>
                 `;
                 list.appendChild(tr);
             });
         });
 
-        // ФУНКЦИИ УПРАВЛЕНИЯ
-        window.processUser = async (id, newStatus) => {
-            try {
-                const userRef = doc(db, "users", id);
-                await updateDoc(userRef, { status: newStatus });
-            } catch (e) {
-                alert("Ошибка доступа к базе: " + e.message);
+        // ФУНКЦИЯ ОДОБРЕНИЯ: Перенос из requests в users
+        window.approveUser = async (id) => {
+            const reqRef = doc(db, "requests", id);
+            const reqSnap = await getDoc(reqRef);
+            
+            if (reqSnap.exists()) {
+                const userData = reqSnap.data();
+                // Создаем юзера в основной коллекции
+                await setDoc(doc(db, "users", id), {
+                    password: userData.password,
+                    role: "user"
+                });
+                // Удаляем из запросов
+                await deleteDoc(reqRef);
+                alert(`Доступ для ${id} активирован!`);
             }
         };
 
+        window.rejectUser = async (id) => {
+            if(confirm("Удалить запрос?")) await deleteDoc(doc(db, "requests", id));
+        };
+
         window.deleteUser = async (id) => {
-            if (confirm("Удалить пользователя навсегда?")) {
-                await deleteDoc(doc(db, "users", id));
-            }
+            if(confirm("Аннулировать доступ пользователя?")) await deleteDoc(doc(db, "users", id));
         };
     </script>
 </body>
