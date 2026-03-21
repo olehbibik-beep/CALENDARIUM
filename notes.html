@@ -3,82 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDARIUM | Inverted Edition</title>
+    <title>CALENDARIUM | Dark Elements on Light</title>
     <style>
         :root {
-            --bg-dark: #1e2122; /* Темный фон */
-            --sidebar-light: #ffffff; /* Светлый сайдбар */
-            --card-light: #ffffff; /* Светлые плитки */
-            --text-main: #333333;
+            --bg-page: #f4f7f6;    /* Светлый фон всей страницы */
+            --sidebar-bg: #1e2122; /* Темный сайдбар */
+            --card-bg: #2d3436;    /* Темные плитки */
+            --accent: #0088cc;
             --text-white: #ffffff;
+            --text-dark: #2d3436;
         }
 
         body { 
             margin: 0; padding: 0; display: flex; 
-            height: 100vh; background: var(--bg-dark); 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            overflow: hidden;
+            height: 100vh; background: var(--bg-page); 
+            font-family: 'Inter', sans-serif; overflow: hidden; 
         }
 
-        /* Светлый Сайдбар */
+        /* ТЕМНЫЙ САЙДБАР */
         .sidebar { 
-            width: 350px; background: var(--sidebar-light); padding: 40px; 
-            border-right: 1px solid #ddd; display: flex; flex-direction: column; 
-            box-sizing: border-box; flex-shrink: 0; color: var(--text-main);
+            width: 380px; background: var(--sidebar-bg); padding: 40px; 
+            display: flex; flex-direction: column; align-items: flex-end; 
+            text-align: right; flex-shrink: 0; box-sizing: border-box;
+            color: white; z-index: 10;
         }
 
         .back-btn { 
-            background: #000; color: #fff; border: none; padding: 10px; 
-            border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold;
+            background: #fff; color: #000; border: none; padding: 10px 20px; 
+            border-radius: 8px; font-weight: 900; cursor: pointer; margin-bottom: 20px;
         }
 
-        #month-title { font-size: 2.5rem; font-weight: 800; margin: 0 0 20px 0; color: var(--text-main); }
+        #month-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0; color: #fff; }
+        #user-name { font-weight: 800; color: #636e72; margin-bottom: 5px; text-transform: uppercase; }
 
-        /* Контентная область (Темная) */
-        .main { 
-            flex-grow: 1; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; 
+        #live-info { 
+            width: 100%; min-height: 100px; background: rgba(255,255,255,0.05); border-radius: 15px; 
+            padding: 15px; border-right: 5px solid #e6007e; color: #ff9fcf;
+            margin-top: 30px; font-size: 0.9rem; box-sizing: border-box;
         }
 
-        .weekdays { 
-            display: grid; grid-template-columns: repeat(7, 100px); 
-            gap: 15px; margin-bottom: 15px; 
-        }
-        .weekday { text-align: center; font-weight: 900; color: var(--text-white); text-transform: uppercase; font-size: 0.8rem; }
+        /* КОНТЕНТ (СВЕТЛЫЙ) */
+        .main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        .grid { 
-            display: grid; grid-template-columns: repeat(7, 100px); 
-            gap: 15px; 
-        }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 15px; }
+        .weekday { color: var(--text-dark); font-weight: 900; text-transform: uppercase; text-align: center; font-size: 0.8rem; opacity: 0.6; }
 
-        /* Светлые плитки дней */
+        .grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
+
+        /* ТЕМНЫЕ ПЛИТКИ */
         .day { 
-            width: 100px; height: 100px; background: var(--card-light); 
-            border-radius: 15px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.5rem; font-weight: bold; color: var(--text-main); 
-            cursor: pointer; transition: 0.2s; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 110px; height: 110px; background: var(--card-bg); border-radius: 20px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.3s; position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-        .day:hover { background: #f0f0f0; transform: translateY(-5px); }
-        .day.empty { background: transparent; border: none; cursor: default; box-shadow: none; }
+        .day:hover { transform: translateY(-5px); background: #000; box-shadow: 0 12px 25px rgba(0, 136, 204, 0.3); }
+        .day.empty { background: transparent; box-shadow: none; cursor: default; }
 
-        /* Модалка */
-        .modal { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000;
-        }
-        .modal-content { background: #fff; padding: 30px; border-radius: 20px; width: 320px; text-align: right; }
-        textarea { width: 100%; height: 80px; margin-top: 10px; border-radius: 10px; padding: 10px; border: 1px solid #ddd; }
+        .day-num { font-size: 1.8rem; font-weight: 900; color: #fff; }
+
+        /* ИНДИКАТОР ЗАМЕТКИ (ТОЧКИ) */
+        .dots { display: flex; gap: 4px; margin-top: 8px; height: 6px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        /* МОДАЛКА */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 350px; text-align: right; color: #000; }
+        textarea { width: 100%; height: 80px; margin-top: 15px; border-radius: 10px; padding: 10px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <button class="back-btn" onclick="location.href='calendar.html'">← НАЗАД</button>
-        <div id="user-name" style="color: #666; font-weight: bold; text-transform: uppercase;">ADMIN</div>
+        <button class="back-btn" onclick="location.href='calendar.html'">НАЗАД</button>
+        <div id="user-name">ADMIN</div>
         <h1 id="month-title">АПРЕЛЬ</h1>
-        <div id="live-info" style="margin-top: 20px; color: #888; font-size: 0.9rem;">Наведите на дату...</div>
+        <div id="live-info">Наведите на число...</div>
     </div>
 
     <div class="main">
@@ -86,15 +86,15 @@
             <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
             <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
         </div>
-        <div class="grid" id="grid"></div>
+        <div id="grid" class="grid"></div>
     </div>
 
     <div class="modal" id="modal">
         <div class="modal-content">
-            <h3 id="m-date" style="margin-top:0">Дата</h3>
-            <textarea id="m-input" placeholder="Введите текст..."></textarea>
-            <button onclick="save()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; margin-top:10px; border-radius:10px; font-weight:bold; cursor:pointer;">СОХРАНИТЬ</button>
-            <button onclick="closeM()" style="width:100%; border:none; background:none; color:gray; margin-top:10px; cursor:pointer;">Отмена</button>
+            <h2 id="m-date" style="margin:0">Дата</h2>
+            <textarea id="m-input" placeholder="Введите заметку..."></textarea>
+            <button onclick="save()" style="width:100%; padding:15px; background:#000; color:#fff; border:none; border-radius:12px; font-weight:900; margin-top:10px; cursor:pointer;">СОХРАНИТЬ</button>
+            <button onclick="closeM()" style="background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
@@ -119,15 +119,17 @@
         document.getElementById('month-title').innerText = months[mIdx];
         document.getElementById('user-name').innerText = user;
 
-        let currentData = {};
+        let dbData = {};
         let activeDay = null;
 
         function render() {
             const grid = document.getElementById('grid');
+            if(!grid) return;
             grid.innerHTML = '';
+            
             const first = new Date(2026, mIdx, 1).getDay();
             const shift = first === 0 ? 6 : first - 1;
-            const daysInMonth = new Date(2026, mIdx + 1, 0).getDate();
+            const totalDays = new Date(2026, mIdx + 1, 0).getDate();
 
             for(let i=0; i<shift; i++) {
                 const empty = document.createElement('div');
@@ -135,26 +137,47 @@
                 grid.appendChild(empty);
             }
 
-            for(let i=1; i<=daysInMonth; i++) {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'day';
-                dayEl.innerText = i;
+            for(let i=1; i<=totalDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
                 
-                dayEl.onmouseover = () => {
-                    document.getElementById('live-info').innerText = currentData[i] ? currentData[i].map(d => d.text).join(', ') : 'Нет записей';
+                const num = document.createElement('div');
+                num.className = 'day-num';
+                num.innerText = i;
+                day.appendChild(num);
+
+                const dotsCont = document.createElement('div');
+                dotsCont.className = 'dots';
+                if(dbData[i] && dbData[i].length > 0) {
+                    dbData[i].forEach(() => {
+                        const dot = document.createElement('div');
+                        dot.className = 'dot';
+                        dotsCont.appendChild(dot);
+                    });
+                }
+                day.appendChild(dotsCont);
+
+                day.onmouseover = () => {
+                    const info = document.getElementById('live-info');
+                    if(dbData[i] && dbData[i].length > 0) {
+                        info.innerHTML = dbData[i].map(d => `<b>${d.user}:</b> ${d.text}`).join('<br>');
+                    } else {
+                        info.innerText = 'Событий нет';
+                    }
                 };
 
-                dayEl.onclick = () => {
+                day.onclick = () => {
                     activeDay = i;
                     document.getElementById('m-date').innerText = i + ' ' + months[mIdx];
                     document.getElementById('modal').style.display = 'flex';
                 };
-                grid.appendChild(dayEl);
+
+                grid.appendChild(day);
             }
         }
 
         onSnapshot(doc(db, "calendar", `2026_${mIdx}`), (snap) => {
-            currentData = snap.exists() ? snap.data() : {};
+            dbData = snap.exists() ? snap.data() : {};
             render();
         });
 
@@ -162,7 +185,7 @@
         window.save = async () => {
             const text = document.getElementById('m-input').value;
             if(!text) return;
-            const list = currentData[activeDay] || [];
+            const list = dbData[activeDay] || [];
             list.push({text, user});
             await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[activeDay]: list}, {merge:true});
             document.getElementById('m-input').value = '';
