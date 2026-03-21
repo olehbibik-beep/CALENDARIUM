@@ -3,117 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL | Admin Panel</title>
+    <title>TERMINAL | Admin Control</title>
     <style>
         :root { 
             --bg: #0a0a0a; 
             --card: #161616;
             --accent: #fdcb6e; 
+            --orange: #f39c12; 
             --text: #ffffff;
-            --danger: #ff7675;
-            --success: #55efc4;
-            --muted: #444;
+            --muted: #555;
         }
         
-        * { box-sizing: border-box; }
         body { 
-            margin: 0; font-family: 'Inter', -apple-system, sans-serif; 
+            margin: 0; font-family: 'Inter', sans-serif; 
             background: var(--bg); color: var(--text); 
-            display: flex; flex-direction: column; height: 100vh;
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
         }
 
-        /* ШАПКА */
+        /* HEADER */
         header { 
             padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #222; background: #000;
+            border-bottom: 1px solid #222;
         }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
-        .logo { font-size: 1rem; font-weight: 900; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
-        
+        .logo { font-weight: 900; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
         .exit-btn { 
-            background: var(--accent); color: #000; border: none; padding: 10px 20px; 
-            border-radius: 12px; font-weight: 900; cursor: pointer; text-decoration: none; 
-            font-size: 0.75rem; text-transform: uppercase; transition: 0.3s;
+            background: #fff; color: #000; padding: 8px 20px; border-radius: 20px; 
+            text-decoration: none; font-weight: 900; font-size: 0.7rem; 
         }
-        .exit-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(253, 203, 110, 0.3); }
 
         /* КОНТЕНТ */
-        main { flex: 1; padding: 40px; overflow-y: auto; max-width: 1100px; margin: 0 auto; width: 100%; }
-        
-        .hero { margin-bottom: 40px; }
-        h1 { font-size: 3rem; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -2px; }
-        p.desc { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; margin-top: 5px; }
+        main { flex: 1; padding: 40px; overflow: hidden; }
+        h1 { font-size: 2.5rem; font-weight: 900; margin: 0 0 30px; letter-spacing: -2px; }
 
-        .grid-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; }
+        .section-label { font-size: 0.7rem; font-weight: 900; color: var(--muted); text-transform: uppercase; margin-bottom: 15px; }
 
-        .section-box { background: var(--card); border-radius: 24px; padding: 25px; border: 1px solid #222; }
-        .section-label { font-size: 0.7rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; display: block; }
-
-        /* ТАБЛИЦЫ */
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 10px; color: #333; font-size: 0.65rem; text-transform: uppercase; }
-        td { padding: 15px 10px; border-top: 1px solid #222; font-size: 0.9rem; font-weight: 700; }
-        
-        .user-id { color: var(--accent); }
-        
-        /* КНОПКИ */
-        .actions { display: flex; gap: 8px; justify-content: flex-end; }
-        .btn { 
-            border: none; padding: 8px 12px; border-radius: 10px; font-weight: 900; 
-            font-size: 0.65rem; cursor: pointer; text-transform: uppercase; transition: 0.2s;
+        /* ГОРИЗОНТАЛЬНЫЙ СПИСОК (БЕГУНОК) */
+        .scroll-container { 
+            display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px;
+            scroll-snap-type: x mandatory; scrollbar-width: none; /* Скрываем стандартный скролл */
         }
-        .btn-approve { background: var(--success); color: #000; }
-        .btn-delete { background: #222; color: var(--danger); }
-        .btn:hover { transform: scale(1.05); }
+        .scroll-container::-webkit-scrollbar { display: none; }
 
-        .empty-state { padding: 40px; text-align: center; color: var(--muted); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
-
-        @media (max-width: 900px) {
-            .grid-layout { grid-template-columns: 1fr; }
-            h1 { font-size: 2rem; }
-            header { padding: 20px; }
+        .user-card { 
+            min-width: 200px; background: var(--card); padding: 25px; border-radius: 30px;
+            border: 1px solid #222; scroll-snap-align: start; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            transition: 0.3s;
         }
+        .user-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .user-avatar { width: 60px; height: 60px; background: #222; border-radius: 50%; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--accent); }
+        .user-name { font-weight: 900; font-size: 1.1rem; margin-bottom: 5px; }
+        .user-status { font-size: 0.6rem; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+        
+        .card-btn { 
+            margin-top: 20px; width: 100%; padding: 10px; border-radius: 15px; border: none;
+            font-weight: 900; cursor: pointer; font-size: 0.7rem; text-transform: uppercase;
+        }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-secondary { background: #222; color: #fff; }
+
+        /* ОРАНЖЕВАЯ ШТОРКА */
+        #confirm-sidebar { 
+            position: fixed; right: 0; top: 0; width: 350px; height: 100vh; 
+            background: var(--orange); color: white; z-index: 1000;
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+            padding: 40px; box-sizing: border-box; display: flex; flex-direction: column;
+        }
+        #confirm-sidebar.active { transform: translateX(0); }
+        .sh-title { font-size: 2rem; font-weight: 900; margin-bottom: 10px; line-height: 1; }
+        .sh-desc { font-size: 0.9rem; opacity: 0.9; margin-bottom: 40px; font-weight: 600; }
+        .sh-btn { 
+            width: 100%; padding: 20px; border-radius: 20px; border: none; 
+            font-weight: 900; cursor: pointer; font-size: 1rem; margin-bottom: 15px;
+        }
+        .sh-confirm { background: white; color: var(--orange); }
+        .sh-cancel { background: rgba(0,0,0,0.1); color: white; }
+
     </style>
 </head>
 <body>
 
+    <div id="confirm-sidebar">
+        <div class="sh-title">SYSTEM<br>CONFIRM</div>
+        <p class="sh-desc" id="confirm-text">Вы уверены, что хотите выполнить это действие?</p>
+        
+        <button class="sh-btn sh-confirm" id="main-confirm-btn">ПОДТВЕРДИТЬ</button>
+        <button class="sh-btn sh-cancel" onclick="closeSidebar()">ОТМЕНА</button>
+    </div>
+
     <header>
-        <div class="logo-area">
-            <div class="status-dot"></div>
-            <div class="logo">Terminal_Admin v2.0</div>
-        </div>
-        <a href="calendar.html" class="exit-btn">← Вернуться в календарь</a>
+        <div class="logo">TERMINAL_DATABASE</div>
+        <a href="calendar.html" class="exit-btn">ВЫХОД</a>
     </header>
 
     <main>
-        <div class="hero">
-            <h1>Управление</h1>
-            <p class="desc">Доступ к системе и активные сессии</p>
-        </div>
+        <div class="section-label">Запросы на доступ</div>
+        <h1>Входящие сигналы</h1>
+        <div class="scroll-container" id="request-list"></div>
 
-        <div class="grid-layout">
-            <div class="section-box">
-                <span class="section-label">Ожидают подтверждения</span>
-                <table id="req-table">
-                    <thead>
-                        <tr><th>Пользователь</th><th>Действие</th></tr>
-                    </thead>
-                    <tbody id="request-list"></tbody>
-                </table>
-                <div id="no-requests" class="empty-state">Новых запросов нет</div>
-            </div>
-
-            <div class="section-box">
-                <span class="section-label">Активные профили</span>
-                <table id="user-table">
-                    <thead>
-                        <tr><th>Имя</th><th>Статус</th><th></th></tr>
-                    </thead>
-                    <tbody id="user-list"></tbody>
-                </table>
-            </div>
-        </div>
+        <div style="margin-top: 40px;" class="section-label">Активная база</div>
+        <h1>Пользователи</h1>
+        <div class="scroll-container" id="user-list"></div>
     </main>
 
     <script type="module">
@@ -130,67 +120,72 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
+        const sidebar = document.getElementById('confirm-sidebar');
+        let pendingAction = null;
 
-        // 1. ПОЛУЧАЕМ ЗАПРОСЫ (requests)
+        // ФУНКЦИИ ШТОРКИ
+        window.openConfirm = (text, action) => {
+            document.getElementById('confirm-text').innerText = text;
+            pendingAction = action;
+            sidebar.classList.add('active');
+        };
+
+        window.closeSidebar = () => {
+            sidebar.classList.remove('active');
+            pendingAction = null;
+        };
+
+        document.getElementById('main-confirm-btn').onclick = () => {
+            if (pendingAction) pendingAction();
+            closeSidebar();
+        };
+
+        // 1. ЗАПРОСЫ (requests)
         onSnapshot(collection(db, "requests"), (snapshot) => {
             const list = document.getElementById('request-list');
-            const empty = document.getElementById('no-requests');
-            list.innerHTML = '';
-            
-            if (snapshot.empty) {
-                empty.style.display = 'block';
-            } else {
-                empty.style.display = 'none';
-                snapshot.forEach(res => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="user-id">${res.id}</td>
-                        <td class="actions">
-                            <button class="btn btn-approve" onclick="approveUser('${res.id}')">Допустить</button>
-                            <button class="btn btn-delete" onclick="deleteDocById('requests', '${res.id}')">Удалить</button>
-                        </td>
-                    `;
-                    list.appendChild(tr);
-                });
-            }
+            list.innerHTML = snapshot.empty ? '<div class="user-card"><p class="user-status">НЕТ ЗАПРОСОВ</p></div>' : '';
+            snapshot.forEach(res => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div class="user-avatar">?</div>
+                    <div class="user-name">${res.id}</div>
+                    <div class="user-status">PENDING</div>
+                    <button class="card-btn btn-primary" onclick="openConfirm('Одобрить доступ для ${res.id}?', () => approveUser('${res.id}'))">ДОПУСТИТЬ</button>
+                `;
+                list.appendChild(card);
+            });
         });
 
-        // 2. ПОЛУЧАЕМ АКТИВНЫХ (users)
+        // 2. ПОЛЬЗОВАТЕЛИ (users)
         onSnapshot(collection(db, "users"), (snapshot) => {
             const list = document.getElementById('user-list');
             list.innerHTML = '';
             snapshot.forEach(res => {
                 if (res.id === 'admin') return;
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${res.id}</td>
-                    <td style="color:var(--muted); font-size:0.7rem; text-transform:uppercase;">Active</td>
-                    <td class="actions">
-                        <button class="btn btn-delete" onclick="deleteDocById('users', '${res.id}')">Блок</button>
-                    </td>
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div class="user-avatar">${res.id[0].toUpperCase()}</div>
+                    <div class="user-name">${res.id}</div>
+                    <div class="user-status">ACTIVE</div>
+                    <button class="card-btn btn-secondary" onclick="openConfirm('Удалить профиль ${res.id}?', () => deleteDocById('users', '${res.id}'))">УДАЛИТЬ</button>
                 `;
-                list.appendChild(tr);
+                list.appendChild(card);
             });
         });
 
-        // ЛОГИКА ОДОБРЕНИЯ
+        // ЛОГИКА
         window.approveUser = async (id) => {
-            const reqRef = doc(db, "requests", id);
-            const snap = await getDoc(reqRef);
+            const snap = await getDoc(doc(db, "requests", id));
             if (snap.exists()) {
-                const data = snap.data();
-                await setDoc(doc(db, "users", id), {
-                    password: data.password,
-                    role: "user"
-                });
-                await deleteDoc(reqRef);
+                await setDoc(doc(db, "users", id), { password: snap.data().password, role: "user" });
+                await deleteDoc(doc(db, "requests", id));
             }
         };
 
         window.deleteDocById = async (coll, id) => {
-            if(confirm("Удалить пользователя " + id + "?")) {
-                await deleteDoc(doc(db, coll, id));
-            }
+            await deleteDoc(doc(db, coll, id));
         };
     </script>
 </body>
