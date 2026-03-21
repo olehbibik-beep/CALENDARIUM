@@ -6,19 +6,17 @@
     <title>2026 | CALENDARIUM Terminal</title>
     <style>
         :root { 
-            --accent: #ffffff; 
-            --sidebar-bg: #1a1a1a; /* Глубокий темный из скриншота */
-            --main-bg: #f4f4f4;    /* Светлый фон для сетки */
-            --card-bg: #2d3436;    /* Цвет плиток из скриншота */
+            --sidebar-bg: #1a1a1a; 
+            --main-bg: #f4f4f4;    
+            --card-bg: #2d3436;    
             --text-white: #ffffff;
-            --text-muted: #636e72;
-            --online-green: #2ecc71;
+            --accent-blue: #0984e3;
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        /* --- ТЕМНЫЙ САЙДБАР --- */
+        /* --- САЙДБАР --- */
         .sidebar { 
             width: 380px; background: var(--sidebar-bg); padding: 50px 40px; 
             display: flex; flex-direction: column; 
@@ -27,56 +25,75 @@
         }
 
         .user-nav { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
-        .back-btn { background: #fff; color: #000; border: none; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+        .logout-btn { background: #fff; color: #000; border: none; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
         .user-name { font-size: 1.2rem; font-weight: 900; text-transform: uppercase; }
 
-        .year-selector { margin-bottom: 20px; }
         #display-year { 
             font-size: 8rem; font-weight: 900; color: #252525; 
-            letter-spacing: -5px; line-height: 0.7; margin-bottom: 10px;
+            letter-spacing: -5px; line-height: 0.7; margin-bottom: 20px;
         }
-        .year-controls { display: flex; gap: 10px; justify-content: flex-end; }
-        .year-btn { background: #333; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
-        .year-btn:hover { background: #444; }
+        .year-controls { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 40px; }
+        .year-btn { background: #333; color: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .year-btn:hover { background: var(--accent-blue); }
 
-        .side-label { font-size: 0.75rem; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 2px; margin: 40px 0 20px; }
+        /* БЛИЖАЙШЕЕ СОБЫТИЕ */
+        .upcoming-box { width: 100%; margin-top: auto; text-align: right; }
+        .side-label { font-size: 0.75rem; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .event-card-mini { 
+            background: #252525; padding: 20px; border-radius: 20px; 
+            border-right: 4px solid var(--accent-blue);
+        }
+        .ev-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
+        .ev-date { font-size: 0.8rem; font-weight: 700; color: var(--accent-blue); }
 
-        /* ОНЛАЙН СПИСОК */
-        .online-box { width: 100%; margin-top: auto; }
-        .user-list { display: flex; flex-direction: column; gap: 12px; }
-        .user-badge { font-size: 1rem; font-weight: 900; text-transform: uppercase; color: #fff; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
-        .user-badge::after { content: ''; width: 10px; height: 10px; background: var(--online-green); border-radius: 50%; box-shadow: 0 0 10px var(--online-green); }
+        /* --- СЕТКА (МЕНЬШЕ ПЛИТКИ, БОЛЬШЕ ОТСТУП) --- */
+        .main-content { 
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 80px; /* Большой отступ от краев экрана */
+        }
 
-        /* --- СЕТКА МЕСЯЦЕВ --- */
-        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
         .months-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); 
-            gap: 20px; width: 100%; max-width: 1000px; 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 30px; /* Больше расстояние между плитками */
+            width: 100%; 
+            max-width: 800px; /* Ограничил ширину, чтобы плитки стали меньше */
         }
 
         .month-card { 
-            background: var(--card-bg); border-radius: 25px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; font-size: 1.3rem; color: #fff;
-            cursor: pointer; border: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: 900; 
+            font-size: 1rem; /* Чуть меньше шрифт для баланса */
+            color: #fff;
+            cursor: pointer; 
             aspect-ratio: 1 / 1;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        .month-card:hover { transform: scale(1.05); background: #1a1a1a; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .month-card:hover { 
+            transform: scale(1.1); 
+            background: #000; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
+        }
 
         /* МОБИЛКИ */
         @media (max-width: 850px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; text-align: center; }
-            #display-year { font-size: 4rem; margin-bottom: 20px; }
-            .year-controls { justify-content: center; }
-            .side-label, .online-box { display: none; }
-            .main-content { padding: 15px; height: calc(100vh - 180px); }
-            .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; height: 100%; }
-            .month-card { aspect-ratio: auto; font-size: 0.9rem; border-radius: 15px; }
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; }
+            #display-year { font-size: 4rem; margin-bottom: 10px; }
+            .upcoming-box { display: none; }
+            .main-content { padding: 40px 20px; height: auto; }
+            .months-grid { grid-template-columns: repeat(3, 1fr); gap: 15px; }
+            .month-card { font-size: 0.8rem; border-radius: 12px; }
         }
     </style>
 </head>
@@ -84,8 +101,8 @@
 
     <div class="sidebar">
         <div class="user-nav">
-            <button class="back-btn" onclick="logout()">Logout</button>
-            <div class="user-name" id="display-name">ADMIN</div>
+            <button class="logout-btn" onclick="logout()">Exit</button>
+            <div class="user-name" id="display-name">...</div>
         </div>
 
         <div class="year-selector">
@@ -96,9 +113,11 @@
             </div>
         </div>
 
-        <div class="online-box">
-            <div class="side-label">В сети</div>
-            <div id="user-list" class="user-list"></div>
+        <div class="upcoming-box">
+            <div class="side-label">Ближайшее</div>
+            <div id="next-event-container">
+                <div style="color: #444; font-size: 0.8rem; font-weight: 900;">ЗАГРУЗКА...</div>
+            </div>
         </div>
     </div>
 
@@ -108,7 +127,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -119,34 +138,27 @@
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
+        const db = getFirestore(initializeApp(firebaseConfig));
         const currentUser = localStorage.getItem('currentUser') || 'ADMIN';
         document.getElementById('display-name').innerText = currentUser;
 
-        // Статус в сети
-        const userStatusRef = doc(db, "online_users", currentUser);
-        setDoc(userStatusRef, { name: currentUser, lastSeen: Date.now() });
-
-        onSnapshot(collection(db, "online_users"), (snapshot) => {
-            const list = document.getElementById('user-list');
-            list.innerHTML = '';
+        // Ближайшее событие
+        const now = new Date().toISOString().split('T')[0];
+        const q = query(collection(db, "events"), where("date", ">=", now), orderBy("date", "asc"), limit(1));
+        onSnapshot(q, (snapshot) => {
+            const container = document.getElementById('next-event-container');
+            if (snapshot.empty) { container.innerHTML = '<div style="color:#444; font-weight:900;">ПЛАНОВ НЕТ</div>'; return; }
             snapshot.forEach(doc => {
-                const user = doc.data();
-                const div = document.createElement('div');
-                div.className = 'user-badge';
-                div.innerText = user.name;
-                list.appendChild(div);
+                const ev = doc.data();
+                container.innerHTML = `<div class="event-card-mini"><div class="ev-title">${ev.title}</div><div class="ev-date">${ev.date.split('-').reverse().join('.')}</div></div>`;
             });
         });
 
-        // Сетка
+        // Сетка месяцев
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const grid = document.getElementById('months');
-        const yearTitle = document.getElementById('display-year');
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
-        yearTitle.innerText = currentYear;
+        document.getElementById('display-year').innerText = currentYear;
 
         function renderMonths() {
             grid.innerHTML = '';
@@ -165,19 +177,13 @@
 
         window.changeYear = (dir) => {
             currentYear += dir;
-            yearTitle.innerText = currentYear;
+            document.getElementById('display-year').innerText = currentYear;
             localStorage.setItem('selectedYear', currentYear);
             renderMonths();
         };
 
-        window.logout = async () => {
-            await deleteDoc(userStatusRef);
-            localStorage.clear();
-            window.location.href = 'index.html';
-        };
-
+        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
         renderMonths();
-        window.addEventListener('beforeunload', () => deleteDoc(userStatusRef));
     </script>
 </body>
 </html>
