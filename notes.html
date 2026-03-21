@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 | CALENDARIUM Terminal</title>
+    <title>Планы | CALENDARIUM</title>
     <style>
         :root { 
             --accent: #0088cc; 
+            --main-bg: #f4f7f6;
             --sidebar-bg: #ffffff;
-            --main-bg: #f4f7f6; /* Светло-серый фон для контраста с сайдбаром */
-            --text-main: #2d3436; 
-            --text-muted: #636e72;
             --ev-work: #0984e3;
             --ev-important: #d63031;
             --ev-personal: #27ae60;
@@ -18,124 +16,119 @@
         
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        /* УЛУЧШЕННЫЙ САЙДБАР */
+        /* САЙДБАР (Твой стиль) */
         .sidebar { 
-            width: 400px; 
-            background: var(--sidebar-bg); 
-            padding: 50px 40px; 
-            display: flex; 
-            flex-direction: column; 
-            border-right: 1px solid #e0e0e0; 
-            box-shadow: 10px 0 30px rgba(0,0,0,0.03); /* Тень для отделения от контента */
-            z-index: 10; flex-shrink: 0; box-sizing: border-box; 
-            align-items: flex-end; 
-            text-align: right;
+            width: 400px; background: var(--sidebar-bg); padding: 50px 40px; 
+            display: flex; flex-direction: column; border-right: 1px solid #e0e0e0; 
+            box-shadow: 10px 0 30px rgba(0,0,0,0.03); z-index: 10; flex-shrink: 0; 
+            box-sizing: border-box; align-items: flex-end; text-align: right;
         }
 
-        /* ПРОФИЛЬ */
-        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
-        .logout-btn { 
-            background: #000; color: #fff; border: none; 
-            padding: 7px 16px; border-radius: 8px; 
-            font-size: 0.7rem; font-weight: 900; cursor: pointer; 
-            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .back-btn { 
+            background: #000; color: #fff; border: none; padding: 7px 16px; 
+            border-radius: 8px; font-size: 0.7rem; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; transition: 0.3s;
         }
-        .logout-btn:hover { background: #333; transform: scale(1.05); }
-        .user-name { font-size: 1.1rem; font-weight: 800; color: var(--text-main); text-transform: uppercase; }
-        .user-icon { color: var(--accent); display: flex; align-items: center; }
-
-        /* ГОД (Более читабельный) */
-        #display-year { 
-            font-size: 8rem; font-weight: 800; 
-            color: #eceff1; /* Чуть темнее и насыщеннее */
-            letter-spacing: -10px; line-height: 0.7; margin-bottom: 60px; 
-            text-shadow: 1px 1px 0px #fff; 
+        #month-title { 
+            font-size: 6rem; font-weight: 800; color: #eceff1; 
+            letter-spacing: -6px; line-height: 0.8; margin-bottom: 40px; text-transform: uppercase;
         }
-
-        /* СЕКЦИИ */
-        .side-section { width: 100%; margin-bottom: 40px; border-bottom: 1px solid #f0f0f0; padding-bottom: 20px; }
-        .side-section:last-of-type { border: none; }
 
         .side-label { font-size: 0.75rem; font-weight: 800; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 12px; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 12px; font-size: 0.9rem; color: #636e72; margin-bottom: 12px; }
         .color-bar { width: 5px; height: 18px; border-radius: 3px; }
 
-        /* ЛОГИ (Яркий акцент) */
-        .log-entry { 
-            font-size: 0.85rem; background: #fff5f9; padding: 18px 20px; 
-            border-radius: 15px 0 0 15px; position: relative;
-            line-height: 1.5; color: #4b4b4b; text-align: right; width: 100%; box-sizing: border-box;
-            box-shadow: -5px 5px 15px rgba(230, 0, 126, 0.05);
+        /* СЕТКА КАЛЕНДАРЯ */
+        .main-content { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; overflow-y: auto; }
+        
+        /* Заголовки дней недели */
+        .weekdays { 
+            display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; 
+            margin-bottom: 15px; text-align: center;
         }
-        .log-entry::after {
-            content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
-            border-right: 4px solid #e6007e; border-top: 4px solid #e6007e;
-            border-bottom: 4px solid #e6007e; border-radius: 0 10px 10px 0;
+        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; }
+
+        .days-grid { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
+
+        .day-card { 
+            background: #fff; height: 110px; border-radius: 20px; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem; color: #2d3436; cursor: pointer;
+            transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.02);
+            position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
+        .day-card:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.07); border-color: var(--accent); }
+        .day-card.empty { background: transparent; box-shadow: none; cursor: default; border: none; }
+        
+        /* Индикатор заметки */
+        .day-mark { position: absolute; bottom: 15px; width: 6px; height: 6px; border-radius: 50%; }
 
-        /* ЦЕНТРАЛЬНАЯ ЧАСТЬ */
-        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
-
-        .months-grid { display: grid; grid-template-columns: repeat(4, 190px); gap: 25px; }
-
-        .month-card { 
-            background: #fff; border-radius: 24px; height: 140px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: 800; font-size: 1.1rem; color: var(--text-main);
-            cursor: pointer; border: 1px solid rgba(0,0,0,0.03);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        /* МОДАЛКА */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(8px); z-index: 100;
+            align-items: center; justify-content: center;
         }
-
-        .month-card:hover { 
-            transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            color: var(--accent); border-color: var(--accent);
+        .modal-content { 
+            background: #fff; padding: 40px; border-radius: 30px; width: 450px; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15); text-align: right;
         }
-
-        footer { position: fixed; bottom: 0; width: 100%; padding: 12px 40px; font-size: 10px; color: #b2bec3; text-align: right; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-top: 1px solid #eee; }
+        textarea { 
+            width: 100%; height: 150px; border: 1px solid #f0f0f0; border-radius: 15px; 
+            padding: 20px; font-family: inherit; font-size: 1rem; resize: none; box-sizing: border-box; 
+            margin: 20px 0; background: #fafafa; outline: none;
+        }
+        .cat-select { display: flex; gap: 10px; margin-bottom: 25px; direction: rtl; }
+        .cat-btn { 
+            flex: 1; padding: 12px; border-radius: 10px; border: 2px solid #f0f0f0; 
+            cursor: pointer; font-size: 0.65rem; font-weight: 900;
+        }
+        .cat-btn.active { border-color: var(--accent); background: #f0f9ff; }
+        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 18px; border-radius: 15px; font-weight: 800; cursor: pointer; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="user-header">
-            <button class="logout-btn" onclick="logout()">Exit</button>
-            <div class="user-name" id="display-name">ADMIN</div>
-            <div class="user-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-            </div>
+            <button class="back-btn" onclick="location.href='calendar.html'">Назад</button>
+            <div class="user-name" id="user-display">ADMIN</div>
         </div>
-
-        <div id="display-year">2026</div>
-
+        <div id="month-title">...</div>
         <div class="side-section">
             <div class="side-label">Категории</div>
             <div class="legend-item">Работа <div class="color-bar" style="background: var(--ev-work);"></div></div>
             <div class="legend-item">Важное <div class="color-bar" style="background: var(--ev-important);"></div></div>
             <div class="legend-item">Личное <div class="color-bar" style="background: var(--ev-personal);"></div></div>
         </div>
-
-        <div class="side-section">
-            <div class="side-label">Логи записей</div>
-            <div id="logs-container">
-                <div class="log-entry">Система готова к работе..</div>
-            </div>
-        </div>
     </div>
 
     <div class="main-content">
-        <div class="months-grid" id="months"></div>
+        <div class="weekdays">
+            <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
+            <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
+        </div>
+        <div class="days-grid" id="days-container"></div>
     </div>
 
-    <footer>Cloud Plan Ecosystem — Secure Terminal 2.0</footer>
+    <div class="modal" id="note-modal">
+        <div class="modal-content">
+            <h2 id="modal-date-title" style="margin:0; font-weight:900; letter-spacing:-1px;">Дата</h2>
+            <textarea id="note-text" placeholder="Что планируем?"></textarea>
+            <div class="cat-select">
+                <div class="cat-btn" id="btn-personal" onclick="selectCat('personal')">ЛИЧНОЕ</div>
+                <div class="cat-btn" id="btn-important" onclick="selectCat('important')">ВАЖНОЕ</div>
+                <div class="cat-btn" id="btn-work" onclick="selectCat('work')">РАБОТА</div>
+            </div>
+            <button class="save-btn" onclick="saveNote()">СОХРАНИТЬ ПЛАН</button>
+            <button onclick="closeModal()" style="margin-top:15px; background:none; border:none; color:#b2bec3; cursor:pointer; font-weight:700;">Отмена</button>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -147,35 +140,76 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
+        const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
         const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) window.location.href = 'index.html';
-        document.getElementById('display-name').innerText = currentUser;
-
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const grid = document.getElementById('months');
-        monthsNames.forEach((m, i) => {
-            const card = document.createElement('div');
-            card.className = 'month-card';
-            card.innerText = m;
-            card.onclick = () => { localStorage.setItem('selectedMonth', i); window.location.href = 'notes.html'; };
-            grid.appendChild(card);
-        });
+        
+        document.getElementById('month-title').innerText = monthsNames[monthIdx];
+        document.getElementById('user-display').innerText = currentUser;
 
-        const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(1));
-        onSnapshot(qLogs, (snapshot) => {
-            const container = document.getElementById('logs-container');
-            if (snapshot.empty) return;
+        let selectedDay = null;
+        let activeCat = 'work';
+
+        // Логика построения сетки
+        const firstDay = new Date(2026, monthIdx, 1).getDay();
+        const shift = firstDay === 0 ? 6 : firstDay - 1; // Коррекция под Пн-Вс
+        const daysInMonth = new Date(2026, monthIdx + 1, 0).getDate();
+        const container = document.getElementById('days-container');
+
+        onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
             container.innerHTML = '';
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const div = document.createElement('div');
-                div.className = 'log-entry';
-                div.innerText = `${data.user}: ${data.action} в ${data.month}`;
-                container.appendChild(div);
-            });
+            const data = snap.exists() ? snap.data() : {};
+            
+            // Пустые ячейки
+            for(let s=0; s<shift; s++) {
+                const empty = document.createElement('div');
+                empty.className = 'day-card empty';
+                container.appendChild(empty);
+            }
+
+            // Дни месяца
+            for (let i = 1; i <= daysInMonth; i++) {
+                const card = document.createElement('div');
+                card.className = 'day-card';
+                card.innerHTML = i;
+                if (data[i]) {
+                    const dot = document.createElement('div');
+                    dot.className = 'day-mark';
+                    dot.style.background = `var(--ev-${data[i].category})`;
+                    card.appendChild(dot);
+                }
+                card.onclick = () => openModal(i, data[i]);
+                container.appendChild(card);
+            }
         });
 
-        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
+        window.openModal = (day, existing) => {
+            selectedDay = day;
+            document.getElementById('modal-date-title').innerText = `${day} ${monthsNames[monthIdx]}`;
+            document.getElementById('note-text').value = existing ? existing.text : '';
+            selectCat(existing ? existing.category : 'work');
+            document.getElementById('note-modal').style.display = 'flex';
+        };
+
+        window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
+
+        window.selectCat = (cat) => {
+            activeCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${cat}`).classList.add('active');
+        };
+
+        window.saveNote = async () => {
+            const text = document.getElementById('note-text').value;
+            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {
+                [selectedDay]: { text, category: activeCat, user: currentUser }
+            }, { merge: true });
+
+            await addDoc(collection(db, "logs"), {
+                user: currentUser, action: "изменил запись", month: monthsNames[monthIdx], timestamp: serverTimestamp()
+            });
+            closeModal();
+        };
     </script>
 </body>
 </html>
