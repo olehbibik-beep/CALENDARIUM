@@ -3,111 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALENDARIUM | Fixed Edition</title>
+    <title>CALENDARIUM | REBORN</title>
     <style>
         :root { 
-            --accent: #0088cc; 
-            --sidebar-bg: #1e2122;
-            --dark-card: #2d3436;
+            --sidebar-bg: #1a1a1a;
+            --main-bg: #ffffff;
+            --card-bg: #2d3436; /* Цвет плитки */
+            --text-main: #2d3436;
             --orange-we: #ff9f43;
-            --ev-memorial: #ff0000; /* Красный */
-            --ev-congress: #0088cc; /* Синий */
-            --ev-meeting: #ffffff;  /* Белый */
+            --ev-memorial: #ff0000;
+            --ev-congress: #0088cc;
+            --ev-meeting: #ffffff;
         }
         
-        body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; background: #f4f7f6; overflow: hidden; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        /* САЙДБАР */
+        /* САЙДБАР КАК НА СКРИНЕ */
         .sidebar { 
-            width: 400px; background: var(--sidebar-bg); padding: 40px; 
+            width: 380px; background: var(--sidebar-bg); padding: 40px; 
             display: flex; flex-direction: column; color: white; flex-shrink: 0; text-align: right;
         }
-        #month-title { font-size: 2.5rem; font-weight: 800; text-transform: uppercase; margin: 10px 0 30px; }
-        .legend { margin-top: 20px; }
-        .leg-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 8px; font-size: 0.85rem; color: #bbb; }
-        .rect { width: 25px; height: 8px; border-radius: 2px; }
+        .back-btn { background: #eee; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 30px; }
+        #month-title { font-size: 3.5rem; font-weight: 900; text-transform: uppercase; margin: 0 0 40px 0; letter-spacing: -2px; }
+        
+        .leg-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; color: #ccc; }
+        .rect { width: 30px; height: 10px; border-radius: 2px; }
 
-        /* ЦЕНТРАЛЬНАЯ ЧАСТЬ */
-        .content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* КОНТЕНТ */
+        .main { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f9f9f9; }
 
-        /* СТАТИЧНАЯ ШАПКА (ЕЁ СКРИПТ НЕ ТРОГАЕТ) */
-        .week-header { 
-            display: grid; 
-            grid-template-columns: repeat(7, 105px); 
-            gap: 15px; 
-            margin-bottom: 15px; 
-        }
-        .wh-day { text-align: center; font-weight: 900; color: #333; text-transform: uppercase; font-size: 0.75rem; width: 105px; }
+        /* ШАПКА ДНЕЙ */
+        .week-header { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; margin-bottom: 15px; }
+        .wh-day { width: 110px; text-align: center; font-weight: 900; color: #333; text-transform: uppercase; font-size: 0.8rem; }
         .wh-day.we { color: var(--orange-we); }
 
-        /* ДИНАМИЧЕСКАЯ СЕТКА ЧИСЕЛ */
-        #days-container { 
-            display: grid; 
-            grid-template-columns: repeat(7, 105px); 
-            gap: 15px; 
-        }
+        /* СЕТКА ЧИСЕЛ (ГЛАВНОЕ) */
+        #days-container { display: grid; grid-template-columns: repeat(7, 110px); gap: 15px; }
 
         .card { 
-            width: 105px; height: 105px; background: var(--dark-card); border-radius: 18px; 
+            width: 110px; height: 110px; background: var(--card-bg); border-radius: 20px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            cursor: pointer; position: relative; transition: 0.2s;
+            cursor: pointer; position: relative; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
-        .card:hover { transform: translateY(-3px); background: #000; }
-        .card.we-card { color: var(--orange-we); border: 1px solid rgba(255,159,67,0.2); }
-        .card.empty { background: transparent; cursor: default; pointer-events: none; }
-        .card-num { font-size: 1.5rem; font-weight: 800; color: inherit; }
-        .card:not(.we-card) .card-num { color: #fff; }
+        .card:hover { transform: scale(1.05); background: #000; z-index: 10; }
+        .card.we-card { color: var(--orange-we); border: 1px solid rgba(255,159,67,0.3); }
+        .card.empty { background: transparent; cursor: default; box-shadow: none; }
+        .card-num { font-size: 1.8rem; font-weight: 800; color: #fff; }
+        .card.we-card .card-num { color: var(--orange-we); }
 
-        /* ПОЛОСКИ */
-        .marks { position: absolute; bottom: 12px; display: flex; gap: 3px; }
-        .m-rect { width: 20px; height: 5px; border-radius: 1px; }
+        .marks { position: absolute; bottom: 15px; display: flex; gap: 4px; }
+        .m-line { width: 25px; height: 5px; border-radius: 2px; }
 
         /* МОДАЛКА */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-inner { background: #fff; padding: 30px; border-radius: 20px; width: 350px; color: #333; }
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .c-btn { padding: 8px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: bold; }
-        .c-btn.active { border-color: var(--accent); background: #f0f7ff; }
+        .modal-box { background: #fff; padding: 30px; border-radius: 25px; width: 380px; color: #333; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <button onclick="location.href='calendar.html'" style="cursor:pointer; padding:8px; border-radius:5px; border:none; font-weight:bold;">← НАЗАД</button>
-        <h1 id="month-title">МЕСЯЦ</h1>
+        <button class="back-btn" onclick="location.href='calendar.html'">← НАЗАД</button>
+        <h1 id="month-title">АПРЕЛЬ</h1>
         
-        <div class="legend">
-            <div class="leg-item">Вечеря Воспоминания <div class="rect" style="background: var(--ev-memorial)"></div></div>
-            <div class="leg-item">Конгресс <div class="rect" style="background: var(--ev-congress)"></div></div>
-            <div class="leg-item">Собрания и ВПС <div class="rect" style="background: var(--ev-meeting); border: 1px solid #555;"></div></div>
-        </div>
+        <div class="leg-item">Вечеря Воспоминания <div class="rect" style="background: var(--ev-memorial)"></div></div>
+        <div class="leg-item">Конгресс <div class="rect" style="background: var(--ev-congress)"></div></div>
+        <div class="leg-item">Собрания и ВПС <div class="rect" style="background: var(--ev-meeting); border: 1px solid #666;"></div></div>
 
-        <div id="preview" style="margin-top:40px; color:#888; font-style:italic;">Наведи на дату...</div>
+        <div id="preview" style="margin-top:50px; color:#666; font-style:italic; font-size:0.9rem;">Наведи на дату...</div>
     </div>
 
-    <div class="content">
+    <div class="main">
         <div class="week-header">
-            <div class="wh-day">Пн</div><div class="wh-day">Вт</div><div class="wh-day">Ср</div>
-            <div class="wh-day">Чт</div><div class="wh-day">Пт</div>
+            <div class="wh-day">Пн</div><div class="wh-day">Вт</div><div class="wh-day">Ср</div><div class="wh-day">Чт</div><div class="wh-day">Пт</div>
             <div class="wh-day we">Сб</div><div class="wh-day we">Вс</div>
         </div>
-        
         <div id="days-container"></div>
     </div>
 
     <div id="modal" class="modal">
-        <div class="modal-inner">
-            <h3 id="m-date" style="margin-top:0">00 Дата</h3>
-            <div id="m-list" style="margin-bottom:15px; font-size:0.8rem;"></div>
-            <textarea id="m-text" style="width:100%; height:50px; border-radius:8px; padding:8px; box-sizing:border-box;" placeholder="Событие..."></textarea>
-            <div class="btn-grid">
-                <div class="c-btn" id="b-memorial" onclick="selCat('memorial')">ВЕЧЕРЯ</div>
-                <div class="c-btn" id="b-congress" onclick="selCat('congress')">КОНГРЕСС</div>
-                <div class="c-btn" id="b-meeting" onclick="selCat('meeting')">СОБРАНИЕ</div>
-                <div class="c-btn" id="b-other" onclick="selCat('other')">ПРОЧЕЕ</div>
+        <div class="modal-box">
+            <h2 id="m-date">00 Дата</h2>
+            <div id="m-list" style="max-height:150px; overflow-y:auto; margin-bottom:15px;"></div>
+            <textarea id="m-text" style="width:100%; height:60px; border-radius:10px; padding:10px; border:1px solid #ccc; box-sizing:border-box;"></textarea>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;" id="cat-btns">
+                <button onclick="window.activeCat='memorial'" style="background:var(--ev-memorial); color:white; border:none; padding:8px; border-radius:5px; font-size:10px; cursor:pointer;">ВЕЧЕРЯ</button>
+                <button onclick="window.activeCat='congress'" style="background:var(--ev-congress); color:white; border:none; padding:8px; border-radius:5px; font-size:10px; cursor:pointer;">КОНГРЕСС</button>
+                <button onclick="window.activeCat='meeting'" style="background:#eee; color:black; border:1px solid #ccc; padding:8px; border-radius:5px; font-size:10px; cursor:pointer;">СОБРАНИЕ</button>
+                <button onclick="window.activeCat='other'" style="background:#27ae60; color:white; border:none; padding:8px; border-radius:5px; font-size:10px; cursor:pointer;">ПРОЧЕЕ</button>
             </div>
-            <button onclick="save()" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">СОХРАНИТЬ</button>
-            <button onclick="closeM()" style="width:100%; border:none; background:none; color:gray; margin-top:8px; cursor:pointer;">Отмена</button>
+            <button onclick="save()" style="width:100%; padding:15px; background:#000; color:#fff; border:none; border-radius:12px; margin-top:20px; font-weight:bold; cursor:pointer;">СОХРАНИТЬ</button>
+            <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Отмена</button>
         </div>
     </div>
 
@@ -125,36 +110,34 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
-        const mIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
-        const user = localStorage.getItem('currentUser') || 'ADMIN';
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const mIdx = parseInt(localStorage.getItem('selectedMonth') || 3); // 3 - это Апрель
+        const months = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
         
         document.getElementById('month-title').innerText = months[mIdx];
 
         let dbData = {};
         let activeDay = null;
-        let activeCat = 'meeting';
-
-        window.selCat = (c) => { 
-            activeCat = c; 
-            document.querySelectorAll('.c-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('b-'+(c === 'other' ? 'other' : c)).classList.add('active');
-        };
+        window.activeCat = 'meeting';
 
         onSnapshot(doc(db, "calendar", `2026_${mIdx}`), (snap) => {
             dbData = snap.exists() ? snap.data() : {};
             render();
-        });
+        }, (err) => console.error("Firebase error:", err));
 
         function render() {
             const container = document.getElementById('days-container');
+            if(!container) return;
             container.innerHTML = '';
             
             const first = new Date(2026, mIdx, 1).getDay();
             const shift = first === 0 ? 6 : first - 1;
             const total = new Date(2026, mIdx + 1, 0).getDate();
 
-            for(let i=0; i<shift; i++) container.appendChild(Object.assign(document.createElement('div'), {className:'card empty'}));
+            for(let i=0; i<shift; i++) {
+                const e = document.createElement('div');
+                e.className = 'card empty';
+                container.appendChild(e);
+            }
 
             for(let i=1; i<=total; i++) {
                 const d = new Date(2026, mIdx, i);
@@ -168,51 +151,48 @@
                     row.className = 'marks';
                     dbData[i].forEach(n => {
                         const m = document.createElement('div');
-                        m.className = 'm-rect';
+                        m.className = 'm-line';
                         m.style.background = n.category === 'other' ? '#27ae60' : `var(--ev-${n.category})`;
+                        if(n.category === 'meeting') m.style.border = "1px solid #666";
                         row.appendChild(m);
                     });
                     card.appendChild(row);
                 }
 
                 card.onmouseover = () => {
-                    const p = document.getElementById('preview');
-                    p.innerHTML = dbData[i] ? dbData[i].map(n => `• ${n.text}`).join('<br>') : 'Нет событий';
+                    document.getElementById('preview').innerHTML = dbData[i] ? dbData[i].map(n => `• ${n.text}`).join('<br>') : 'Событий нет';
                 };
-                card.onclick = () => { activeDay = i; openM(i); };
+                card.onclick = () => { activeDay = i; openModal(i); };
                 container.appendChild(card);
             }
         }
 
-        window.openM = (day) => {
+        window.openModal = (day) => {
             document.getElementById('m-date').innerText = day + ' ' + months[mIdx];
             document.getElementById('m-list').innerHTML = (dbData[day] || []).map((n, idx) => `
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #eee;">
-                    <span>${n.text}</span>
-                    <button onclick="del(${day}, ${idx})" style="color:red; border:none; background:none; cursor:pointer;">×</button>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px; background:#f0f0f0; padding:5px; border-radius:5px; font-size:12px;">
+                    <span style="border-left:3px solid ${n.category === 'other' ? '#27ae60' : 'var(--ev-'+n.category+')'}; padding-left:5px;">${n.text}</span>
+                    <button onclick="del(${day}, ${idx})" style="border:none; color:red; cursor:pointer;">×</button>
                 </div>
             `).join('');
-            selCat('meeting');
             document.getElementById('modal').style.display = 'flex';
         };
-
-        window.closeM = () => document.getElementById('modal').style.display = 'none';
 
         window.save = async () => {
             const val = document.getElementById('m-text').value;
             if(!val) return;
             const list = dbData[activeDay] || [];
-            list.push({text: val, category: activeCat, user: user});
+            list.push({text: val, category: window.activeCat, user: 'ADMIN'});
             await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[activeDay]: list}, {merge:true});
             document.getElementById('m-text').value = '';
-            closeM();
+            document.getElementById('modal').style.display = 'none';
         };
 
         window.del = async (day, idx) => {
             const list = [...dbData[day]];
             list.splice(idx, 1);
             await setDoc(doc(db, "calendar", `2026_${mIdx}`), {[day]: list}, {merge:true});
-            openM(day);
+            openModal(day);
         };
     </script>
 </body>
