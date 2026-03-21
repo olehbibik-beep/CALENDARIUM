@@ -3,149 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Планы | CALENDARIUM</title>
+    <title>CALENDARIUM | Stable Edition</title>
     <style>
         :root { 
-            --accent: #0088cc; 
             --main-bg: #f4f7f6; 
             --sidebar-bg: #1e2122; 
-            --dark-card: #2d3436; 
+            --card-bg: #2d3436; 
+            --text-white: #ffffff;
+            --text-dark: #2d3436;
         }
-        
-        /* Базовый макет */
+
         body { 
-            margin: 0; 
-            padding: 0;
-            font-family: 'Inter', sans-serif; 
-            display: flex; 
-            width: 100vw;
-            height: 100vh; 
-            background: var(--main-bg); 
-            overflow: hidden; 
+            margin: 0; padding: 0; display: flex; 
+            height: 100vh; background: var(--main-bg); 
+            font-family: 'Inter', sans-serif; overflow: hidden; 
         }
 
-        /* ТЕМНЫЙ САЙДБАР (Слева) */
+        /* САЙДБАР */
         .sidebar { 
-            width: 420px; 
-            height: 100vh;
-            background: var(--sidebar-bg); 
-            padding: 50px 40px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-end; 
-            text-align: right; 
-            color: white;
-            box-sizing: border-box;
-            flex-shrink: 0;
-            z-index: 100;
+            width: 400px; height: 100vh; background: var(--sidebar-bg); 
+            padding: 40px; display: flex; flex-direction: column; 
+            align-items: flex-end; text-align: right; color: white; flex-shrink: 0;
         }
 
-        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         .back-btn { 
-            background: #fff; color: #000; border: none; padding: 6px 16px; border-radius: 8px; 
-            font-size: 0.75rem; font-weight: 900; cursor: pointer; text-transform: uppercase;
+            background: #fff; color: #000; border: none; padding: 8px 20px; 
+            border-radius: 10px; font-weight: 900; cursor: pointer; margin-bottom: 20px;
         }
 
-        #display-year-static { font-size: 8rem; font-weight: 200; color: rgba(255,255,255,0.05); margin: 0; line-height: 0.7; letter-spacing: -10px;}
-        #month-title { font-size: 3.5rem; font-weight: 900; color: #fff; text-transform: uppercase; margin-top: -10px; margin-bottom: 30px;}
+        #month-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; margin: 0 0 20px 0; }
 
         #live-preview { 
-            width: 100%; min-height: 100px; background: rgba(230, 0, 126, 0.1); 
-            border-radius: 15px 0 0 15px; padding: 15px; border-right: 4px solid #e6007e;
-            color: #ff9fcf; font-size: 0.9rem; margin-bottom: 30px; box-sizing: border-box;
+            width: 100%; min-height: 100px; background: rgba(255, 255, 255, 0.05); 
+            border-radius: 15px; padding: 15px; border-right: 4px solid #e6007e;
+            font-size: 0.9rem; color: #ff9fcf; margin-bottom: 20px;
         }
 
-        /* КОНТЕНТ (Справа) */
-        .main-content { 
-            flex-grow: 1;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-            background: var(--main-bg); /* Светлый фон */
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .content { 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 20px; 
         }
 
-        /* СЕТКА КАЛЕНДАРЯ */
+        /* ДНИ НЕДЕЛИ */
         .weekdays { 
-            display: grid; 
-            grid-template-columns: repeat(7, 110px); 
-            gap: 15px; 
-            margin-bottom: 15px;
+            display: grid; grid-template-columns: repeat(7, 110px); 
+            gap: 15px; margin-bottom: 15px; 
         }
         .weekday { 
-            font-size: 0.9rem; 
-            font-weight: 900; 
-            color: #2d3436; /* ЧЕРНЫЙ ЦВЕТ ДЛЯ ДНЕЙ НЕДЕЛИ */
-            text-transform: uppercase; 
-            text-align: center;
+            color: var(--text-dark); font-weight: 900; 
+            text-transform: uppercase; text-align: center; font-size: 0.8rem;
         }
-        
-        .days-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 110px); 
+
+        /* СЕТКА ДНЕЙ */
+        .grid { 
+            display: grid; grid-template-columns: repeat(7, 110px); 
             gap: 15px; 
         }
 
-        /* КАРТОЧКА ДНЯ */
-        .day-card { 
-            width: 110px;
-            height: 110px; 
-            background: var(--dark-card); 
-            border-radius: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            cursor: pointer; 
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        .day { 
+            width: 110px; height: 110px; background: var(--card-bg); 
+            border-radius: 20px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; cursor: pointer; 
+            transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .day-card:hover { transform: translateY(-5px); background: #000; }
-        .day-card.empty { background: transparent; box-shadow: none; cursor: default; }
-        .day-number { font-weight: 800; font-size: 1.8rem; color: #fff; }
+        .day:hover { transform: translateY(-5px); background: #000; }
+        .day.empty { background: transparent; box-shadow: none; cursor: default; }
+        .day-num { font-size: 1.8rem; font-weight: 800; color: white; }
 
-        .dots-row { margin-top: 5px; display: flex; gap: 4px; height: 6px; }
-        .day-mark { width: 6px; height: 6px; border-radius: 50%; }
+        .dots { display: flex; gap: 4px; margin-top: 5px; height: 6px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
 
         /* МОДАЛКА */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 400px; color: #000; text-align: right; }
+        .modal { 
+            display: none; position: fixed; inset: 0; 
+            background: rgba(0,0,0,0.7); z-index: 1000; 
+            align-items: center; justify-content: center; 
+        }
+        .modal-box { background: white; padding: 30px; border-radius: 20px; width: 350px; text-align: right; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="user-header">
-            <button class="back-btn" onclick="location.href='calendar.html'">Назад</button>
-            <div class="user-name" id="user-display">ADMIN</div>
-        </div>
-        <div id="display-year-static">2026</div>
+        <button class="back-btn" onclick="location.href='calendar.html'">НАЗАД</button>
+        <div style="font-size: 1.2rem; font-weight: 800; margin-bottom: 10px;" id="user-name">ADMIN</div>
         <div id="month-title">АПРЕЛЬ</div>
         <div id="live-preview">Наведите на дату...</div>
-        <div style="color: #636e72; font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px;">ЛЕГЕНДА</div>
-        <div style="font-size: 0.9rem; color: #b2bec3;">Работа <span style="color: var(--ev-work)">●</span></div>
-        <div style="font-size: 0.9rem; color: #b2bec3;">Важное <span style="color: var(--ev-important)">●</span></div>
-        <div style="font-size: 0.9rem; color: #b2bec3;">Личное <span style="color: var(--ev-personal)">●</span></div>
+        <div style="color: #636e72; font-size: 0.7rem; font-weight: 900; letter-spacing: 2px;">ЛЕГЕНДА</div>
+        <div style="font-size: 0.8rem; color: #b2bec3; margin-top: 10px;">Работа <span style="color: #0984e3">●</span></div>
     </div>
 
-    <div class="main-content">
+    <div class="content">
         <div class="weekdays">
             <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
             <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
         </div>
-        <div class="days-grid" id="days-container">
-            </div>
+        <div class="grid" id="grid"></div>
     </div>
 
-    <div class="modal" id="note-modal">
-        <div class="modal-content">
-            <h2 id="modal-date-title">Дата</h2>
-            <textarea id="note-text" style="width:100%; height:100px; margin:15px 0; border-radius:10px; padding:10px;"></textarea>
-            <button onclick="saveNote()" style="width:100%; background:#000; color:#fff; border:none; padding:15px; border-radius:10px; font-weight:900; cursor:pointer;">СОХРАНИТЬ</button>
-            <button onclick="closeModal()" style="background:none; border:none; color:gray; margin-top:10px; cursor:pointer;">Закрыть</button>
+    <div class="modal" id="modal">
+        <div class="modal-box">
+            <h2 id="modal-date" style="margin-top:0">Дата</h2>
+            <textarea id="note-input" style="width:100%; height:80px; margin-bottom:10px;"></textarea>
+            <button onclick="saveNote()" style="width:100%; padding:10px; background:black; color:white; border-radius:10px; font-weight:900;">СОХРАНИТЬ</button>
+            <button onclick="closeModal()" style="border:none; background:none; color:gray; margin-top:10px; cursor:pointer;">Закрыть</button>
         </div>
     </div>
 
@@ -164,91 +126,78 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
-        const currentUser = localStorage.getItem('currentUser') || 'GUEST';
-        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const user = localStorage.getItem('currentUser') || 'ADMIN';
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
-        document.getElementById('month-title').innerText = monthsNames[monthIdx];
-        document.getElementById('user-display').innerText = currentUser;
+        document.getElementById('month-title').innerText = months[monthIdx];
+        document.getElementById('user-name').innerText = user;
 
-        let currentMonthData = {};
-        let selectedDay = null;
+        let data = {};
+        let activeDay = null;
 
-        // Следим за базой
-        onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
-            currentMonthData = snap.exists() ? snap.data() : {};
-            renderGrid();
-        });
-
-        function renderGrid() {
-            const container = document.getElementById('days-container');
-            if (!container) return;
-            container.innerHTML = '';
+        // Принудительно рисуем сетку сразу, не дожидаясь Firebase
+        function render() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
             
-            const firstDay = new Date(2026, monthIdx, 1).getDay();
-            const shift = firstDay === 0 ? 6 : firstDay - 1;
-            const daysInMonth = new Date(2026, monthIdx + 1, 0).getDate();
+            const first = new Date(2026, monthIdx, 1).getDay();
+            const shift = first === 0 ? 6 : first - 1;
+            const days = new Date(2026, monthIdx + 1, 0).getDate();
 
-            // Пустые ячейки
-            for(let s=0; s<shift; s++) {
-                const empty = document.createElement('div');
-                empty.className = 'day-card empty';
-                container.appendChild(empty);
+            for(let i=0; i<shift; i++) {
+                const div = document.createElement('div');
+                div.className = 'day empty';
+                grid.appendChild(div);
             }
 
-            // Реальные дни
-            for (let i = 1; i <= daysInMonth; i++) {
-                const card = document.createElement('div');
-                card.className = 'day-card';
+            for(let i=1; i<=days; i++) {
+                const day = document.createElement('div');
+                day.className = 'day';
+                day.innerHTML = `<div class="day-num">${i}</div>`;
                 
-                const num = document.createElement('div');
-                num.className = 'day-number';
-                num.innerText = i;
-                
-                const dots = document.createElement('div');
-                dots.className = 'dots-row';
-                if (currentMonthData[i]) {
-                    currentMonthData[i].forEach(n => {
-                        const d = document.createElement('div');
-                        d.className = 'day-mark';
-                        d.style.background = n.category === 'work' ? '#0984e3' : (n.category === 'important' ? '#d63031' : '#27ae60');
-                        dots.appendChild(d);
+                const dotsDiv = document.createElement('div');
+                dotsDiv.className = 'dots';
+                if(data[i]) {
+                    data[i].forEach(() => {
+                        dotsDiv.innerHTML += `<div class="dot" style="background:#0984e3"></div>`;
                     });
                 }
+                day.appendChild(dotsDiv);
 
-                card.appendChild(num);
-                card.appendChild(dots);
-
-                card.onmouseover = () => {
+                day.onmouseover = () => {
                     const prev = document.getElementById('live-preview');
-                    if (currentMonthData[i] && currentMonthData[i].length > 0) {
-                        prev.innerHTML = currentMonthData[i].map(n => `<b>${n.user}:</b> ${n.text}`).join('<br>');
-                    } else { prev.innerText = 'Событий нет'; }
+                    prev.innerHTML = data[i] ? data[i].map(n => `<b>${n.user}:</b> ${n.text}`).join('<br>') : 'Событий нет';
                 };
 
-                card.onclick = () => {
-                    selectedDay = i;
-                    document.getElementById('modal-date-title').innerText = i + ' ' + monthsNames[monthIdx];
-                    document.getElementById('note-modal').style.display = 'flex';
+                day.onclick = () => {
+                    activeDay = i;
+                    document.getElementById('modal-date').innerText = i + ' ' + months[monthIdx];
+                    document.getElementById('modal').style.display = 'flex';
                 };
-                
-                container.appendChild(card);
+
+                grid.appendChild(day);
             }
         }
 
-        window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
+        // Подключаем Firebase
+        onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
+            data = snap.exists() ? snap.data() : {};
+            render();
+        });
+
+        window.closeModal = () => document.getElementById('modal').style.display = 'none';
         
         window.saveNote = async () => {
-            const text = document.getElementById('note-text').value;
+            const text = document.getElementById('note-input').value;
             if(!text) return;
-            const notes = currentMonthData[selectedDay] || [];
-            notes.push({text, category: 'work', user: currentUser});
-            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[selectedDay]: notes}, {merge:true});
-            document.getElementById('note-text').value = '';
+            const notes = data[activeDay] || [];
+            notes.push({text, user, category: 'work'});
+            await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[activeDay]: notes}, {merge:true});
+            document.getElementById('note-input').value = '';
             closeModal();
         };
 
-        // Запуск при загрузке
-        renderGrid();
+        render(); // Первый запуск
     </script>
 </body>
 </html>
