@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN | Terminal Control</title>
+    <style>
+        :root { 
+            --bg: #1a1a1a; 
+            --card: #252525;
+            --accent: #fdcb6e; /* Золотой акцент */
+            --text: #ffffff;
+            --danger: #d63031;
+            --success: #2ecc71;
+        }
+        
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background: var(--bg); color: var(--text); 
+            display: flex; flex-direction: column; height: 100vh;
+        }
+
+        /* ХЕДЕР */
+        header { 
+            padding: 30px 50px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; color: var(--accent); }
+        .back-btn { 
+            background: #fff; color: #000; border: none; padding: 8px 20px; 
+            border-radius: 20px; font-weight: 900; cursor: pointer; text-decoration: none; font-size: 0.8rem;
+        }
+
+        /* КОНТЕНТ */
+        main { flex: 1; padding: 50px; overflow-y: auto; max-width: 1200px; margin: 0 auto; width: 100%; }
+        h1 { font-size: 3rem; font-weight: 900; margin-bottom: 40px; text-transform: uppercase; letter-spacing: -2px; }
+
+        .section-label { font-size: 0.8rem; font-weight: 900; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+
+        /* ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ */
+        .user-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 20px; overflow: hidden; }
+        .user-table th { text-align: left; padding: 20px; background: #2d2d2d; color: #888; font-size: 0.7rem; text-transform: uppercase; }
+        .user-table td { padding: 20px; border-bottom: 1px solid #333; font-weight: 700; }
+        
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; }
+        .status-pending { background: var(--accent); color: #000; }
+        .status-approved { background: var(--success); color: #000; }
+        .status-blocked { background: var(--danger); color: #fff; }
+
+        .actions { display: flex; gap: 10px; }
+        .btn-act { 
+            border: none; padding: 8px 15px; border-radius: 10px; font-weight: 900; 
+            font-size: 0.7rem; cursor: pointer; text-transform: uppercase; transition: 0.2s;
+        }
+        .btn-approve { background: var(--success); color: #000; }
+        .btn-block { background: var(--danger); color: #fff; }
+        .btn-act:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        @media (max-width: 700px) {
+            main { padding: 20px; }
+            h1 { font-size: 2rem; }
+            .user-table th:nth-child(2), .user-table td:nth-child(2) { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">TERMINAL_ADMIN v2.0</div>
+        <a href="calendar.html" class="back-btn">← BACK</a>
+    </header>
+
+    <main>
+        <div class="section-label">System Control</div>
+        <h1>Users Management</h1>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="user-list">
+                </tbody>
+        </table>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            messagingSenderId: "204240857105",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const db = getFirestore(initializeApp(firebaseConfig));
+
+        // Проверка прав (на всякий случай)
+        if (localStorage.getItem('currentUser') !== 'ADMIN') {
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:100px;'>ACCESS DENIED</h1>";
+        }
+
+        // Загрузка списка пользователей
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            const list = document.getElementById('user-list');
+            list.innerHTML = '';
+            
+            snapshot.forEach((userDoc) => {
+                const user = userDoc.data();
+                if (user.username === 'ADMIN') return; // Админа не редактируем
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.role || 'User'}</td>
+                    <td><span class="status-badge status-${user.status}">${user.status}</span></td>
+                    <td class="actions">
+                        ${user.status !== 'approved' ? `<button class="btn-act btn-approve" onclick="updateUser('${userDoc.id}', 'approved')">Approve</button>` : ''}
+                        ${user.status !== 'blocked' ? `<button class="btn-act btn-block" onclick="updateUser('${userDoc.id}', 'blocked')">Block</button>` : ''}
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+        });
+
+        // Функция обновления статуса
+        window.updateUser = async (id, newStatus) => {
+            const userRef = doc(db, "users", id);
+            await updateDoc(userRef, { status: newStatus });
+        };
+    </script>
+</body>
+</html>
