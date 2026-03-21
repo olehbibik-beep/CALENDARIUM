@@ -6,10 +6,10 @@
     <title>2026 | CALENDARIUM Terminal</title>
     <style>
         :root { 
-            --accent: #0984e3; 
-            --bg: #fff; /* Фон белый, как на картинке */
-            --orange: #f39c12; 
+            --accent: #0088cc; 
+            --bg: #f8f9fa; 
             --text: #2d3436; 
+            --card-bg: #ffffff;
             --ev-work: #0984e3;
             --ev-important: #d63031;
             --ev-personal: #27ae60;
@@ -17,81 +17,80 @@
         
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
 
-        /* ИСПРАВЛЕННЫЙ ЕДИНЫЙ САЙДБАР */
+        /* САЙДБАР (ПО КАРТИНКЕ) */
         .sidebar { 
-            width: 420px; /* Ширина, чтобы элементы влезли комфортно */
+            width: 400px; 
+            background: #fff; 
             padding: 50px 40px; 
             display: flex; 
             flex-direction: column; 
             border-right: 1px solid #eee; 
             z-index: 10; flex-shrink: 0; box-sizing: border-box; 
-            align-items: flex-end; /* Весь контент прижат вправо */
+            align-items: flex-end; 
             text-align: right;
         }
 
-        /* --- ВЕРХНИЙ БЛОК ПРОФИЛЯ --- */
-        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 60px; }
-        
-        /* Черная кнопка EXIT */
+        /* ПРОФИЛЬ */
+        .user-header { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
         .logout-btn { 
             background: #000; color: #fff; border: none; 
-            padding: 6px 14px; border-radius: 8px; /* Сильное скругление */
+            padding: 6px 14px; border-radius: 8px; 
             font-size: 0.75rem; font-weight: 900; cursor: pointer; 
             text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
         }
-        .logout-btn:hover { background: #333; }
+        .user-name { font-size: 1.1rem; font-weight: 800; color: #2d3436; text-transform: uppercase; }
+        .user-icon { color: var(--accent); display: flex; align-items: center; }
 
-        /* Имя ADMIN */
-        .user-name { font-size: 1.1rem; font-weight: 800; color: #2d3436; text-transform: uppercase; letter-spacing: -0.5px; }
-
-        /* Иконка (синяя) */
-        .user-icon { color: #0088cc; display: flex; align-items: center; }
-
-        /* --- ОГРОМНЫЙ ГОД (Светлый) --- */
+        /* ГОД */
         #display-year { 
-            font-size: 8rem; /* Ещё больше */
-            font-weight: 200; /* Тонкий */
-            color: #dfe6e9; /* Светлый серый */
-            letter-spacing: -12px; /* Супер-плотный */
-            line-height: 0.7; margin: 0 0 60px 0; 
+            font-size: 8rem; font-weight: 200; color: #dfe6e9; 
+            letter-spacing: -12px; line-height: 0.7; margin-bottom: 60px; 
         }
 
-        /* --- СЕКЦИИ --- */
+        /* СЕКЦИИ */
         .side-section { width: 100%; margin-bottom: 40px; }
         .side-label { font-size: 0.7rem; font-weight: 700; color: #b2bec3; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
         
-        /* Легенда с ПОЛОСКАМИ */
         .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; font-size: 0.95rem; font-weight: 600; color: #636e72; margin-bottom: 12px; }
-        
-        /* Полоска-маркер */
         .color-bar { width: 4px; height: 16px; border-radius: 2px; }
 
-        /* --- ЛОГИ (Розовый блок со скобкой) --- */
-        .logs-container { width: 100%; }
-        
+        /* ЛОГИ (РОЗОВЫЙ БЛОК) */
         .log-entry { 
-            font-size: 0.85rem; 
-            background: #ffe6f2; /* Нежно-розовый фон */
-            padding: 16px 20px; 
-            border-radius: 15px 0 0 15px; /* Скругление только слева */
-            position: relative;
-            line-height: 1.4; color: #636e72;
-            box-sizing: border-box;
+            font-size: 0.85rem; background: #ffe6f2; padding: 16px 20px; 
+            border-radius: 15px 0 0 15px; position: relative;
+            line-height: 1.4; color: #636e72; text-align: right; width: 100%; box-sizing: border-box;
         }
-        
-        /* Ярко-розовая скобка */
         .log-entry::after {
-            content: '';
-            position: absolute;
-            right: -10px; top: -5px; bottom: -5px; width: 10px;
-            border-right: 3px solid #e6007e; /* Яркая розовая скобка */
-            border-top: 3px solid #e6007e;
-            border-bottom: 3px solid #e6007e;
-            border-radius: 0 10px 10px 0;
+            content: ''; position: absolute; right: -10px; top: -5px; bottom: -5px; width: 10px;
+            border-right: 3px solid #e6007e; border-top: 3px solid #e6007e;
+            border-bottom: 3px solid #e6007e; border-radius: 0 10px 10px 0;
         }
 
-        /* footer: поверх шторки, если она открыта */
-        footer { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 6px 20px; font-size: 9px; color: #b2bec3; border-top: 1px solid #eee; text-align: right; }
+        /* ЦЕНТРАЛЬНАЯ ЧАСТЬ */
+        .main-content { 
+            flex: 1; display: flex; align-items: center; justify-content: center; 
+            padding: 40px; position: relative; 
+        }
+
+        .months-grid { 
+            display: grid; grid-template-columns: repeat(4, 180px); gap: 20px; 
+        }
+
+        .month-card { 
+            background: #fff; border-radius: 20px; height: 130px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 1.1rem; color: #2d3436;
+            cursor: pointer; border: 1px solid transparent;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .month-card:hover { 
+            transform: scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.05);
+            color: var(--accent); border-color: #eee;
+        }
+
+        footer { position: fixed; bottom: 0; width: 100%; padding: 10px 40px; font-size: 10px; color: #b2bec3; text-align: right; background: #fff; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
@@ -99,9 +98,9 @@
     <div class="sidebar">
         <div class="user-header">
             <button class="logout-btn" onclick="logout()">Exit</button>
-            <div class="user-name" id="display-name">...</div>
+            <div class="user-name" id="display-name">ADMIN</div>
             <div class="user-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
@@ -119,19 +118,21 @@
 
         <div class="side-section">
             <div class="side-label">Логи записей</div>
-            <div class="logs-container" id="logs-container">
+            <div id="logs-container">
                 <div class="log-entry">Подключение к базе..</div>
             </div>
         </div>
     </div>
 
-    <div style="flex:1; background:#f0f2f5;"></div>
+    <div class="main-content">
+        <div class="months-grid" id="months"></div>
+    </div>
 
     <footer>Cloud Plan Ecosystem — Secure Terminal 2.0</footer>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, limit, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -144,12 +145,22 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const currentUser = localStorage.getItem('currentUser');
-
         if (!currentUser) window.location.href = 'index.html';
         document.getElementById('display-name').innerText = currentUser;
 
-        // Логи
-        const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(1)); // На картинке только 1
+        // Отрисовка месяцев
+        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const grid = document.getElementById('months');
+        months.forEach((m, i) => {
+            const card = document.createElement('div');
+            card.className = 'month-card';
+            card.innerText = m;
+            card.onclick = () => { localStorage.setItem('selectedMonth', i); window.location.href = 'notes.html'; };
+            grid.appendChild(card);
+        });
+
+        // Живые логи (только 1 последний, как на скрине)
+        const qLogs = query(collection(db, "logs"), orderBy("timestamp", "desc"), limit(1));
         onSnapshot(qLogs, (snapshot) => {
             const container = document.getElementById('logs-container');
             if (snapshot.empty) return;
@@ -158,7 +169,7 @@
                 const data = doc.data();
                 const div = document.createElement('div');
                 div.className = 'log-entry';
-                div.innerHTML = `${data.action} в ${data.month}`; // Без времени
+                div.innerText = `${data.user}: ${data.action} в ${data.month}`;
                 container.appendChild(div);
             });
         });
