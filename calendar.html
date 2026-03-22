@@ -52,7 +52,6 @@
         .ev-title { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .ev-date { font-size: 0.8rem; font-weight: 700; opacity: 0.7; }
 
-        /* КНОПКА АДМИНКИ (ВНУТРИ САЙДБАРА) */
         #admin-link {
             display: none; 
             color: var(--accent-gold); 
@@ -84,22 +83,11 @@
         .dot.blue { background: var(--ev-work); box-shadow: 0 0 5px var(--ev-work); }
         .month-card:hover { transform: scale(1.08); background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
             .sidebar { width: 100%; height: auto; padding: 25px; align-items: center; text-align: center; }
-            .year-switcher { margin-bottom: 20px; }
-            #display-year { font-size: 3.5rem; }
-            
-            /* ИСПРАВЛЕНО: Теперь скрываем только блок события, а ссылку админа оставляем */
             .upcoming-box { display: none !important; }
-            
-            #admin-link { 
-                display: none; /* Будет включен через JS */
-                width: 200px; /* На мобилке делаем кнопку поуже, чтобы не на весь экран */
-                margin: 20px auto 0;
-            }
-
+            #admin-link { width: 200px; margin: 20px auto 0; }
             .main-content { padding: 20px; height: auto; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
         }
@@ -133,7 +121,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -148,13 +136,31 @@
         const currentUser = localStorage.getItem('currentUser') || 'GUEST';
         document.getElementById('display-name').innerText = currentUser;
 
-        // Показываем кнопку админа (используем !important в стиле, чтобы перебить медиа-запросы)
         if (currentUser.toUpperCase() === 'ADMIN') {
             document.getElementById('admin-link').style.setProperty('display', 'block', 'important');
         }
 
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
         let allEventsGlobal = [];
+
+        // Функции в Global Scope для работы onclick
+        window.changeYear = (dir) => {
+            currentYear += dir;
+            updateYearDisplay();
+            renderMonths();
+        };
+
+        window.logout = () => { 
+            localStorage.clear(); 
+            window.location.href = 'index.html'; 
+        };
+
+        function updateYearDisplay() {
+            document.getElementById('display-year').innerText = currentYear;
+            document.getElementById('prev-year').innerText = currentYear - 1;
+            document.getElementById('next-year').innerText = currentYear + 1;
+            localStorage.setItem('selectedYear', currentYear);
+        }
 
         const qEvents = query(collection(db, "events"), orderBy("date", "asc"));
         onSnapshot(qEvents, (snapshot) => {
@@ -177,7 +183,6 @@
             } else {
                 container.innerHTML = '<div style="color:#444; font-weight:900; font-size:0.7rem;">ПЛАНОВ НЕТ</div>';
             }
-
             renderMonths();
         }
 
@@ -213,20 +218,7 @@
             });
         }
 
-        window.changeYear = (dir) => {
-            currentYear += dir;
-            updateYearDisplay();
-            renderMonths();
-        };
-
-        function updateYearDisplay() {
-            document.getElementById('display-year').innerText = currentYear;
-            document.getElementById('prev-year').innerText = currentYear - 1;
-            document.getElementById('next-year').innerText = currentYear + 1;
-            localStorage.setItem('selectedYear', currentYear);
-        }
-
-        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
+        // Инициализация
         updateYearDisplay();
     </script>
 </body>
