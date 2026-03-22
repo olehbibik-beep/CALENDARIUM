@@ -68,8 +68,8 @@
         .dot.blue { background: #0984e3; box-shadow: 0 0 8px #0984e3; }
 
         @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 25px; align-items: center; }
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar { width: 100%; height: auto; padding: 25px; align-items: center; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
         }
     </style>
@@ -121,14 +121,12 @@
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-        // 1. РИСУЕМ СЕТКУ МЕСЯЦЕВ СРАЗУ (чтобы не исчезали)
         function initGrid() {
             const grid = document.getElementById('months');
             grid.innerHTML = '';
             monthsNames.forEach((m, i) => {
                 const card = document.createElement('div');
                 card.className = 'month-card';
-                card.id = `month-card-${i}`;
                 card.innerHTML = `<span>${m}</span><div class="month-indicator" id="ind-${i}"></div>`;
                 card.onclick = () => {
                     localStorage.setItem('selectedMonth', i);
@@ -139,51 +137,57 @@
             });
         }
 
-        // 2. ЗАГРУЖАЕМ ТОЧКИ И СОБЫТИЯ
         async function loadData() {
-            let foundEvent = false;
             const container = document.getElementById('next-event-container');
+            let foundEvent = false;
             const now = new Date();
+            const realYear = now.getFullYear();
+            const realMonth = now.getMonth();
+            const realDay = now.getDate();
 
             for (let i = 0; i < 12; i++) {
-                const docRef = doc(db, "calendar", `${currentYear}_${i}`);
+                const docId = `${currentYear}_${i}`;
+                const docRef = doc(db, "calendar", docId);
                 const snap = await getDoc(docRef);
                 
                 if (snap.exists()) {
                     const data = snap.data();
                     const ind = document.getElementById(`ind-${i}`);
-                    
-                    let hasRed = false; let hasBlue = false;
+                    if(!ind) continue;
+
+                    let hasHigh = false; let hasLow = false;
                     Object.values(data).forEach(dayNotes => {
                         dayNotes.forEach(n => {
-                            if(n.category === 'memorial' || n.category === 'congress') hasRed = true;
-                            else hasBlue = true;
+                            if(n.category === 'memorial' || n.category === 'congress') hasHigh = true;
+                            else hasLow = true;
                         });
                     });
                     
-                    if(hasRed) ind.innerHTML += '<div class="dot red"></div>';
-                    if(hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
+                    if(hasHigh) ind.innerHTML += '<div class="dot red"></div>';
+                    if(hasLow) ind.innerHTML += '<div class="dot blue"></div>';
 
-                    // Логика ближайшего события
-                    if (!foundEvent && currentYear >= now.getFullYear()) {
+                    if (!foundEvent) {
                         const days = Object.keys(data).map(Number).sort((a,b) => a-b);
                         for(let d of days) {
-                            if (currentYear === now.getFullYear() && i < now.getMonth()) continue;
-                            if (currentYear === now.getFullYear() && i === now.getMonth() && d < now.getDate()) continue;
-                            
-                            const note = data[d][0];
-                            container.innerHTML = `
-                                <div class="event-card-mini" style="border-right-color: var(--ev-${note.category})">
-                                    <div class="ev-title">${note.text}</div>
-                                    <div class="ev-date">${d}.${i+1}.${currentYear}</div>
-                                </div>`;
-                            foundEvent = true;
-                            break;
+                            const isFutureYear = currentYear > realYear;
+                            const isFutureMonth = (currentYear === realYear && i > realMonth);
+                            const isTodayOrLater = (currentYear === realYear && i === realMonth && d >= realDay);
+
+                            if (isFutureYear || isFutureMonth || isTodayOrLater) {
+                                const note = data[d][0];
+                                container.innerHTML = `
+                                    <div class="event-card-mini" style="border-right-color: var(--ev-${note.category})">
+                                        <div class="ev-title">${note.text}</div>
+                                        <div class="ev-date">${d} ${monthsNames[i]} ${currentYear}</div>
+                                    </div>`;
+                                foundEvent = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
-            if(!foundEvent) container.innerHTML = 'ПЛАНОВ НЕТ';
+            if(!foundEvent) container.innerHTML = '<div style="opacity:0.5; font-size:0.7rem;">ПЛАНОВ НЕТ</div>';
         }
 
         window.changeYear = (dir) => {
@@ -202,7 +206,6 @@
             localStorage.setItem('selectedYear', currentYear);
         }
 
-        // Запуск
         updateYearDisplay();
         initGrid();
         loadData();
