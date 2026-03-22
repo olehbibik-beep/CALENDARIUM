@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 | CALENDARIUM Terminal</title>
+    <title>Главная | CALENDARIUM Terminal</title>
     <style>
         :root { 
             --sidebar-bg: #1a1a1a; 
@@ -46,26 +46,14 @@
 
         .upcoming-box { width: 100%; margin-top: auto; text-align: right; margin-bottom: 25px; }
         .side-label { font-size: 0.7rem; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
-        .event-card-mini { background: #252525; padding: 20px; border-radius: 20px; transition: 0.3s; position: relative; }
-        .event-card-mini.important { border-right: 5px solid var(--ev-important); }
-        .event-card-mini.work { border-right: 5px solid var(--ev-work); }
-        .ev-title { font-size: 1rem; font-weight: 900; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
-        .ev-date { font-size: 0.8rem; font-weight: 700; opacity: 0.7; }
+        .event-card-mini { background: #252525; padding: 20px; border-radius: 20px; transition: 0.3s; position: relative; text-align: left; }
+        .ev-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
+        .ev-date { font-size: 0.75rem; font-weight: 700; opacity: 0.6; color: #fff; }
 
         #admin-link {
-            display: none; 
-            color: var(--accent-gold); 
-            text-decoration: none; 
-            font-size: 0.75rem; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            border: 1px solid var(--accent-gold); 
-            padding: 12px 25px; 
-            border-radius: 12px; 
-            transition: 0.3s; 
-            width: 100%; 
-            text-align: center;
-            margin-top: 10px;
+            display: none; color: var(--accent-gold); text-decoration: none; font-size: 0.75rem; 
+            font-weight: 900; text-transform: uppercase; border: 1px solid var(--accent-gold); 
+            padding: 12px 25px; border-radius: 12px; transition: 0.3s; width: 100%; text-align: center; margin-top: 10px;
         }
         #admin-link:hover { background: var(--accent-gold); color: #000; }
 
@@ -79,15 +67,14 @@
         }
         .month-indicator { position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; }
-        .dot.red { background: var(--ev-important); box-shadow: 0 0 5px var(--ev-important); }
-        .dot.blue { background: var(--ev-work); box-shadow: 0 0 5px var(--ev-work); }
-        .month-card:hover { transform: scale(1.08); background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .dot.red { background: #ff4757; box-shadow: 0 0 8px #ff4757; }
+        .dot.blue { background: #2f3542; border: 1px solid #fff; }
+        .month-card:hover { transform: scale(1.05); background: #000; }
 
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; height: auto; }
             .sidebar { width: 100%; height: auto; padding: 25px; align-items: center; text-align: center; }
-            .upcoming-box { display: none !important; }
-            #admin-link { width: 200px; margin: 20px auto 0; }
+            .upcoming-box { display: block; margin-top: 20px; }
             .main-content { padding: 20px; height: auto; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
         }
@@ -108,8 +95,8 @@
         </div>
 
         <div class="upcoming-box">
-            <div class="side-label">Приоритет</div>
-            <div id="next-event-container"></div>
+            <div class="side-label">Ближайшее из планов</div>
+            <div id="next-event-container">Загрузка...</div>
         </div>
 
         <a href="admin.html" id="admin-link">Admin Terminal</a>
@@ -121,7 +108,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
@@ -141,71 +128,41 @@
         }
 
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
-        let allEventsGlobal = [];
+        let plansData = {};
 
-        // Функции в Global Scope для работы onclick
-        window.changeYear = (dir) => {
-            currentYear += dir;
-            updateYearDisplay();
-            renderMonths();
-        };
-
-        window.logout = () => { 
-            localStorage.clear(); 
-            window.location.href = 'index.html'; 
-        };
-
-        function updateYearDisplay() {
-            document.getElementById('display-year').innerText = currentYear;
-            document.getElementById('prev-year').innerText = currentYear - 1;
-            document.getElementById('next-year').innerText = currentYear + 1;
-            localStorage.setItem('selectedYear', currentYear);
-        }
-
-        const qEvents = query(collection(db, "events"), orderBy("date", "asc"));
-        onSnapshot(qEvents, (snapshot) => {
-            allEventsGlobal = [];
-            snapshot.forEach(doc => allEventsGlobal.push(doc.data()));
-            updateUI();
-        });
-
-        function updateUI() {
-            const container = document.getElementById('next-event-container');
-            const now = new Date().toISOString().split('T')[0];
-            const futureEvents = allEventsGlobal.filter(e => e.date >= now);
-            const priority = futureEvents.find(e => e.type === 'important' || e.type === 'work');
-            
-            if (priority) {
-                const typeClass = priority.type === 'important' ? 'important' : 'work';
-                container.innerHTML = `<div class="event-card-mini ${typeClass}"><div class="ev-title">${priority.title}</div><div class="ev-date" style="color: var(--ev-${priority.type})">${priority.date.split('-').reverse().join('.')}</div></div>`;
-            } else if (futureEvents[0]) {
-                container.innerHTML = `<div class="event-card-mini"><div class="ev-title">${futureEvents[0].title}</div><div class="ev-date">${futureEvents[0].date.split('-').reverse().join('.')}</div></div>`;
-            } else {
-                container.innerHTML = '<div style="color:#444; font-weight:900; font-size:0.7rem;">ПЛАНОВ НЕТ</div>';
-            }
-            renderMonths();
-        }
-
-        function renderMonths() {
+        // 1. ЗАГРУЗКА ИНДИКАТОРОВ (ТОЧЕК)
+        async function loadIndicators() {
+            plansData = {};
+            const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
             const grid = document.getElementById('months');
-            const names = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
             grid.innerHTML = '';
 
-            names.forEach((m, i) => {
+            for (let i = 0; i < 12; i++) {
+                const docRef = doc(db, "calendar", `${currentYear}_${i}`);
+                const snap = await getDoc(docRef);
+                const monthInfo = snap.exists() ? snap.data() : null;
+                plansData[i] = monthInfo;
+
                 const card = document.createElement('div');
                 card.className = 'month-card';
-                card.innerHTML = `<span>${m}</span>`;
+                card.innerHTML = `<span>${monthsNames[i]}</span>`;
 
-                const monthEvents = allEventsGlobal.filter(e => {
-                    const d = new Date(e.date);
-                    return d.getMonth() === i && d.getFullYear() === currentYear;
-                });
-
-                if (monthEvents.length > 0) {
+                if (monthInfo && Object.keys(monthInfo).length > 0) {
                     const ind = document.createElement('div');
                     ind.className = 'month-indicator';
-                    if (monthEvents.some(e => e.type === 'important')) ind.innerHTML += '<div class="dot red"></div>';
-                    if (monthEvents.some(e => e.type === 'work')) ind.innerHTML += '<div class="dot blue"></div>';
+                    
+                    let hasHigh = false; // Важное
+                    let hasNormal = false; // Обычное
+                    
+                    Object.values(monthInfo).forEach(dayArray => {
+                        dayArray.forEach(note => {
+                            if(note.category === 'memorial' || note.category === 'congress') hasHigh = true;
+                            else hasNormal = true;
+                        });
+                    });
+
+                    if (hasHigh) ind.innerHTML += '<div class="dot red"></div>';
+                    if (hasNormal) ind.innerHTML += '<div class="dot blue"></div>';
                     card.appendChild(ind);
                 }
 
@@ -215,11 +172,65 @@
                     window.location.href = 'notes.html';
                 };
                 grid.appendChild(card);
-            });
+            }
+            updateUpcoming();
         }
 
-        // Инициализация
+        // 2. БЛИЖАЙШЕЕ СОБЫТИЕ
+        function updateUpcoming() {
+            const container = document.getElementById('next-event-container');
+            const now = new Date();
+            const curMonth = now.getMonth();
+            const curDay = now.getDate();
+            const curYearReal = now.getFullYear();
+
+            let found = false;
+
+            // Если смотрим текущий год, ищем событие начиная с сегодняшнего дня
+            if (currentYear === curYearReal) {
+                for (let m = curMonth; m < 12; m++) {
+                    if (plansData[m]) {
+                        const days = Object.keys(plansData[m]).map(Number).sort((a,b) => a-b);
+                        for (let d of days) {
+                            if (m === curMonth && d < curDay) continue; 
+                            const note = plansData[m][d][0];
+                            container.innerHTML = `
+                                <div class="event-card-mini" style="border-right: 5px solid var(--ev-${note.category})">
+                                    <div class="ev-title">${note.text}</div>
+                                    <div class="ev-date">${d}.${m + 1}.${currentYear}</div>
+                                </div>`;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) break;
+                }
+            }
+
+            if (!found) {
+                container.innerHTML = '<div style="color:#666; font-size:0.7rem; font-weight:800;">СОБЫТИЙ НЕ НАЙДЕНО</div>';
+            }
+        }
+
+        // 3. ПЕРЕКЛЮЧЕНИЕ ГОДА
+        window.changeYear = (dir) => {
+            currentYear += dir;
+            updateYearDisplay();
+            loadIndicators();
+        };
+
+        window.logout = () => { localStorage.clear(); window.location.href = 'index.html'; };
+
+        function updateYearDisplay() {
+            document.getElementById('display-year').innerText = currentYear;
+            document.getElementById('prev-year').innerText = currentYear - 1;
+            document.getElementById('next-year').innerText = currentYear + 1;
+            localStorage.setItem('selectedYear', currentYear);
+        }
+
+        // СТАРТ
         updateYearDisplay();
+        loadIndicators();
     </script>
 </body>
 </html>
