@@ -17,117 +17,105 @@
             --ev-personal: #27ae60;
         }
 
-        * { box-sizing: border-box; } /* Чтобы отступы не распирали экран */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
             margin: 0; font-family: 'Inter', sans-serif; display: flex; 
             height: 100vh; background: var(--main-bg); overflow: hidden; 
         }
 
-        /* --- САЙДБАР (ПК версия) --- */
+        /* --- САЙДБАР --- */
         .sidebar { 
-            width: 420px; background: var(--sidebar-bg); padding: 50px 40px; 
+            width: 420px; background: var(--sidebar-bg); padding: 40px; 
             display: flex; flex-direction: column; color: white;
             z-index: 100; flex-shrink: 0; align-items: flex-end; text-align: right;
+            overflow-y: auto;
         }
 
         .logout-btn { background: #fff; color: #000; border: none; padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-weight: 900; cursor: pointer; text-transform: uppercase; }
         .user-name { color: #fff; font-weight: 800; text-transform: uppercase; margin-left: 10px; }
         
         #display-year-static { font-size: 8rem; font-weight: 200; color: rgba(255,255,255,0.05); letter-spacing: -12px; line-height: 0.7; margin: 0; }
-        #month-title { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -2px; margin-bottom: 40px; text-transform: uppercase; }
+        #month-title { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -2px; margin-bottom: 20px; text-transform: uppercase; }
 
         .side-label { color: #636e72; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
 
+        /* ПРЕВЬЮ ЗАМЕТОК */
         #live-preview { 
-            font-size: 0.85rem; background: rgba(255, 255, 255, 0.05); padding: 20px; 
+            font-size: 0.9rem; background: rgba(255, 255, 255, 0.05); padding: 20px; 
             border-radius: 15px 0 0 15px; position: relative;
-            line-height: 1.5; color: #dfe6e9; text-align: right; width: 100%; min-height: 100px; border-right: 3px solid var(--accent);
+            line-height: 1.6; color: #dfe6e9; text-align: right; width: 100%; min-height: 100px; 
+            border-right: 4px solid var(--accent);
+            margin-bottom: 15px;
+        }
+        .preview-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 8px 0; }
+        .preview-item:last-child { border: none; }
+
+        /* Кнопка "Изменить" в сайдбаре */
+        #edit-trigger-btn {
+            display: none; width: 100%; background: var(--accent); color: white;
+            border: none; padding: 12px; border-radius: 10px; font-weight: 800;
+            text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
         }
 
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; color: #b2bec3; font-size: 0.9rem; margin-bottom: 8px; }
+        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; color: #b2bec3; font-size: 0.8rem; margin-bottom: 8px; }
         .rect { width: 25px; height: 8px; border-radius: 2px; }
 
-        /* --- КОНТЕНТ (ПК версия) --- */
+        /* --- СЕТКА --- */
         .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-
-        .weekdays-fixed, .days-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 110px); 
-            gap: 15px; 
-        }
-        .weekdays-fixed { margin-bottom: 15px; }
-
-        .weekday { font-size: 0.75rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; text-align: center; }
-        .weekday.weekend-label { color: var(--orange-weekend); }
-
-        .day-card { 
-            background: var(--dark-card); width: 110px; height: 110px; border-radius: 20px; 
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1.3rem; color: #ffffff; cursor: pointer; transition: 0.3s;
-            position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-
-        .day-card.weekend { border: 2px solid rgba(255, 159, 67, 0.3); color: var(--orange-weekend); }
-        .day-card.empty { background: transparent; box-shadow: none; cursor: default; border: none; }
+        .weekdays-fixed, .days-grid { display: grid; grid-template-columns: repeat(7, 100px); gap: 12px; }
+        .weekdays-fixed { margin-bottom: 10px; }
+        .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; text-align: center; }
         
-        .marks-row { position: absolute; bottom: 12px; display: flex; gap: 4px; justify-content: center; width: 100%; }
-        .day-mark-rect { width: 22px; height: 5px; border-radius: 1px; }
+        .day-card { 
+            background: var(--dark-card); width: 100px; height: 100px; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.2rem; color: #ffffff; cursor: pointer; transition: 0.2s;
+            position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .day-card.active-day { border: 3px solid var(--accent); transform: scale(1.05); }
+        .day-card.weekend { color: var(--orange-weekend); }
+        .day-card.empty { background: transparent; box-shadow: none; border: none; }
+        
+        .marks-row { position: absolute; bottom: 10px; display: flex; gap: 3px; justify-content: center; width: 100%; }
+        .day-mark-rect { width: 18px; height: 4px; border-radius: 1px; }
 
         /* --- МОДАЛКА --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 200; align-items: center; justify-content: center; }
-        .modal-content { background: #fff; padding: 35px; border-radius: 30px; width: 480px; text-align: right; color: #000; }
-        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; margin-top: 10px; }
-        .cat-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #eee; font-size: 10px; font-weight: bold; cursor: pointer; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 100%; max-width: 450px; text-align: right; }
+        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
 
-        /* -------------------------------------------------- */
-        /* !!! МОБИЛЬНАЯ ВЕРСИЯ (В самом конце) !!!         */
-        /* -------------------------------------------------- */
+        /* МОБИЛКА */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
-
-            .sidebar { 
-                width: 100%; height: auto; padding: 20px; align-items: center; text-align: center; 
-                border-bottom: 2px solid var(--accent);
-            }
-            #display-year-static { font-size: 4rem; letter-spacing: -4px; margin-bottom: 10px; }
-            #month-title { font-size: 2rem; margin-bottom: 15px; }
-            #live-preview { border-radius: 10px; border-right: none; border-bottom: 3px solid var(--accent); min-height: 50px; }
-            .legend-item { justify-content: center; font-size: 0.7rem; }
-
-            .main-content { padding: 15px 5px; justify-content: flex-start; }
-
-            /* Форсируем растягивание сетки на весь экран */
-            .weekdays-fixed, .days-grid { 
-                grid-template-columns: repeat(7, 1fr) !important; 
-                width: 100% !important; 
-                gap: 5px !important; 
-            }
-
-            .day-card { 
-                width: 100% !important; 
-                height: 14vw !important; /* Квадраты зависят от ширины экрана */
-                border-radius: 8px; font-size: 1rem; 
-            }
-            .day-mark-rect { width: 15%; height: 3px; }
-            .modal-content { width: 95%; padding: 20px; }
-            #cat-btns { flex-wrap: wrap; }
+            .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; text-align: center; border-bottom: 2px solid var(--accent); }
+            #display-year-static { font-size: 4rem; letter-spacing: -4px; margin-bottom: 5px; }
+            #month-title { font-size: 2rem; margin-bottom: 10px; }
+            #live-preview { border-radius: 12px; border-right: none; border-bottom: 4px solid var(--accent); text-align: center; min-height: 60px; }
+            .legend-item { justify-content: center; }
+            .main-content { padding: 20px 10px; }
+            .weekdays-fixed, .days-grid { grid-template-columns: repeat(7, 1fr); width: 100%; gap: 6px; }
+            .day-card { width: 100%; height: 13vw; border-radius: 10px; font-size: 1rem; }
+            .day-mark-rect { width: 12%; height: 3px; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="user-header" style="display:flex; align-items:center; margin-bottom: 20px;">
+        <div class="user-header" style="display:flex; align-items:center; margin-bottom: 15px;">
             <button class="logout-btn" onclick="location.href='calendar.html'">Назад</button>
             <div class="user-name" id="user-display">ADMIN</div>
         </div>
         <div id="display-year-static">2026</div>
         <div id="month-title">...</div>
+        
         <div class="side-section" style="width: 100%;">
-            <div class="side-label">Планы на день</div>
-            <div id="live-preview">Наведите на число...</div>
+            <div class="side-label" id="preview-label">Планы</div>
+            <div id="live-preview">Выберите дату в календаре</div>
+            <button id="edit-trigger-btn" onclick="openEditModal()">РЕДАКТИРОВАТЬ</button>
         </div>
-        <div class="side-section" style="width: 100%; margin-top: 30px;">
+
+        <div class="side-section" style="width: 100%; margin-top: 25px;">
             <div class="side-label">Легенда</div>
             <div class="legend-item">Вечеря <div class="rect" style="background:var(--ev-memorial)"></div></div>
             <div class="legend-item">Конгресс <div class="rect" style="background:var(--ev-congress)"></div></div>
@@ -140,29 +128,31 @@
         <div class="weekdays-fixed">
             <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
             <div class="weekday">Чт</div><div class="weekday">Пт</div>
-            <div class="weekday weekend-label">Сб</div><div class="weekday weekend-label">Вс</div>
+            <div class="weekday">Сб</div><div class="weekday">Вс</div>
         </div>
         <div class="days-grid" id="days-container"></div>
     </div>
 
     <div class="modal" id="note-modal">
         <div class="modal-content">
-            <h2 id="modal-date-title" style="margin:0 0 20px 0; font-weight: 900;">Дата</h2>
-            <div id="existing-notes" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
-            <textarea id="note-text" style="width:100%; height:80px; border-radius:12px; padding:10px; border:1px solid #eee; background:#fafafa;" placeholder="Добавить запись..."></textarea>
-            <div style="display:flex; gap:5px; margin: 10px 0;" id="cat-btns">
-                <button class="cat-btn" onclick="window.activeCat='memorial'" style="background:var(--ev-memorial); color:white; border:none;">ВЕЧЕРЯ</button>
-                <button class="cat-btn" onclick="window.activeCat='congress'" style="background:var(--ev-congress); color:white; border:none;">КОНГРЕСС</button>
-                <button class="cat-btn" onclick="window.activeCat='meeting'" style="background:#eee;">СОБРАНИЕ</button>
-                <button class="cat-btn" onclick="window.activeCat='personal'" style="background:var(--ev-personal); color:white; border:none;">ЛИЧНОЕ</button>
+            <h2 id="modal-date-title" style="margin:0 0 15px 0; font-weight: 900; font-size: 1.2rem;">Редактирование</h2>
+            <div id="existing-notes" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; text-align: left;"></div>
+            
+            <textarea id="note-text" style="width:100%; height:70px; border-radius:12px; padding:10px; border:1px solid #eee; background:#fafafa; font-family:inherit;" placeholder="Новая запись..."></textarea>
+            
+            <div style="display:flex; gap:5px; margin: 10px 0; flex-wrap: wrap;" id="cat-btns">
+                <button class="cat-btn" onclick="setActiveCat('memorial', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-memorial); color:white; font-size:9px; font-weight:900; cursor:pointer;">ВЕЧЕРЯ</button>
+                <button class="cat-btn" onclick="setActiveCat('congress', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-congress); color:white; font-size:9px; font-weight:900; cursor:pointer;">КОНГРЕСС</button>
+                <button class="cat-btn" onclick="setActiveCat('meeting', this)" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ccc; background:#fff; font-size:9px; font-weight:900; cursor:pointer;">СОБРАНИЕ</button>
+                <button class="cat-btn" onclick="setActiveCat('personal', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-personal); color:white; font-size:9px; font-weight:900; cursor:pointer;">ЛИЧНОЕ</button>
             </div>
-            <button class="save-btn" onclick="saveNote()">СОХРАНИТЬ</button>
-            <button onclick="closeModal()" style="margin-top:10px; background:none; border:none; color:#bbb; cursor:pointer;">Закрыть</button>
+            
+            <button class="save-btn" onclick="saveNote()">ДОБАВИТЬ ЗАПИСЬ</button>
+            <button onclick="closeModal()" style="margin-top:10px; background:none; border:none; color:#bbb; cursor:pointer; width:100%; font-weight:bold;">ЗАКРЫТЬ</button>
         </div>
     </div>
 
     <script type="module">
-        /* Твой JS скрипт (без изменений) */
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -190,11 +180,11 @@
         onSnapshot(doc(db, "calendar", `2026_${monthIdx}`), (snap) => {
             currentMonthData = snap.exists() ? snap.data() : {};
             renderGrid();
+            if(selectedDay) updatePreview(selectedDay); // Обновляем превью если день выбран
         });
 
         function renderGrid() {
             const container = document.getElementById('days-container');
-            if(!container) return;
             container.innerHTML = '';
             const firstDay = new Date(2026, monthIdx, 1).getDay();
             const shift = firstDay === 0 ? 6 : firstDay - 1;
@@ -206,6 +196,7 @@
                 const date = new Date(2026, monthIdx, i);
                 const dayOfWeek = date.getDay();
                 const card = document.createElement('div');
+                card.id = `day-${i}`;
                 card.className = 'day-card' + (dayOfWeek === 0 || dayOfWeek === 6 ? ' weekend' : '');
                 card.innerHTML = `<span>${i}</span>`;
                 
@@ -216,36 +207,67 @@
                         const m = document.createElement('div');
                         m.className = 'day-mark-rect';
                         m.style.background = `var(--ev-${n.category})`;
-                        if(n.category === 'meeting') m.style.border = "1px solid #666";
                         row.appendChild(m);
                     });
                     card.appendChild(row);
                 }
 
-                card.onmouseover = () => {
-                    document.getElementById('live-preview').innerHTML = (currentMonthData[i] && currentMonthData[i].length > 0) 
-                        ? currentMonthData[i].map(n => `• ${n.text}`).join('<br>') : 'Событий нет';
-                };
-                card.onclick = () => window.openModal(i);
+                // ГЛАВНОЕ ИЗМЕНЕНИЕ: Клик теперь отвечает за выбор дня
+                card.onclick = () => selectDay(i);
                 container.appendChild(card);
             }
         }
 
-        window.openModal = (day) => {
+        // Функция выбора дня
+        function selectDay(day) {
             selectedDay = day;
-            document.getElementById('modal-date-title').innerText = day + ' ' + monthsNames[monthIdx];
+            
+            // Визуально выделяем карточку
+            document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active-day'));
+            document.getElementById(`day-${day}`).classList.add('active-day');
+
+            // Обновляем текст в сайдбаре
+            updatePreview(day);
+
+            // Показываем кнопку "Редактировать"
+            document.getElementById('edit-trigger-btn').style.display = 'block';
+            document.getElementById('preview-label').innerText = `Планы на ${day} число`;
+        }
+
+        function updatePreview(day) {
+            const preview = document.getElementById('live-preview');
+            const notes = currentMonthData[day] || [];
+            if(notes.length > 0) {
+                preview.innerHTML = notes.map(n => `<div class="preview-item">• ${n.text}</div>`).join('');
+            } else {
+                preview.innerHTML = 'Записей нет';
+            }
+        }
+
+        // Логика модального окна (изменение/добавление)
+        window.openEditModal = () => {
+            if(!selectedDay) return;
+            document.getElementById('modal-date-title').innerText = `${selectedDay} ${monthsNames[monthIdx]}`;
             const list = document.getElementById('existing-notes');
             list.innerHTML = '';
-            (currentMonthData[day] || []).forEach((n, idx) => {
-                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px; border-bottom:1px solid #eee; font-size:12px; background:#f9f9f9; margin-bottom:4px; border-radius:5px;">
-                    <span style="border-left:3px solid var(--ev-${n.category}); padding-left:8px;">${n.text}</span>
-                    <button onclick="deleteNote(${idx})" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">×</button>
-                </div>`;
+            
+            (currentMonthData[selectedDay] || []).forEach((n, idx) => {
+                list.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#f4f4f4; margin-bottom:5px; border-radius:8px; border-right:4px solid var(--ev-${n.category})">
+                        <span style="font-size:13px; font-weight:600;">${n.text}</span>
+                        <button onclick="deleteNote(${idx})" style="color:red; border:none; background:none; font-size:18px; cursor:pointer;">&times;</button>
+                    </div>`;
             });
             document.getElementById('note-modal').style.display = 'flex';
         };
 
         window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
+
+        window.setActiveCat = (cat, btn) => {
+            window.activeCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.style.outline = "none");
+            btn.style.outline = "3px solid #000";
+        };
 
         window.saveNote = async () => {
             const text = document.getElementById('note-text').value;
@@ -254,14 +276,14 @@
             notes.push({text, category: window.activeCat, user: currentUser});
             await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[selectedDay]: notes}, {merge:true});
             document.getElementById('note-text').value = '';
-            window.openModal(selectedDay);
+            openEditModal(); // Обновить список в модалке
         };
 
         window.deleteNote = async (idx) => {
             const notes = [...currentMonthData[selectedDay]];
             notes.splice(idx, 1);
             await setDoc(doc(db, "calendar", `2026_${monthIdx}`), {[selectedDay]: notes}, {merge:true});
-            window.openModal(selectedDay);
+            openEditModal();
         };
     </script>
 </body>
