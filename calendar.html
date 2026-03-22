@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Главная | CALENDARIUM Terminal</title>
+    <title>Главная | CALENDARIUM</title>
     <style>
         :root { 
             --sidebar-bg: #1a1a1a; --main-bg: #f4f4f4; --card-bg: #2d3436; 
@@ -18,109 +18,96 @@
 
         /* САЙДБАР */
         .sidebar { 
-            width: 350px; background: var(--sidebar-bg); padding: 30px; 
+            width: 320px; background: var(--sidebar-bg); padding: 30px; 
             display: flex; flex-direction: column; color: white;
             flex-shrink: 0; z-index: 10;
         }
 
-        .user-header { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 20px; }
-        .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--accent-gold); letter-spacing: 1px; }
-        .logout-btn { background: #fff; color: #000; border: none; padding: 5px 12px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .user-header { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 15px; }
+        .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--accent-gold); }
+        .logout-btn { background: #fff; color: #000; border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 900; cursor: pointer; }
 
-        .year-switcher { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 25px; }
-        #display-year { font-size: 3.8rem; font-weight: 900; letter-spacing: -3px; line-height: 1; }
-        .year-side { cursor: pointer; color: #444; font-weight: 900; padding: 10px; font-size: 1.3rem; transition: 0.2s; }
-        .year-side:hover { color: #fff; }
+        .year-switcher { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; }
+        #display-year { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; }
+        .year-side { cursor: pointer; color: #444; font-weight: 900; padding: 10px; font-size: 1.2rem; }
 
         .upcoming-box { width: 100%; margin-top: auto; }
-        .event-card-mini { background: #252525; padding: 15px; border-radius: 18px; border-right: 5px solid transparent; animation: fadeIn 0.5s ease; }
-        .ev-title { font-size: 0.85rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 4px; }
+        .event-card-mini { background: #252525; padding: 15px; border-radius: 15px; border-right: 5px solid transparent; }
+        .ev-title { font-size: 0.8rem; font-weight: 800; color: #fff; text-transform: uppercase; }
 
-        /* ОСНОВНОЙ КОНТЕНТ (СЕТКА) */
+        /* СЕТКА */
         .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .months-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; 
+            gap: 12px; 
             width: 100%; 
-            max-width: 850px; 
+            max-width: 800px; 
         }
         
         .month-card { 
-            background: var(--card-bg); border-radius: 20px; 
+            background: var(--card-bg); border-radius: 15px; 
             aspect-ratio: 1 / 1; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             color: #fff; font-weight: 900; cursor: pointer; position: relative; transition: 0.2s;
-            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;
         }
-        .month-card:hover { transform: translateY(-3px); background: #000; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        .month-card:active { transform: scale(0.95); } /* Пульсация при нажатии */
+        .month-card:active { transform: scale(0.9); }
 
-        .month-indicator { position: absolute; top: 10px; right: 10px; display: flex; gap: 4px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; }
-        .dot.red { background: var(--ev-memorial); box-shadow: 0 0 6px var(--ev-memorial); }
-        .dot.blue { background: var(--ev-meeting); box-shadow: 0 0 6px var(--ev-meeting); }
+        .month-indicator { position: absolute; top: 8px; right: 8px; display: flex; gap: 3px; }
+        .dot { width: 5px; height: 5px; border-radius: 50%; }
+        .dot.red { background: var(--ev-memorial); }
+        .dot.blue { background: var(--ev-meeting); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 850px) {
-            body { flex-direction: column; height: 100vh; }
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
             .sidebar { 
-                width: 100%; padding: 15px 20px; height: auto; 
-                align-items: center; position: relative;
+                width: 100%; padding: 10px 20px; height: auto; 
+                align-items: center; 
             }
-            .user-header { margin-bottom: 10px; }
-            .year-switcher { margin-bottom: 10px; justify-content: center; gap: 40px; }
-            #display-year { font-size: 2.8rem; }
-            .upcoming-box { display: none; } /* Скрыто на мобилках для экономии места */
+            .year-switcher { margin-bottom: 5px; }
+            #display-year { font-size: 2.5rem; }
             
-            .main-content { 
-                padding: 10px; 
-                flex: 1; 
-                align-items: center; /* Центрируем сетку по вертикали */
+            /* Ближайшее событие ТЕПЕРЬ ВИДНО и компактно */
+            .upcoming-box { 
+                display: block; 
+                margin: 5px 0 10px 0; 
+                width: 100%; 
+                max-width: 300px;
             }
+            .event-card-mini { padding: 8px 12px; border-radius: 10px; }
+            .ev-title { font-size: 0.7rem; }
+            .upcoming-box div:first-child { display: none; } /* Скрываем надпись "Ближайшее" для экономии */
+
+            .main-content { padding: 10px; flex: 1; align-items: flex-start; }
             .months-grid { 
-                grid-template-columns: repeat(3, 1fr); /* 3 в ряд, 4 ряда вниз = 12 месяцев */
+                grid-template-columns: repeat(4, 1fr); /* 4 в ряд как просил */
                 gap: 8px; 
-                height: 100%; 
-                align-content: center;
             }
             .month-card { 
-                aspect-ratio: 1 / 0.9; 
-                border-radius: 15px; 
-                font-size: 0.65rem; 
+                border-radius: 10px; 
+                font-size: 0.6rem; 
             }
-        }
-
-        /* Совсем маленькие экраны */
-        @media (max-height: 670px) {
-            #display-year { font-size: 2.2rem; }
-            .month-card { aspect-ratio: auto; height: 65px; }
-            .year-switcher { margin-bottom: 5px; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <div class="user-header">
-            <div id="user-display" class="user-name">ГОСТЬ</div>
+            <div id="user-display" class="user-name">...</div>
             <button class="logout-btn" onclick="location.href='index.html'">ВЫХОД</button>
         </div>
-
         <div class="year-switcher">
             <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
             <div id="display-year"></div>
             <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
         </div>
-        
         <div class="upcoming-box">
-            <div style="font-size: 0.6rem; opacity: 0.4; margin-bottom: 8px; letter-spacing: 2px; font-weight: 900; text-align: left;">БЛИЖАЙШЕЕ СОБЫТИЕ</div>
-            <div id="next-event-container">Поиск...</div>
+            <div style="font-size:0.5rem; opacity:0.4; margin-bottom:5px; letter-spacing:1px; text-align:center;">БЛИЖАЙШЕЕ</div>
+            <div id="next-event-container">...</div>
         </div>
     </div>
-
     <div class="main-content">
         <div class="months-grid" id="months"></div>
     </div>
@@ -139,11 +126,10 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
-        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const monthsNames = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
         
         const user = localStorage.getItem('currentUser') || 'ГОСТЬ';
         document.getElementById('user-display').innerText = user;
-
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
 
         function initGrid() {
@@ -165,74 +151,43 @@
         async function loadData() {
             const container = document.getElementById('next-event-container');
             let firstFound = null;
-
             for (let j = 0; j < 12; j++) {
                 const el = document.getElementById(`ind-${j}`);
                 if (el) el.innerHTML = '';
             }
-
             for (let i = 0; i < 12; i++) {
-                const docId = `${currentYear}_${i}`;
                 try {
-                    const snap = await getDoc(doc(db, "calendar", docId));
+                    const snap = await getDoc(doc(db, "calendar", `${currentYear}_${i}`));
                     if (snap.exists()) {
-                        const monthData = snap.data();
+                        const data = snap.data();
                         const ind = document.getElementById(`ind-${i}`);
-                        let red = false, blue = false;
-
-                        const days = Object.keys(monthData).map(Number).sort((a,b) => a-b);
-                        days.forEach(day => {
-                            const entries = monthData[day];
-                            if (Array.isArray(entries)) {
-                                entries.forEach(entry => {
-                                    if (entry.category === 'memorial' || entry.category === 'congress') red = true;
-                                    else blue = true;
-                                    if (!firstFound) {
-                                        firstFound = { text: entry.text, day: day, month: monthsNames[i], cat: entry.category };
-                                    }
-                                });
-                            }
+                        let r = false, b = false;
+                        Object.keys(data).forEach(day => {
+                            data[day].forEach(n => {
+                                if (n.category === 'memorial' || n.category === 'congress') r = true; else b = true;
+                                if (!firstFound) firstFound = { text: n.text, day, month: monthsNames[i] };
+                            });
                         });
-
                         if (ind) {
-                            if (red) ind.innerHTML += '<div class="dot red"></div>';
-                            if (blue) ind.innerHTML += '<div class="dot blue"></div>';
+                            if (r) ind.innerHTML += '<div class="dot red"></div>';
+                            if (b) ind.innerHTML += '<div class="dot blue"></div>';
                         }
                     }
-                } catch (e) { console.error(e); }
+                } catch (e) {}
             }
-
-            if (firstFound) {
-                const color = (firstFound.cat === 'memorial' || firstFound.cat === 'congress') ? '#ff4757' : '#0984e3';
-                container.innerHTML = `
-                    <div class="event-card-mini" style="border-right-color: ${color}">
-                        <div class="ev-title">${firstFound.text}</div>
-                        <div style="font-size:0.7rem; opacity:0.5; font-weight:700;">
-                            ${firstFound.day} ${firstFound.month} ${currentYear}
-                        </div>
-                    </div>`;
-            } else {
-                container.innerHTML = '<div style="opacity:0.2; font-weight:900; font-size:0.7rem;">ПЛАНОВ НЕТ</div>';
-            }
+            container.innerHTML = firstFound ? 
+                `<div class="event-card-mini" style="border-right-color:#0984e3"><div class="ev-title">${firstFound.text}</div><div style="font-size:0.6rem; opacity:0.5;">${firstFound.day} ${firstFound.month}</div></div>` : 
+                '<div style="font-size:0.7rem; opacity:0.2; text-align:center;">НЕТ ПЛАНОВ</div>';
         }
 
-        window.changeYear = (dir) => { 
-            currentYear += dir; 
-            updateDisp(); 
-            initGrid(); 
-            loadData(); 
-        };
-
+        window.changeYear = (dir) => { currentYear += dir; updateDisp(); initGrid(); loadData(); };
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
             document.getElementById('prev-year').innerText = currentYear - 1;
             document.getElementById('next-year').innerText = currentYear + 1;
             localStorage.setItem('selectedYear', currentYear.toString());
         }
-
-        updateDisp();
-        initGrid();
-        loadData();
+        updateDisp(); initGrid(); loadData();
     </script>
 </body>
 </html>
