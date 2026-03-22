@@ -11,20 +11,15 @@
             --sidebar-bg: #1e2122;
             --dark-card: #2d3436;
             --orange-weekend: #ff9f43;
-            --ev-memorial: #ff0000;
-            --ev-congress: #0984e3;
-            --ev-meeting: #ffffff;
+            --ev-memorial: #ff4757;
+            --ev-congress: #ff4757;
+            --ev-meeting: #0984e3;
             --ev-personal: #27ae60;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--main-bg); overflow: hidden; }
 
-        body { 
-            margin: 0; font-family: 'Inter', sans-serif; display: flex; 
-            height: 100vh; background: var(--main-bg); overflow: hidden; 
-        }
-
-        /* --- САЙДБАР --- */
         .sidebar { 
             width: 420px; background: var(--sidebar-bg); padding: 40px; 
             display: flex; flex-direction: column; color: white;
@@ -38,110 +33,77 @@
         #display-year-static { font-size: 8rem; font-weight: 200; color: rgba(255,255,255,0.05); letter-spacing: -12px; line-height: 0.7; margin: 0; }
         #month-title { font-size: 2.8rem; font-weight: 800; color: #fff; letter-spacing: -2px; margin-bottom: 20px; text-transform: uppercase; }
 
-        .side-label { color: #636e72; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-
         #live-preview { 
             font-size: 0.9rem; background: rgba(255, 255, 255, 0.05); padding: 20px; 
-            border-radius: 15px 0 0 15px; position: relative;
-            line-height: 1.6; color: #dfe6e9; text-align: right; width: 100%; min-height: 100px; 
-            border-right: 4px solid var(--accent);
-            margin-bottom: 15px;
+            border-radius: 15px 0 0 15px; line-height: 1.6; color: #dfe6e9; text-align: right; width: 100%; min-height: 100px; 
+            border-right: 4px solid var(--accent); margin-bottom: 15px;
         }
         .preview-item { border-bottom: 1px solid rgba(255,255,255,0.1); padding: 8px 0; }
 
-        #edit-trigger-btn {
-            display: none; width: 100%; background: var(--accent); color: white;
-            border: none; padding: 12px; border-radius: 10px; font-weight: 800;
-            text-transform: uppercase; cursor: pointer; font-size: 0.7rem;
-        }
+        #edit-trigger-btn { display: none; width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.7rem; }
 
-        .legend-item { display: flex; align-items: center; justify-content: flex-end; gap: 10px; color: #b2bec3; font-size: 0.8rem; margin-bottom: 8px; }
-        .rect { width: 25px; height: 8px; border-radius: 2px; }
-
-        /* --- КОНТЕНТ --- */
         .main-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .weekdays-fixed, .days-grid { display: grid; grid-template-columns: repeat(7, 100px); gap: 12px; }
-        .weekdays-fixed { margin-bottom: 10px; }
         .weekday { font-size: 0.7rem; font-weight: 900; color: #b2bec3; text-transform: uppercase; text-align: center; }
         
         .day-card { 
             background: var(--dark-card); width: 100px; height: 100px; border-radius: 18px; 
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 1.2rem; color: #ffffff; cursor: pointer; transition: 0.2s;
-            position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
         .day-card.active-day { border: 3px solid var(--accent); transform: scale(1.05); }
         .day-card.weekend { color: var(--orange-weekend); }
-        .day-card.empty { background: transparent; box-shadow: none; border: none; cursor: default; }
+        .day-card.empty { background: transparent; cursor: default; }
         
         .marks-row { position: absolute; bottom: 10px; display: flex; gap: 3px; justify-content: center; width: 100%; }
         .day-mark-rect { width: 18px; height: 4px; border-radius: 1px; }
 
-        /* --- МОДАЛКА --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 100%; max-width: 450px; text-align: right; }
-        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: #fff; padding: 30px; border-radius: 25px; width: 450px; text-align: right; color: #000; }
+        .save-btn { width: 100%; background: #000; color: #fff; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
 
         @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; height: auto; }
-            .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; text-align: center; border-bottom: 2px solid var(--accent); }
-            #display-year-static { font-size: 4rem; letter-spacing: -4px; margin-bottom: 5px; }
-            #month-title { font-size: 2rem; margin-bottom: 10px; }
-            #live-preview { border-radius: 12px; border-right: none; border-bottom: 4px solid var(--accent); text-align: center; min-height: 60px; }
-            .legend-item { justify-content: center; }
-            .main-content { padding: 20px 10px; }
-            .weekdays-fixed, .days-grid { grid-template-columns: repeat(7, 1fr); width: 100%; gap: 6px; }
-            .day-card { width: 100%; height: 13vw; border-radius: 10px; font-size: 1rem; }
-            .day-mark-rect { width: 12%; height: 3px; }
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; padding: 20px; align-items: center; }
+            .weekdays-fixed, .days-grid { grid-template-columns: repeat(7, 1fr); width: 100%; gap: 5px; }
+            .day-card { width: 100%; height: 13vw; }
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="user-header" style="display:flex; align-items:center; margin-bottom: 15px;">
+        <div style="display:flex; align-items:center; margin-bottom: 15px;">
             <button class="logout-btn" onclick="location.href='calendar.html'">Назад</button>
             <div class="user-name" id="user-display">...</div>
         </div>
         <div id="display-year-static">...</div>
         <div id="month-title">...</div>
-        
-        <div class="side-section" style="width: 100%;">
-            <div class="side-label" id="preview-label">Планы</div>
-            <div id="live-preview">Выберите дату в календаре</div>
+        <div style="width: 100%;">
+            <div id="live-preview">Выберите дату</div>
             <button id="edit-trigger-btn" onclick="openEditModal()">РЕДАКТИРОВАТЬ</button>
-        </div>
-
-        <div class="side-section" style="width: 100%; margin-top: 25px;">
-            <div class="side-label">Легенда</div>
-            <div class="legend-item">Вечеря <div class="rect" style="background:var(--ev-memorial)"></div></div>
-            <div class="legend-item">Конгресс <div class="rect" style="background:var(--ev-congress)"></div></div>
-            <div class="legend-item">Собрание <div class="rect" style="background:var(--ev-meeting); border: 1px solid #666;"></div></div>
-            <div class="legend-item">Личное <div class="rect" style="background:var(--ev-personal)"></div></div>
         </div>
     </div>
 
     <div class="main-content">
         <div class="weekdays-fixed">
             <div class="weekday">Пн</div><div class="weekday">Вт</div><div class="weekday">Ср</div>
-            <div class="weekday">Чт</div><div class="weekday">Пт</div>
-            <div class="weekday">Сб</div><div class="weekday">Вс</div>
+            <div class="weekday">Чт</div><div class="weekday">Пт</div><div class="weekday">Сб</div><div class="weekday">Вс</div>
         </div>
         <div class="days-grid" id="days-container"></div>
     </div>
 
     <div class="modal" id="note-modal">
         <div class="modal-content">
-            <h2 id="modal-date-title" style="margin:0 0 15px 0; font-weight: 900; font-size: 1.2rem;">Редактирование</h2>
+            <h2 id="modal-date-title">Редактирование</h2>
             <div id="existing-notes" style="max-height: 180px; overflow-y: auto; margin-bottom: 15px; text-align: left;"></div>
-            <textarea id="note-text" style="width:100%; height:70px; border-radius:12px; padding:10px; border:1px solid #eee; background:#fafafa; font-family:inherit;" placeholder="Новая запись..."></textarea>
-            <div style="display:flex; gap:5px; margin: 10px 0; flex-wrap: wrap;" id="cat-btns">
-                <button class="cat-btn" onclick="setActiveCat('memorial', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-memorial); color:white; font-size:9px; font-weight:900; cursor:pointer;">ВЕЧЕРЯ</button>
-                <button class="cat-btn" onclick="setActiveCat('congress', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-congress); color:white; font-size:9px; font-weight:900; cursor:pointer;">КОНГРЕСС</button>
-                <button class="cat-btn" onclick="setActiveCat('meeting', this)" style="flex:1; padding:8px; border-radius:8px; border:1px solid #ccc; background:#fff; font-size:9px; font-weight:900; cursor:pointer;">СОБРАНИЕ</button>
-                <button class="cat-btn" onclick="setActiveCat('personal', this)" style="flex:1; padding:8px; border-radius:8px; border:none; background:var(--ev-personal); color:white; font-size:9px; font-weight:900; cursor:pointer;">ЛИЧНОЕ</button>
+            <textarea id="note-text" style="width:100%; height:70px; border-radius:12px; padding:10px; margin-bottom:10px;" placeholder="Новая запись..."></textarea>
+            <div style="display:flex; gap:5px; margin-bottom: 15px;" id="cat-btns">
+                <button class="cat-btn" onclick="setActiveCat('memorial', this)" style="flex:1; background:var(--ev-memorial); color:white; border:none; padding:10px; border-radius:8px; font-size:10px; font-weight:900;">ВЕЧЕРЯ</button>
+                <button class="cat-btn" onclick="setActiveCat('meeting', this)" style="flex:1; background:var(--ev-meeting); border:1px solid #ccc; padding:10px; border-radius:8px; font-size:10px; font-weight:900;">СОБРАНИЕ</button>
             </div>
             <button class="save-btn" onclick="saveNote()">ДОБАВИТЬ ЗАПИСЬ</button>
-            <button onclick="closeModal()" style="margin-top:10px; background:none; border:none; color:#bbb; cursor:pointer; width:100%; font-weight:bold;">ЗАКРЫТЬ</button>
+            <button onclick="closeModal()" style="margin-top:10px; background:none; border:none; color:#999; width:100%; cursor:pointer;">ЗАКРЫТЬ</button>
         </div>
     </div>
 
@@ -159,15 +121,12 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
-
-        // --- ДИНАМИЧЕСКИЙ ГОД И МЕСЯЦ ---
         const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
         const currentYear = parseInt(localStorage.getItem('selectedYear') || 2026);
         const currentUser = localStorage.getItem('currentUser') || 'GUEST';
         const docPath = `${currentYear}_${monthIdx}`;
 
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        
         document.getElementById('month-title').innerText = monthsNames[monthIdx];
         document.getElementById('display-year-static').innerText = currentYear;
         document.getElementById('user-display').innerText = currentUser;
@@ -176,7 +135,6 @@
         let selectedDay = null;
         window.activeCat = 'meeting';
 
-        // Слушаем данные для выбранного года и месяца
         onSnapshot(doc(db, "calendar", docPath), (snap) => {
             currentMonthData = snap.exists() ? snap.data() : {};
             renderGrid();
@@ -219,40 +177,29 @@
         function selectDay(day) {
             selectedDay = day;
             document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active-day'));
-            const card = document.getElementById(`day-${day}`);
-            if(card) card.classList.add('active-day');
+            document.getElementById(`day-${day}`).classList.add('active-day');
             updatePreview(day);
             document.getElementById('edit-trigger-btn').style.display = 'block';
-            document.getElementById('preview-label').innerText = `Планы на ${day} число`;
         }
 
         function updatePreview(day) {
             const preview = document.getElementById('live-preview');
             const notes = currentMonthData[day] || [];
-            if(notes.length > 0) {
-                preview.innerHTML = notes.map(n => `<div class="preview-item">• ${n.text}</div>`).join('');
-            } else {
-                preview.innerHTML = 'Записей нет';
-            }
+            preview.innerHTML = notes.length > 0 ? notes.map(n => `<div class="preview-item">• ${n.text}</div>`).join('') : 'Записей нет';
         }
 
         window.openEditModal = () => {
-            if(!selectedDay) return;
             document.getElementById('modal-date-title').innerText = `${selectedDay} ${monthsNames[monthIdx]}`;
             const list = document.getElementById('existing-notes');
-            list.innerHTML = '';
-            (currentMonthData[selectedDay] || []).forEach((n, idx) => {
-                list.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#f4f4f4; margin-bottom:5px; border-radius:8px; border-right:4px solid var(--ev-${n.category})">
-                        <span style="font-size:13px; font-weight:600;">${n.text}</span>
-                        <button onclick="deleteNote(${idx})" style="color:red; border:none; background:none; font-size:18px; cursor:pointer;">&times;</button>
-                    </div>`;
-            });
+            list.innerHTML = (currentMonthData[selectedDay] || []).map((n, idx) => `
+                <div style="display:flex; justify-content:space-between; padding:10px; background:#f9f9f9; margin-bottom:5px; border-radius:8px; border-right:4px solid var(--ev-${n.category})">
+                    <span style="font-size:13px;">${n.text}</span>
+                    <button onclick="deleteNote(${idx})" style="color:red; border:none; background:none; cursor:pointer;">&times;</button>
+                </div>`).join('');
             document.getElementById('note-modal').style.display = 'flex';
         };
 
         window.closeModal = () => document.getElementById('note-modal').style.display = 'none';
-
         window.setActiveCat = (cat, btn) => {
             window.activeCat = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.style.outline = "none");
@@ -260,9 +207,9 @@
         };
 
         window.saveNote = async () => {
-            const text = document.getElementById('note-text').value;
+            const text = document.getElementById('note-text').value.trim();
             if(!text) return;
-            const notes = currentMonthData[selectedDay] || [];
+            const notes = [...(currentMonthData[selectedDay] || [])];
             notes.push({text, category: window.activeCat, user: currentUser});
             await setDoc(doc(db, "calendar", docPath), {[selectedDay]: notes}, {merge:true});
             document.getElementById('note-text').value = '';
