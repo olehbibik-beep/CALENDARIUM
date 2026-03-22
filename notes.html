@@ -7,55 +7,64 @@
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436;
-            --ev-memorial: #ff4757; --ev-meeting: #0984e3;
+            --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #2ecc71; /* Новый цвет */
         }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
 
         /* Левая панель */
         .sidebar { 
-            width: 350px; background: #1e2122; padding: 30px; color: white;
-            display: flex; flex-direction: column; align-items: flex-end; text-align: right;
+            width: 320px; background: #1e2122; padding: 25px; color: white;
+            display: flex; flex-direction: column; align-items: flex-end; text-align: right; flex-shrink: 0;
         }
         .back-btn { background: #fff; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-bottom: 20px; }
-        #month-title { font-size: 2.5rem; font-weight: 800; text-transform: uppercase; margin: 0; }
-        #year-label { font-size: 1.2rem; opacity: 0.3; margin-bottom: 30px; }
+        #month-title { font-size: 2.2rem; font-weight: 800; text-transform: uppercase; margin: 0; line-height: 1; }
+        #year-label { font-size: 1.1rem; opacity: 0.3; margin-bottom: 20px; }
 
         #live-preview { 
-            width: 100%; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px;
-            border-right: 4px solid var(--accent); min-height: 100px; margin-bottom: 20px;
+            width: 100%; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
+            border-right: 4px solid var(--accent); min-height: 80px; margin-bottom: 15px; font-size: 0.85rem;
+            text-align: left; overflow-y: auto;
         }
 
         /* Календарная сетка */
-        .main { flex: 1; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; width: 100%; max-width: 800px; }
+        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; max-width: 700px; }
         .day { 
-            background: var(--dark); height: 90px; border-radius: 15px; color: white;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            position: relative; font-weight: 800; font-size: 1.2rem;
+            background: var(--dark); aspect-ratio: 1/1; border-radius: 12px; color: white;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
+            position: relative; font-weight: 800; font-size: 1.1rem; transition: 0.2s;
         }
         .day.empty { background: transparent; cursor: default; }
-        .day.selected { border: 3px solid var(--accent); transform: scale(1.05); }
-        .dots { position: absolute; bottom: 8px; display: flex; gap: 3px; }
-        .dot-line { width: 15px; height: 3px; border-radius: 2px; }
+        .day.selected { border: 3px solid var(--accent); transform: scale(1.05); z-index: 2; }
+        
+        /* Исправленные индикаторы */
+        .dots { 
+            position: absolute; bottom: 6px; left: 0; right: 0;
+            display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; padding: 0 4px;
+        }
+        .dot { width: 5px; height: 5px; border-radius: 50%; }
 
         /* Модальное окно */
         .modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            z-index: 1000; align-items: center; justify-content: center; 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+            z-index: 1000; align-items: center; justify-content: center; padding: 15px;
         }
-        .modal-box { background: white; padding: 30px; border-radius: 20px; width: 400px; color: black; }
-        textarea { width: 100%; height: 80px; margin: 10px 0; padding: 10px; border-radius: 10px; border: 1px solid #ddd; }
-        .btn-save { width: 100%; background: black; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: 800; cursor: pointer; }
+        .modal-box { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; color: black; }
+        textarea { width: 100%; height: 80px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 1rem; }
+        .btn-save { width: 100%; background: black; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; }
         
-        .cat-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .cat-opt { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: white; }
+        .cat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .cat-opt { padding: 8px 4px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; font-weight: 800; font-size: 0.6rem; color: white; text-transform: uppercase; }
 
         @media (max-width: 800px) {
             body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; align-items: center; }
-            .grid { grid-template-columns: repeat(7, 1fr); }
-            .day { height: 12vw; font-size: 0.9rem; }
+            .sidebar { width: 100%; height: auto; align-items: center; padding: 15px; text-align: center; }
+            #month-title { font-size: 1.8rem; }
+            #year-label { margin-bottom: 10px; }
+            .grid { gap: 5px; }
+            .day { font-size: 0.9rem; border-radius: 8px; }
+            .dot { width: 4px; height: 4px; }
         }
     </style>
 </head>
@@ -65,9 +74,9 @@
         <button class="back-btn" onclick="location.href='calendar.html'">← НАЗАД</button>
         <div id="month-title">...</div>
         <div id="year-label">...</div>
-        <div style="width:100%; text-align:right; font-size:0.7rem; opacity:0.5; margin-bottom:5px;">ЗАПИСИ НА ДЕНЬ:</div>
+        <div style="width:100%; font-size:0.65rem; opacity:0.5; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">События дня:</div>
         <div id="live-preview">Выберите дату</div>
-        <button id="edit-btn" style="display:none; width:100%; padding:10px; background:var(--accent); border:none; color:white; border-radius:8px; font-weight:800; cursor:pointer;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
+        <button id="edit-btn" style="display:none; width:100%; padding:12px; background:var(--accent); border:none; color:white; border-radius:10px; font-weight:800; cursor:pointer;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
     </div>
 
     <div class="main">
@@ -76,15 +85,16 @@
 
     <div class="modal" id="modal">
         <div class="modal-box">
-            <h3 id="modal-date" style="margin-top:0">Дата</h3>
-            <div id="notes-list" style="margin-bottom:15px"></div>
-            <textarea id="note-input" placeholder="Введите текст..."></textarea>
+            <h3 id="modal-date" style="margin-top:0; font-size: 1.2rem;">Дата</h3>
+            <div id="notes-list" style="margin-bottom:15px; max-height: 150px; overflow-y: auto;"></div>
+            <textarea id="note-input" placeholder="Что планируем?"></textarea>
             <div class="cat-row">
                 <button class="cat-opt" id="opt-mem" style="background:var(--ev-memorial)" onclick="setCat('memorial')">ВЕЧЕРЯ</button>
                 <button class="cat-opt" id="opt-meet" style="background:var(--ev-meeting)" onclick="setCat('meeting')">СОБРАНИЕ</button>
+                <button class="cat-opt" id="opt-pers" style="background:var(--ev-personal)" onclick="setCat('personal')">ЛИЧНОЕ</button>
             </div>
-            <button class="btn-save" onclick="save()">СОХРАНИТЬ</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#aaa; cursor:pointer;">Закрыть</button>
+            <button class="btn-save" onclick="save()">ДОБАВИТЬ</button>
+            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#aaa; cursor:pointer; font-weight:700;">ОТМЕНА</button>
         </div>
     </div>
 
@@ -139,8 +149,10 @@
                     dBox.className = 'dots';
                     data[i].forEach(n => {
                         const dot = document.createElement('div');
-                        dot.className = 'dot-line';
-                        dot.style.background = n.category === 'memorial' ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
+                        dot.className = 'dot';
+                        if(n.category === 'memorial') dot.style.background = 'var(--ev-memorial)';
+                        else if(n.category === 'personal') dot.style.background = 'var(--ev-personal)';
+                        else dot.style.background = 'var(--ev-meeting)';
                         dBox.appendChild(dot);
                     });
                     card.appendChild(dBox);
@@ -153,22 +165,28 @@
         function updatePreview() {
             const p = document.getElementById('live-preview');
             const notes = data[selDay] || [];
-            p.innerHTML = notes.length ? notes.map(n => `<div>• ${n.text}</div>`).join('') : 'Нет записей';
+            p.innerHTML = notes.length ? notes.map(n => {
+                let color = 'var(--accent)';
+                if(n.category === 'memorial') color = 'var(--ev-memorial)';
+                if(n.category === 'personal') color = 'var(--ev-personal)';
+                return `<div style="border-left: 3px solid ${color}; padding-left: 8px; margin-bottom: 5px;">${n.text}</div>`;
+            }).join('') : 'Нет записей';
         }
 
         window.setCat = (c) => { 
             curCat = c; 
-            document.getElementById('opt-mem').style.outline = c === 'memorial' ? '3px solid black' : 'none';
-            document.getElementById('opt-meet').style.outline = c === 'meeting' ? '3px solid black' : 'none';
+            const opts = { 'memorial': 'opt-mem', 'meeting': 'opt-meet', 'personal': 'opt-pers' };
+            Object.values(opts).forEach(id => document.getElementById(id).style.borderColor = 'transparent');
+            document.getElementById(opts[c]).style.borderColor = 'black';
         };
 
         window.openModal = () => {
             document.getElementById('modal-date').innerText = selDay + ' ' + months[monthIdx];
             const list = document.getElementById('notes-list');
             list.innerHTML = (data[selDay] || []).map((n, idx) => `
-                <div style="display:flex; justify-content:space-between; background:#eee; padding:8px; border-radius:5px; margin-bottom:5px">
-                    <span>${n.text}</span>
-                    <button onclick="del(${idx})" style="color:red; border:none; background:none; cursor:pointer">×</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f8f8; padding:10px; border-radius:8px; margin-bottom:5px; border-left: 4px solid ${n.category==='memorial'?'var(--ev-memorial)':(n.category==='personal'?'var(--ev-personal)':'var(--ev-meeting)')}">
+                    <span style="font-size:0.9rem">${n.text}</span>
+                    <button onclick="del(${idx})" style="color:#ff4757; border:none; background:none; cursor:pointer; font-size:1.2rem; font-weight:bold;">×</button>
                 </div>`).join('');
             document.getElementById('modal').style.display = 'flex';
             setCat('meeting');
