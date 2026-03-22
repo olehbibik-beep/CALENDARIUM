@@ -10,8 +10,10 @@
             --main-bg: #f4f4f4;    
             --card-bg: #2d3436;    
             --text-white: #ffffff;
-            --ev-important: #d63031;
-            --ev-work: #0984e3;
+            --ev-memorial: #ff4757;
+            --ev-congress: #ff4757;
+            --ev-meeting: #0984e3;
+            --ev-personal: #27ae60;
             --accent-gold: #fdcb6e;
         }
         
@@ -33,43 +35,35 @@
             display: flex; align-items: center; justify-content: space-between; 
             width: 100%; margin-bottom: 40px; 
         }
-        .year-side { 
-            font-size: 1.1rem; font-weight: 900; color: #444; 
-            cursor: pointer; transition: 0.3s; flex: 1; text-align: center;
-        }
-        #display-year { 
-            font-size: 4.5rem; font-weight: 900; color: var(--text-white); 
-            letter-spacing: -3px; line-height: 1; flex: 2; text-align: center;
-        }
+        .year-side { font-size: 1.1rem; font-weight: 900; color: #444; cursor: pointer; flex: 1; text-align: center; }
+        #display-year { font-size: 4.5rem; font-weight: 900; color: var(--text-white); letter-spacing: -3px; flex: 2; text-align: center; }
 
         .upcoming-box { width: 100%; margin-top: auto; text-align: right; margin-bottom: 25px; }
         .side-label { font-size: 0.7rem; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
-        .event-card-mini { background: #252525; padding: 20px; border-radius: 20px; text-align: left; border-right: 5px solid transparent; }
+        
+        /* Исправленный стиль карточки в сайдбаре */
+        .event-card-mini { 
+            background: #252525; padding: 20px; border-radius: 20px; text-align: left; 
+            border-right-width: 6px; border-right-style: solid; border-right-color: transparent;
+        }
         .ev-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 5px; color: #fff; text-transform: uppercase; }
         .ev-date { font-size: 0.75rem; font-weight: 700; opacity: 0.6; color: #fff; }
 
-        #admin-link {
-            display: none; color: var(--accent-gold); text-decoration: none; font-size: 0.75rem; 
-            font-weight: 900; border: 1px solid var(--accent-gold); padding: 12px 25px; border-radius: 12px; width: 100%; text-align: center; margin-top: 10px;
-        }
+        #admin-link { display: none; color: var(--accent-gold); text-decoration: none; font-size: 0.75rem; font-weight: 900; border: 1px solid var(--accent-gold); padding: 12px 25px; border-radius: 12px; width: 100%; text-align: center; margin-top: 10px; }
 
         .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px; }
         .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; width: 100%; max-width: 700px; }
-        .month-card { 
-            background: var(--card-bg); border-radius: 22px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; 
-            color: #fff; cursor: pointer; aspect-ratio: 1 / 1; transition: 0.2s; text-transform: uppercase; position: relative;
-        }
+        .month-card { background: var(--card-bg); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.85rem; color: #fff; cursor: pointer; aspect-ratio: 1/1; transition: 0.2s; text-transform: uppercase; position: relative; }
         .month-card:hover { transform: scale(1.05); background: #000; }
         
         .month-indicator { position: absolute; top: 12px; right: 12px; display: flex; gap: 4px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; }
         .dot.red { background: #ff4757; box-shadow: 0 0 8px #ff4757; }
-        .dot.blue { background: #0984e3; box-shadow: 0 0 8px #0984e3; }
+        .dot.blue { background: #0088cc; box-shadow: 0 0 8px #0088cc; }
 
         @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; height: auto; }
-            .sidebar { width: 100%; height: auto; padding: 25px; align-items: center; }
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; padding: 25px; align-items: center; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
         }
     </style>
@@ -140,10 +134,12 @@
         async function loadData() {
             const container = document.getElementById('next-event-container');
             let foundEvent = false;
+            
+            // Текущая дата для фильтрации "прошлого"
             const now = new Date();
-            const realYear = now.getFullYear();
-            const realMonth = now.getMonth();
-            const realDay = now.getDate();
+            const todayDay = now.getDate();
+            const todayMonth = now.getMonth();
+            const todayYear = now.getFullYear();
 
             for (let i = 0; i < 12; i++) {
                 const docId = `${currentYear}_${i}`;
@@ -153,37 +149,42 @@
                 if (snap.exists()) {
                     const data = snap.data();
                     const ind = document.getElementById(`ind-${i}`);
-                    if(!ind) continue;
+                    
+                    let hasHigh = false; 
+                    let hasLow = false;
 
-                    let hasHigh = false; let hasLow = false;
-                    Object.values(data).forEach(dayNotes => {
-                        dayNotes.forEach(n => {
-                            if(n.category === 'memorial' || n.category === 'congress') hasHigh = true;
+                    // Собираем все дни месяца, где есть записи
+                    const days = Object.keys(data).map(Number).sort((a,b) => a-b);
+                    
+                    days.forEach(day => {
+                        const dayNotes = data[day];
+                        dayNotes.forEach(note => {
+                            if(note.category === 'memorial' || note.category === 'congress') hasHigh = true;
                             else hasLow = true;
+
+                            // Проверка на ближайшее событие (самое первое подходящее)
+                            if (!foundEvent) {
+                                const isFutureYear = currentYear > todayYear;
+                                const isFutureMonth = (currentYear === todayYear && i > todayMonth);
+                                const isTodayOrLater = (currentYear === todayYear && i === todayMonth && day >= todayDay);
+
+                                if (isFutureYear || isFutureMonth || isTodayOrLater) {
+                                    const color = note.category === 'memorial' || note.category === 'congress' ? '#ff4757' : '#0984e3';
+                                    container.innerHTML = `
+                                        <div class="event-card-mini" style="border-right-color: ${color}">
+                                            <div class="ev-title">${note.text}</div>
+                                            <div class="ev-date">${day} ${monthsNames[i]} ${currentYear}</div>
+                                        </div>`;
+                                    foundEvent = true;
+                                }
+                            }
                         });
                     });
                     
-                    if(hasHigh) ind.innerHTML += '<div class="dot red"></div>';
-                    if(hasLow) ind.innerHTML += '<div class="dot blue"></div>';
-
-                    if (!foundEvent) {
-                        const days = Object.keys(data).map(Number).sort((a,b) => a-b);
-                        for(let d of days) {
-                            const isFutureYear = currentYear > realYear;
-                            const isFutureMonth = (currentYear === realYear && i > realMonth);
-                            const isTodayOrLater = (currentYear === realYear && i === realMonth && d >= realDay);
-
-                            if (isFutureYear || isFutureMonth || isTodayOrLater) {
-                                const note = data[d][0];
-                                container.innerHTML = `
-                                    <div class="event-card-mini" style="border-right-color: var(--ev-${note.category})">
-                                        <div class="ev-title">${note.text}</div>
-                                        <div class="ev-date">${d} ${monthsNames[i]} ${currentYear}</div>
-                                    </div>`;
-                                foundEvent = true;
-                                break;
-                            }
-                        }
+                    if(ind) {
+                        ind.innerHTML = ''; // Очистка
+                        if(hasHigh) ind.innerHTML += '<div class="dot red"></div>';
+                        if(hasLow) ind.innerHTML += '<div class="dot blue"></div>';
                     }
                 }
             }
