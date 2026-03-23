@@ -48,23 +48,34 @@
         }
         .month-card:active { transform: scale(0.92); }
 
-        .month-indicator { 
+        /* Обновляем контейнер для индикаторов */
+.month-indicator { 
     position: absolute; 
-    bottom: 0;         /* Прижимаем в самый низ */
-    left: 0;
+    bottom: 10px; 
     display: flex; 
-    width: 100%;       /* На всю ширину карточки */
-    height: 4px; 
+    gap: 3px; 
+    height: 3px; /* Высота линии */
+    width: 80%;  /* Растягиваем почти на всю ширину карточки */
+    justify-content: center;
 }
 
+/* Общий стиль для индикатора */
 .dot { 
-    flex: 1;           /* Линии разделят ширину поровну */
-    height: 100%; 
-    border-radius: 0;  /* Прямые углы */
+    width: 15px;      /* Ширина полоски */
+    height: 3px;      /* Высота полоски */
+    border-radius: 2px; /* Легкое закругление углов */
+    transition: 0.3s;
 }
 
-/* Закруглим только нижние углы карточки у индикатора */
-.month-card { overflow: hidden; }
+/* Цвета со свечением */
+.dot.red { 
+    background: var(--ev-memorial); 
+    box-shadow: 0 0 6px var(--ev-memorial); 
+}
+.dot.blue { 
+    background: var(--ev-meeting); 
+    box-shadow: 0 0 6px var(--ev-meeting); 
+}
 
         /* ФУТЕР КАК РАНЬШЕ */
         footer {
