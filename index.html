@@ -52,6 +52,23 @@
 
         .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
+        .auth-logo {
+    width: 60px;          /* Ширина иконки */
+    height: 60px;         /* Высота иконки */
+    margin: 0 auto 15px;  /* Центрируем и добавляем отступ снизу до заголовка */
+    display: block;       /* Чтобы margin: auto сработал */
+    filter: drop-shadow(0 0 10px rgba(0, 136, 204, 0.4)); /* Легкое синее свечение под цвет темы */
+    border-radius: 12px;  /* Если картинка квадратная, можно чуть скруглить углы */
+    object-fit: contain;  /* Чтобы картинка не растягивалась */
+}
+
+/* Немного уменьшим отступ у H1, чтобы композиция была плотнее */
+.auth-card h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
+}
         /* ШТОРКА SYSTEM LOG */
         #notif-sidebar { 
             position: fixed; right: 0; top: 0; width: 350px; height: 100vh; 
