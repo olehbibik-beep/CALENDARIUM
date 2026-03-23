@@ -74,7 +74,18 @@
 .dot.blue { 
     background: var(--ev-meeting);  
 }
+/* Стиль для плитки текущего месяца */
+.month-card.current-active {
+    background: rgba(230, 126, 34, 0.12) !important; /* Очень прозрачный оранжевый */
+    border: 1px solid rgba(230, 126, 34, 0.25) !important; /* Тонкая рамка в цвет */
+    box-shadow: inset 0 0 15px rgba(230, 126, 34, 0.05); /* Внутреннее мягкое свечение */
+}
 
+/* Опционально: сделаем текст месяца чуть ярче для контраста */
+.month-card.current-active span {
+    color: #ffaa66; 
+    text-shadow: 0 0 8px rgba(230, 126, 34, 0.4);
+}
         /* ФУТЕР КАК РАНЬШЕ */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--footer-bg); 
