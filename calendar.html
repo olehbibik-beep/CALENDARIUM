@@ -6,105 +6,58 @@
     <title>Главная | CALENDARIUM</title>
     <style>
         :root { 
-            --accent: #0088cc; 
-            --bg: #121416; 
-            --dark: #22272a; 
-            --card-bg: #1e2224;
-            --ev-memorial: #ff7675; 
-            --ev-meeting: #0984e3; 
-            --accent-gold: #fdcb6e;
-            --text-main: #e0e6ed;
-            --footer-bg: #0f1112; 
-            --footer-border: #222;
+            --accent: #0088cc; --bg: #121416; --dark: #22272a; --card-bg: #1e2224;
+            --ev-memorial: #ff7675; --ev-meeting: #0984e3; --text-main: #e0e6ed;
+            --footer-bg: #0f1112; --footer-border: #222;
         }
-        
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; background: var(--bg); color: var(--text-main); 
-            display: flex; height: 100vh; overflow: hidden; 
-        }
+        body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* САЙДБАР (ТЕМНЫЙ) */
         .sidebar { 
             width: 320px; background: #0f1112; padding: 25px; 
             display: flex; flex-direction: column; border-right: 1px solid var(--footer-border);
             flex-shrink: 0; z-index: 10;
         }
-
         .user-header { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 25px; }
         .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--accent); letter-spacing: 1px; }
-        
         .nav-btns { display: flex; gap: 8px; }
-        .btn-small { background: var(--dark); color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn-small:active { transform: scale(0.9); }
-        .btn-admin { border-color: var(--accent); color: var(--accent); }
+        .btn-small { background: var(--dark); color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        /* ПЕРЕКЛЮЧАТЕЛЬ ГОДА */
         .year-switcher { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 30px; }
         #display-year { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; line-height: 1; color: #fff; }
-        .year-side { cursor: pointer; color: #3d444b; font-weight: 900; padding: 10px; font-size: 1.2rem; transition: 0.2s; }
-        .year-side:hover { color: var(--accent); }
+        .year-side { cursor: pointer; color: #3d444b; font-weight: 900; padding: 10px; font-size: 1.2rem; }
 
-        /* ПРЕВЬЮ СОБЫТИЯ */
         .upcoming-box { width: 100%; margin-top: auto; padding-bottom: 40px; }
-        .event-card-mini { background: var(--card-bg); padding: 15px; border-radius: 15px; border-left: 4px solid var(--ev-meeting); border: 1px solid #2d3436; border-left-width: 4px; animation: fadeIn 0.4s ease; }
-        .ev-title { font-size: 0.85rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 4px; }
+        .event-card-mini { background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid #2d3436; border-left: 4px solid var(--ev-meeting); }
 
-        /* СЕТКА МЕСЯЦЕВ */
-        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; background: var(--bg); }
-        .months-grid { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; 
-            width: 100%; 
-            max-width: 850px; 
-        }
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 850px; }
         
         .month-card { 
-            background: var(--dark); border-radius: 18px; 
-            aspect-ratio: 1 / 1; 
+            background: var(--dark); border-radius: 18px; aspect-ratio: 1 / 1; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             color: #fff; font-weight: 900; cursor: pointer; position: relative; transition: 0.3s;
-            text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
-            border: 1px solid transparent;
+            text-transform: uppercase; font-size: 0.75rem; border: 1px solid transparent;
         }
-        .month-card:hover { background: var(--card-bg); border-color: #333; transform: translateY(-3px); }
-        .month-card:active { transform: scale(0.92); background: #000; }
+        .month-card:active { transform: scale(0.92); }
 
-        /* ИНДИКАТОРЫ ТОЧКИ */
-        .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; }
+        .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; height: 6px; }
         .dot { width: 6px; height: 6px; border-radius: 50%; }
         .dot.red { background: var(--ev-memorial); box-shadow: 0 0 8px var(--ev-memorial); }
         .dot.blue { background: var(--ev-meeting); box-shadow: 0 0 8px var(--ev-meeting); }
 
-        /* ФУТЕР */
         footer {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--footer-bg); padding: 15px 25px;
-            display: flex; align-items: center; box-sizing: border-box; 
-            border-top: 1px solid var(--footer-border); z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--footer-bg); 
+            padding: 15px 25px; display: flex; align-items: center; border-top: 1px solid var(--footer-border);
         }
-        .footer-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-right: 12px; box-shadow: 0 0 10px #2ecc71; }
-        .footer-text { font-size: 10px; color: #576574; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .footer-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-right: 12px; }
+        .footer-text { font-size: 10px; color: #576574; text-transform: uppercase; font-weight: 700; }
 
-        /* АНИМАЦИЯ */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; }
-            .sidebar { 
-                width: 100%; padding: 15px; height: auto; 
-                border-right: none; border-bottom: 1px solid var(--footer-border);
-            }
-            .year-switcher { margin-bottom: 10px; }
-            #display-year { font-size: 2.8rem; }
-            .upcoming-box { padding-bottom: 10px; margin-top: 15px; }
-            
+            .sidebar { width: 100%; padding: 15px; height: auto; border-right: none; border-bottom: 1px solid var(--footer-border); }
             .main-content { padding: 20px; padding-bottom: 100px; }
             .months-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .month-card { border-radius: 12px; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -113,21 +66,17 @@
         <div class="user-header">
             <div id="user-display" class="user-name">...</div>
             <div class="nav-btns">
-                <button id="admin-btn" class="btn-small btn-admin" onclick="location.href='admin.html'" style="display:none;">АДМИН</button>
+                <button id="admin-btn" class="btn-small" onclick="location.href='admin.html'" style="display:none; color:var(--accent);">АДМИН</button>
                 <button class="btn-small" onclick="localStorage.clear(); location.href='index.html'">ВЫХОД</button>
             </div>
         </div>
-
         <div class="year-switcher">
             <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
             <div id="display-year"></div>
             <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
         </div>
-
-        <div class="upcoming-box">
-            <div id="next-event-container">
-                <div style="font-size:0.6rem; opacity:0.3; text-align:center;">ПОИСК СОБЫТИЙ...</div>
-            </div>
+        <div class="upcoming-box" id="next-event-container">
+            <div style="font-size:0.6rem; opacity:0.3; text-align:center;">ОБНОВЛЕНИЕ ДАННЫХ...</div>
         </div>
     </div>
 
@@ -137,7 +86,7 @@
 
     <footer>
         <div class="footer-dot"></div>
-        <div class="footer-text">Cloud Plan Ecosystem • Main Terminal v2.3</div>
+        <div class="footer-text">Cloud Plan Ecosystem • Main Terminal v2.4</div>
     </footer>
 
     <script type="module">
@@ -149,91 +98,96 @@
             authDomain: "calendarium-1f7d7.firebaseapp.com",
             projectId: "calendarium-1f7d7",
             storageBucket: "calendarium-1f7d7.firebasestorage.app",
-            messagingSenderId: "204240857105",
             appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
+        let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
         const user = localStorage.getItem('currentUser') || 'ГОСТЬ';
         document.getElementById('user-display').innerText = user;
-        if(user.toLowerCase() === 'admin') {
-            document.getElementById('admin-btn').style.display = 'block';
-        }
-
-        let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
+        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
 
         function initGrid() {
             const grid = document.getElementById('months');
             grid.innerHTML = '';
             monthsNames.forEach((m, i) => {
-                const card = document.createElement('div');
-                card.className = 'month-card';
-                // Берем короткое имя для карточки
-                const shortName = m.substring(0, 3);
-                card.innerHTML = `<span>${shortName}</span><div class="month-indicator" id="ind-${i}"></div>`;
-                card.onclick = () => {
-                    localStorage.setItem('selectedMonth', i);
-                    localStorage.setItem('selectedYear', currentYear.toString());
-                    window.location.href = 'notes.html';
-                };
-                grid.appendChild(card);
+                grid.innerHTML += `
+                    <div class="month-card" onclick="goToMonth(${i})">
+                        <span>${m.substring(0, 3)}</span>
+                        <div class="month-indicator" id="ind-${i}"></div>
+                    </div>`;
             });
         }
+
+        window.goToMonth = (i) => {
+            localStorage.setItem('selectedMonth', i);
+            localStorage.setItem('selectedYear', currentYear);
+            window.location.href = 'notes.html';
+        };
 
         async function loadData() {
             const container = document.getElementById('next-event-container');
             let firstFound = null;
 
-            for (let j = 0; j < 12; j++) {
-                const el = document.getElementById(`ind-${j}`);
-                if (el) el.innerHTML = '';
+            // Сначала очищаем все индикаторы
+            for(let i=0; i<12; i++) {
+                const el = document.getElementById(`ind-${i}`);
+                if(el) el.innerHTML = '';
             }
 
-            for (let i = 0; i < 12; i++) {
-                try {
-                    const snap = await getDoc(doc(db, "calendar", `${currentYear}_${i}`));
-                    if (snap.exists()) {
-                        const data = snap.data();
-                        const ind = document.getElementById(`ind-${i}`);
-                        let hasRed = false, hasBlue = false;
+            // Формируем массив запросов ко всем 12 месяцам года сразу
+            const monthPromises = Array.from({length: 12}, (_, i) => 
+                getDoc(doc(db, "calendar", `${currentYear}_${i}`))
+            );
 
-                        Object.keys(data).sort((a,b) => a-b).forEach(day => {
-                            data[day].forEach(n => {
-                                if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
-                                else hasBlue = true;
+            const snapshots = await Promise.all(monthPromises);
+
+            snapshots.forEach((snap, i) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const ind = document.getElementById(`ind-${i}`);
+                    let red = false, blue = false;
+
+                    // Перебираем все дни месяца
+                    Object.values(data).forEach(dayNotes => {
+                        if(Array.isArray(dayNotes)) {
+                            dayNotes.forEach(note => {
+                                if (note.category === 'memorial' || note.category === 'congress') red = true;
+                                else blue = true;
                                 
+                                // Логика ближайшего события для сайдбара
                                 if (!firstFound) {
-                                    firstFound = { text: n.text, day, month: monthsNames[i], cat: n.category };
+                                    firstFound = { text: note.text, d: '?', m: monthsNames[i], cat: note.category };
                                 }
                             });
-                        });
-
-                        if (ind) {
-                            if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
-                            if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
                         }
-                    }
-                } catch (e) {}
-            }
+                    });
 
+                    if (ind) {
+                        if (red) ind.innerHTML += '<div class="dot red"></div>';
+                        if (blue) ind.innerHTML += '<div class="dot blue"></div>';
+                    }
+                }
+            });
+
+            // Обновляем плашку в сайдбаре
             if (firstFound) {
-                const accent = (firstFound.cat === 'memorial') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
+                const col = firstFound.cat === 'memorial' ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
                 container.innerHTML = `
-                    <div class="event-card-mini" style="border-left-color: ${accent}">
+                    <div class="event-card-mini" style="border-left-color: ${col}">
                         <div class="ev-title">${firstFound.text}</div>
-                        <div style="font-size:0.65rem; opacity:0.5; font-weight:700; color: #ccc;">${firstFound.day} ${firstFound.month} ${currentYear}</div>
+                        <div style="font-size:0.6rem; opacity:0.5;">Ближайшее в ${firstFound.m}</div>
                     </div>`;
             } else {
-                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center; letter-spacing:1px;">НЕТ ЗАПЛАНИРОВАННЫХ СОБЫТИЙ</div>';
+                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center;">ПЛАНОВ НЕТ</div>';
             }
         }
 
         window.changeYear = (dir) => { 
             currentYear += dir; 
             updateDisp(); 
-            initGrid(); 
             loadData(); 
         };
 
@@ -241,7 +195,7 @@
             document.getElementById('display-year').innerText = currentYear;
             document.getElementById('prev-year').innerText = currentYear - 1;
             document.getElementById('next-year').innerText = currentYear + 1;
-            localStorage.setItem('selectedYear', currentYear.toString());
+            localStorage.setItem('selectedYear', currentYear);
         }
 
         updateDisp();
