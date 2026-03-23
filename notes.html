@@ -3,82 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Visible Marks</title>
+    <title>CALENDARIUM | BACK TO STABLE</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
             --ev-memorial: #ff4757; --ev-memorial-bg: #ffebeb;
-            --ev-meeting: #0984e3; --ev-personal: #ffffff;
+            --ev-meeting: #0984e3; 
             --weekend: #4a5558;
         }
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
         
-        .header { width: 100%; background: #1e2122; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 20; }
+        .header { width: 100%; background: #1e2122; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 10; }
+        .back-btn { position: absolute; left: 15px; background: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
+        
         .main { width: 100%; max-width: 500px; padding: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         
         .day { 
-            background: var(--dark); aspect-ratio: 1/1; border-radius: 10px; color: white;
+            background: var(--dark); aspect-ratio: 1/1; border-radius: 8px; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; font-weight: bold; cursor: pointer; font-size: 18px; border: 2px solid transparent;
-            z-index: 1; /* Базовый слой */
+            position: relative; font-weight: bold; cursor: pointer; font-size: 16px; border: 2px solid transparent;
         }
         .day.empty { background: transparent; pointer-events: none; }
-        .day.weekend { background: var(--weekend); color: #ccc; }
-        .day.selected { border-color: var(--accent) !important; z-index: 5; }
+        .day.weekend { background: var(--weekend); color: #d1d8db; }
+        .day.selected { border-color: var(--accent) !important; }
         
-        /* РОЗОВЫЙ ДЕНЬ */
+        /* РОЗОВЫЙ ЦВЕТ ДЛЯ ВЕЧЕРИ */
         .day.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
         
-        /* КОНТЕЙНЕР ДЛЯ ЧЕРТОЧЕК — ТЕПЕРЬ ОН СВЕРХУ */
-        .indicator-box { 
-            position: absolute; 
-            bottom: 6px; 
-            left: 0; 
-            right: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 2px;
-            z-index: 10; /* ПОВЕРХ ВСЕГО */
-            pointer-events: none;
-        }
-        
-        .mark-line { 
-            width: 70%; 
-            height: 4px; /* Сделал потолще */
-            border-radius: 2px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.4); /* Тень для видимости */
-        }
+        /* ЧЕРТОЧКИ (ИНДИКАЦИЯ) */
+        .lines { position: absolute; bottom: 4px; width: 80%; display: flex; flex-direction: column; gap: 2px; }
+        .line { width: 100%; height: 3px; border-radius: 1px; }
 
-        .preview { background: white; width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; }
-        .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
+        .preview { background: white; width: 100%; padding: 15px; margin-top: 10px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 350px; }
+        .btn { width: 100%; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div id="m-name" style="font-weight: 900;">...</div>
+    <button class="back-btn" onclick="location.href='calendar.html'">←</button>
+    <div id="m-name" style="font-size: 18px; font-weight: bold;">ЗАГРУЗКА...</div>
 </div>
 
 <div class="main">
     <div class="grid" id="grid"></div>
-    <div class="preview" id="preview">Нажмите на дату</div>
-    <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">ИЗМЕНИТЬ</button>
+    <div class="preview" id="preview">Выберите дату</div>
+    <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-box">
-        <h3 id="modal-title"></h3>
-        <div id="modal-list" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px; border-bottom: 1px solid #eee;"></div>
-        <textarea id="note-input" placeholder="Текст..." style="width:100%; height:60px; margin-bottom:10px;"></textarea>
+        <h3 id="modal-title" style="margin: 0 0 10px 0;"></h3>
+        <div id="modal-list" style="margin-bottom: 10px;"></div>
+        <textarea id="note-input" style="width:100%; height:50px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
-            <button class="btn" style="background:#ff4757; color:white; font-size: 9px;" onclick="save('memorial')">ВЕЧЕРЯ</button>
-            <button class="btn" style="background:#0984e3; color:white; font-size: 9px;" onclick="save('meeting')">СОБРАНИЕ</button>
-            <button class="btn" style="background:#f0f0f0; color:black; font-size: 9px; border:1px solid #ccc" onclick="save('personal')">ЛИЧНОЕ</button>
+            <button class="btn" style="background:#ff4757; color:white; font-size: 10px;" onclick="save('memorial')">ВЕЧЕРЯ</button>
+            <button class="btn" style="background:#0984e3; color:white; font-size: 10px;" onclick="save('meeting')">СОБРАНИЕ</button>
+            <button class="btn" style="background:#eee; color: black; font-size: 10px; border: 1px solid #ccc;" onclick="save('personal')">ЛИЧНОЕ</button>
         </div>
         <button class="btn" style="background:#000; color:white; margin-top:10px;" onclick="closeModal()">ЗАКРЫТЬ</button>
     </div>
@@ -117,11 +102,7 @@
         for (let i = 0; i < shift; i++) grid.innerHTML += '<div class="day empty"></div>';
         for (let i = 1; i <= total; i++) {
             const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
-            grid.innerHTML += `
-                <div class="day ${isW ? 'weekend' : ''}" id="day-${i}" onclick="selectDay(${i})">
-                    <span>${i}</span>
-                    <div class="indicator-box"></div>
-                </div>`;
+            grid.innerHTML += `<div class="day ${isW ? 'weekend' : ''}" id="day-${i}" onclick="selectDay(${i})"><span>${i}</span><div class="lines"></div></div>`;
         }
     }
 
@@ -141,23 +122,18 @@
             const notes = dbData[i] || [];
             const hasMem = notes.some(n => n.category === 'memorial');
             
-            // Розовый фон
+            // Розовая плитка
             el.classList.toggle('has-memorial', hasMem);
             
-            // Индикаторы
-            const box = el.querySelector('.indicator-box');
-            box.innerHTML = '';
-            
+            // Отрисовка линий
+            const lineBox = el.querySelector('.lines');
+            lineBox.innerHTML = '';
             notes.forEach(n => {
                 if (n.category !== 'memorial') {
-                    const line = document.createElement('div');
-                    line.className = 'mark-line';
-                    // Цвета: Личное — БЕЛЫЙ, Собрание — СИНИЙ
-                    line.style.background = (n.category === 'personal') ? '#ffffff' : '#0984e3';
-                    // Если фон розовый, белую черточку делаем чуть серым для контраста
-                    if (hasMem && n.category === 'personal') line.style.background = '#aaa';
-                    
-                    box.appendChild(line);
+                    const l = document.createElement('div');
+                    l.className = 'line';
+                    l.style.background = (n.category === 'personal') ? 'white' : '#0984e3';
+                    lineBox.appendChild(l);
                 }
             });
         }
@@ -169,16 +145,16 @@
         if (!selectedDay) return;
         const notes = dbData[selectedDay] || [];
         p.innerHTML = `<b>${selectedDay} ${months[mIdx]}:</b><br>` + 
-            (notes.length ? notes.map(n => `• ${n.text}`).join('<br>') : 'Нет событий');
+            (notes.map(n => `• ${n.text}`).join('<br>') || 'Нет событий');
     }
 
     window.openModal = () => {
         document.getElementById('modal-title').innerText = selectedDay + " " + months[mIdx];
         const list = document.getElementById('modal-list');
         list.innerHTML = (dbData[selectedDay] || []).map((n, idx) => `
-            <div style="display:flex; justify-content:space-between; background:#f4f4f4; padding:8px; margin-bottom:4px; border-radius:8px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between; background:#eee; padding:5px; margin-bottom:3px; border-radius:5px; font-size:13px;">
                 <span>${n.text}</span>
-                <b onclick="delNote(${idx})" style="color:red; cursor:pointer">✕</b>
+                <b onclick="delNote(${idx})" style="color:red; cursor:pointer">X</b>
             </div>`).join('');
         document.getElementById('modal').style.display = 'flex';
     };
