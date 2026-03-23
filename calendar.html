@@ -160,7 +160,7 @@
         const isCurrent = (i === todayMonth && currentYear === todayYear);
         
         // Если это текущий месяц, добавляем инлайн-стиль рамки
-        const borderStyle = isCurrent ? 'style="border: 1px solid var(--accent); shadow: 0 0 10px rgba(0,136,204,0.3);"' : '';
+        const borderStyle = isCurrent ? 'style="bgcolor: 1px solid var(--accent); shadow: 0 0 10px rgba(0,136,204,0.3);"' : '';
 
         grid.innerHTML += `
             <div class="month-card" ${borderStyle} onclick="goToMonth(${i})">
