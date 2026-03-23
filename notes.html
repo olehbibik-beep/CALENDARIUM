@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Финал</title>
+    <title>CALENDARIUM | Исправленный выбор</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
             --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #2ecc71;
-            --weekend: #4a5558; /* Цвет для выходных */
+            --weekend: #4a5558;
         }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; color: var(--dark); }
+        * { box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
         
-        /* Шапка */
-        .header { width: 100%; background: #1e2122; color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .back-btn { position: absolute; left: 15px; top: 22px; background: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 900; }
-        #month-name { font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .header { width: 100%; background: #1e2122; color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 10; }
+        .back-btn { position: absolute; left: 15px; top: 20px; background: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; cursor: pointer; }
 
-        /* Сетка */
         .main { width: 100%; max-width: 500px; padding: 15px; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 8px; opacity: 0.5; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
@@ -27,28 +24,29 @@
         .day { 
             background: var(--dark); aspect-ratio: 1/1; border-radius: 12px; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; font-weight: 800; cursor: pointer; font-size: 18px; transition: 0.2s;
+            position: relative; font-weight: 800; cursor: pointer; font-size: 18px; border: 3px solid transparent;
         }
         .day.empty { background: transparent; pointer-events: none; }
-        .day.weekend { background: var(--weekend); color: #d1d8db; } /* Стиль выходных */
-        .day.selected { transform: scale(1.05); outline: 3px solid var(--accent); z-index: 5; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .day.has-memorial { background: var(--ev-memorial) !important; color: white; }
+        .day.weekend { background: var(--weekend); color: #d1d8db; }
         
-        /* Точки-индикаторы */
+        /* КРИТИЧЕСКИЙ КЛАСС: ВЫДЕЛЕНИЕ */
+        .day.selected { border-color: var(--accent) !important; transform: scale(1.05); z-index: 5; box-shadow: 0 0 15px rgba(0,136,204,0.4); }
+        
+        .day.has-memorial { background: var(--ev-memorial) !important; }
+        
         .dots { position: absolute; bottom: 6px; display: flex; gap: 3px; justify-content: center; width: 100%; height: 5px; }
         .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* Список событий под календарем */
-        .preview { background: white; width: 100%; border-radius: 15px; padding: 20px; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); min-height: 100px; }
-        .preview-title { font-weight: 900; margin-bottom: 10px; color: #888; font-size: 12px; text-transform: uppercase; }
-        .event-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 600; font-size: 15px; padding: 8px; background: #f8f9fa; border-radius: 8px; }
-        .event-color { width: 4px; height: 20px; border-radius: 2px; }
+        /* Блок событий */
+        .preview { background: white; width: 100%; border-radius: 15px; padding: 20px; margin-top: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .preview-title { font-weight: 900; margin-bottom: 12px; color: var(--dark); font-size: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .event-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 600; padding: 10px; background: #f8f9fa; border-radius: 10px; }
+        .event-color { width: 5px; height: 18px; border-radius: 3px; }
 
-        /* Модалка */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
         .modal-box { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 380px; }
-        textarea { width: 100%; height: 80px; margin: 15px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; resize: none; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; margin-bottom: 8px; font-size: 14px; }
+        textarea { width: 100%; height: 80px; margin: 15px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -60,21 +58,20 @@
 
 <div class="main">
     <div class="weekdays"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div></div>
-    <div class="grid" id="grid"></div>
+    <div id="grid" class="grid"></div>
     
-    <div class="preview" id="preview-box">
-        <div class="preview-title" id="prev-date">Выберите дату</div>
+    <div class="preview">
+        <div id="prev-date" class="preview-title">Выберите день на календаре</div>
         <div id="events-list"></div>
-        <button class="btn" id="edit-btn" style="display:none; background: var(--dark); color:white; margin-top:15px;" onclick="window.openModal()">+ ДОБАВИТЬ / ИЗМЕНИТЬ</button>
+        <button class="btn" id="edit-btn" style="display:none; background: var(--dark); color:white; margin-top:10px;" onclick="window.openModal()">+ ДОБАВИТЬ СОБЫТИЕ</button>
     </div>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-box">
-        <h2 id="modal-date-title" style="margin:0; font-weight:900;">Дата</h2>
+        <h2 id="modal-date-title" style="margin:0">Дата</h2>
         <div id="modal-items-list" style="margin: 15px 0; max-height: 150px; overflow-y: auto;"></div>
-        <textarea id="note-input" placeholder="Введите описание..."></textarea>
-        
+        <textarea id="note-input" placeholder="Что планируем?"></textarea>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
             <button class="btn" style="background:var(--ev-memorial); color:white" onclick="window.save('memorial')">ВЕЧЕРЯ</button>
             <button class="btn" style="background:var(--ev-meeting); color:white" onclick="window.save('meeting')">СОБРАНИЕ</button>
@@ -108,7 +105,7 @@
     let dbData = {};
     let selectedDay = null;
 
-    // Инициализация сетки (один раз)
+    // 1. Создаем сетку
     function initGrid() {
         const container = document.getElementById('grid');
         const firstDay = new Date(year, mIdx, 1).getDay();
@@ -121,17 +118,30 @@
         for (let i = 1; i <= total; i++) {
             const dObj = new Date(year, mIdx, i);
             const isWeekend = dObj.getDay() === 0 || dObj.getDay() === 6;
-            const weekendClass = isWeekend ? 'weekend' : '';
-            
             container.innerHTML += `
-                <div class="day ${weekendClass}" id="day-${i}" onclick="window.selectDay(${i})">
+                <div class="day ${isWeekend ? 'weekend' : ''}" id="day-${i}" onclick="window.selectDay(${i})">
                     <span>${i}</span>
                     <div class="dots"></div>
                 </div>`;
         }
     }
 
-    // Обновление данных в сетке
+    // 2. Функция выбора дня (теперь работает железно)
+    window.selectDay = (num) => {
+        selectedDay = num;
+        
+        // Показываем кнопку добавления
+        document.getElementById('edit-btn').style.display = 'block';
+        
+        // Снимаем выделение со всех и ставим на нужный
+        document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
+        const el = document.getElementById(`day-${num}`);
+        if(el) el.classList.add('selected');
+        
+        window.renderPreview();
+    };
+
+    // 3. Обновление визуальных данных (точки и цвета из базы)
     window.updateVisuals = () => {
         for (let i = 1; i <= 31; i++) {
             const el = document.getElementById(`day-${i}`);
@@ -140,69 +150,63 @@
             const notes = dbData[i] || [];
             const hasMemorial = notes.some(n => n.category === 'memorial');
             
-            // Подсветка дня
-            el.classList.toggle('selected', selectedDay === i);
+            // Красим в красный если вечеря
             el.classList.toggle('has-memorial', hasMemorial);
             
-            // Отрисовка точек
+            // Точки
             const dotBox = el.querySelector('.dots');
             dotBox.innerHTML = '';
             notes.forEach(n => {
                 const dot = document.createElement('div');
                 dot.className = 'dot';
-                if (hasMemorial) {
-                    dot.style.background = 'white';
-                } else {
-                    dot.style.background = n.category === 'memorial' ? 'var(--ev-memorial)' : 
-                                         (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
-                }
+                const color = n.category === 'memorial' ? '#ff4757' : (n.category === 'personal' ? '#2ecc71' : '#0984e3');
+                dot.style.background = hasMemorial ? 'white' : color;
                 dotBox.appendChild(dot);
             });
         }
-        window.renderPreview();
-    }
+        if (selectedDay) window.renderPreview();
+    };
 
-    window.selectDay = (i) => {
-        selectedDay = i;
-        document.getElementById('edit-btn').style.display = 'block';
-        window.updateVisuals();
-    }
-
+    // 4. Отрисовка списка событий под календарем
     window.renderPreview = () => {
-        const dateLabel = document.getElementById('prev-date');
+        const title = document.getElementById('prev-date');
         const list = document.getElementById('events-list');
+        
         if (!selectedDay) return;
 
-        dateLabel.innerText = selectedDay + " " + months[mIdx];
+        title.innerText = `События: ${selectedDay} ${months[mIdx]}`;
         const notes = dbData[selectedDay] || [];
         
         if (notes.length === 0) {
-            list.innerHTML = '<div style="opacity:0.5; font-size:14px;">Нет запланированных событий</div>';
+            list.innerHTML = '<div style="opacity:0.5; padding:10px;">На этот день ничего не запланировано.</div>';
         } else {
             list.innerHTML = notes.map(n => {
-                const color = n.category === 'memorial' ? 'var(--ev-memorial)' : 
-                             (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
+                const color = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
                 return `
                     <div class="event-item">
                         <div class="event-color" style="background:${color}"></div>
-                        ${n.text}
+                        <div style="display:flex; flex-direction:column;">
+                            <span style="font-size:14px; color:#555; text-transform:uppercase; font-size:10px;">${n.category}</span>
+                            <span>${n.text}</span>
+                        </div>
                     </div>`;
             }).join('');
         }
-    }
+    };
 
+    // Работа с модалкой
     window.openModal = () => {
         document.getElementById('modal-date-title').innerText = selectedDay + " " + months[mIdx];
         const list = document.getElementById('modal-items-list');
         const notes = dbData[selectedDay] || [];
         list.innerHTML = notes.map((n, idx) => `
             <div style="display:flex; justify-content:space-between; align-items:center; background:#f0f2f3; padding:10px; border-radius:10px; margin-bottom:8px;">
-                <span style="font-weight:600; font-size:14px;">${n.text}</span>
+                <span style="font-weight:600;">${n.text}</span>
                 <button onclick="window.delNote(${idx})" style="color:red; border:none; background:none; font-weight:bold; cursor:pointer;">Удалить</button>
             </div>
         `).join('');
         document.getElementById('modal').style.display = 'flex';
-    }
+    };
 
     window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
@@ -214,14 +218,14 @@
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
         document.getElementById('note-input').value = '';
         window.openModal();
-    }
+    };
 
     window.delNote = async (idx) => {
         const notes = [...dbData[selectedDay]];
         notes.splice(idx, 1);
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
         window.openModal();
-    }
+    };
 
     onSnapshot(doc(db, "calendar", docId), (s) => {
         dbData = s.exists() ? s.data() : {};
