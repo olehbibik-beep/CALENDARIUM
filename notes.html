@@ -1,79 +1,3 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Stable v13</title>
-    <style>
-        :root { 
-            --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
-            --ev-mem: #ff4757; --ev-mem-bg: #ffebeb;
-            --ev-meet: #0984e3; --weekend: #4a5558;
-        }
-        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        .header { width: 100%; background: #1e2122; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
-        .back-btn { position: absolute; left: 15px; background: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
-        
-        .main { width: 100%; max-width: 500px; padding: 10px; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #666; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px 5px; } /* Увеличил отступ еще больше */
-        
-        .day-unit { display: flex; flex-direction: column; align-items: center; min-height: 60px; }
-        .day-box { 
-            width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 8px; color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 18px; cursor: pointer; border: 2px solid transparent;
-        }
-        .day-box.weekend { background: var(--weekend); color: #ccc; }
-        .day-box.selected { border-color: var(--accent) !important; }
-        .day-box.has-memorial { background: var(--ev-mem-bg) !important; color: var(--ev-mem) !important; }
-        
-        /* ИНДИКАТОРЫ - ТЕПЕРЬ ЭТО ПРЯМОУГОЛЬНИКИ */
-        .indicator-row { 
-            height: 6px; width: 100%; margin-top: 4px; 
-            display: flex; gap: 2px; justify-content: center; 
-            min-height: 6px; /* Чтобы место не схлопывалось */
-        }
-        .mark { height: 6px; width: 12px; border-radius: 2px; display: inline-block; }
-        .m-meeting { background: #0984e3 !important; }
-        .m-personal { background: #444 !important; }
-
-        .preview { background: white; width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
-    </style>
-</head>
-<body>
-
-<div class="header">
-    <button class="back-btn" onclick="location.href='calendar.html'">←</button>
-    <div id="m-name" style="font-size: 18px; font-weight: bold;">ЗАГРУЗКА...</div>
-</div>
-
-<div class="main">
-    <div class="weekdays"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div></div>
-    <div class="grid" id="grid"></div>
-    <div class="preview" id="preview">Нажмите на дату</div>
-    <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
-</div>
-
-<div class="modal" id="modal">
-    <div class="modal-box">
-        <h3 id="modal-title"></h3>
-        <div id="modal-list" style="margin-bottom:10px; max-height: 150px; overflow-y: auto;"></div>
-        <textarea id="note-input" placeholder="Текст..."></textarea>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
-            <button class="btn" style="background:#ff4757; color:white; font-size: 9px;" onclick="save('memorial')">ВЕЧЕРЯ</button>
-            <button class="btn" style="background:#0984e3; color:white; font-size: 9px;" onclick="save('meeting')">СОБРАНИЕ</button>
-            <button class="btn" style="background:#eee; color: black; font-size: 9px; border: 1px solid #ccc;" onclick="save('personal')">ЛИЧНОЕ</button>
-        </div>
-        <button class="btn" style="background:#000; color:white; margin-top:10px;" onclick="closeModal()">ЗАКРЫТЬ</button>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -97,28 +21,43 @@
     let dbData = {};
     let selectedDay = null;
 
-    // 1. Рисуем сетку ТОЛЬКО ОДИН РАЗ
     function createEmptyGrid() {
         const grid = document.getElementById('grid');
-        const first = new Date(year, mIdx, 1).getDay();
-        const shift = (first === 0) ? 6 : first - 1;
-        const total = new Date(year, mIdx + 1, 0).getDate();
+        grid.innerHTML = ''; // Полная очистка
 
-        grid.innerHTML = '';
-        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+        // Находим день недели для 1-го числа выбранного месяца
+        const firstDate = new Date(year, mIdx, 1);
+        let firstDayOfWeek = firstDate.getDay(); // 0 - Вс, 1 - Пн...
+
+        // Вычисляем сдвиг (сколько пустых клеток до Пн)
+        // Пн=0, Вт=1, Ср=2, Чт=3, Пт=4, Сб=5, Вс=6
+        const shift = (firstDayOfWeek === 0) ? 6 : firstDayOfWeek - 1;
         
-        for (let i = 1; i <= total; i++) {
-            const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
-            grid.innerHTML += `
-                <div class="day-unit">
-                    <div class="day-box ${isW ? 'weekend' : ''}" id="tile-${i}" onclick="selectDay(${i})">${i}</div>
-                    <div class="indicator-row" id="marks-${i}"></div>
-                </div>`;
+        const totalDays = new Date(year, mIdx + 1, 0).getDate();
+
+        // 1. Рисуем пустые клетки
+        for (let i = 0; i < shift; i++) {
+            const empty = document.createElement('div');
+            grid.appendChild(empty);
+        }
+        
+        // 2. Рисуем плитки дней
+        for (let i = 1; i <= totalDays; i++) {
+            const dayUnit = document.createElement('div');
+            dayUnit.className = 'day-unit';
+            
+            const isWeekend = new Date(year, mIdx, i).getDay() % 6 === 0;
+            
+            dayUnit.innerHTML = `
+                <div class="day-box ${isWeekend ? 'weekend' : ''}" id="tile-${i}" onclick="selectDay(${i})">${i}</div>
+                <div class="indicator-row" id="marks-${i}"></div>
+            `;
+            grid.appendChild(dayUnit);
         }
     }
 
-    // 2. Обновляем ТОЛЬКО индикаторы и цвета
     function updateVisuals() {
+        // Проходим по всем возможным дням месяца
         for (let i = 1; i <= 31; i++) {
             const tile = document.getElementById(`tile-${i}`);
             const row = document.getElementById(`marks-${i}`);
@@ -126,15 +65,18 @@
 
             const notes = dbData[i] || [];
             
-            // Сброс и установка Вечери
+            // Сброс класса Вечери
             tile.classList.remove('has-memorial');
-            if (notes.some(n => n.category === 'memorial')) tile.classList.add('has-memorial');
-
-            // Отрисовка полосок
+            
             let html = '';
             notes.forEach(n => {
-                if (n.category === 'meeting') html += '<div class="mark m-meeting"></div>';
-                if (n.category === 'personal') html += '<div class="mark m-personal"></div>';
+                if (n.category === 'memorial') {
+                    tile.classList.add('has-memorial');
+                } else if (n.category === 'meeting') {
+                    html += '<div class="mark m-meeting"></div>';
+                } else if (n.category === 'personal') {
+                    html += '<div class="mark m-personal"></div>';
+                }
             });
             row.innerHTML = html;
         }
@@ -144,7 +86,8 @@
     window.selectDay = (i) => {
         selectedDay = i;
         document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
-        document.getElementById(`tile-${i}`).classList.add('selected');
+        const activeTile = document.getElementById(`tile-${i}`);
+        if(activeTile) activeTile.classList.add('selected');
         document.getElementById('edit-btn').style.display = 'block';
         updatePreview();
     };
@@ -163,7 +106,7 @@
         list.innerHTML = (dbData[selectedDay] || []).map((n, idx) => `
             <div style="display:flex; justify-content:space-between; align-items:center; background:#f0f0f0; padding:10px; margin-bottom:5px; border-radius:8px;">
                 <span style="font-size:13px;">${n.text}</span>
-                <b onclick="delNote(${idx})" style="color:red; padding:5px;">✕</b>
+                <b onclick="delNote(${idx})" style="color:red; padding:5px; cursor:pointer;">✕</b>
             </div>`).join('');
         document.getElementById('modal').style.display = 'flex';
     };
@@ -172,7 +115,7 @@
 
     window.save = async (cat) => {
         const val = document.getElementById('note-input').value.trim();
-        const text = val || cat.toUpperCase();
+        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'СОБРАНИЕ' : 'ЛИЧНОЕ');
         const notes = [...(dbData[selectedDay] || [])];
         notes.push({ text, category: cat });
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
@@ -187,14 +130,10 @@
         openModal();
     };
 
-    // Слушатель базы
     onSnapshot(doc(db, "calendar", docId), (s) => {
         dbData = s.exists() ? s.data() : {};
         updateVisuals();
     });
 
-    // Запуск при загрузке
     createEmptyGrid();
 </script>
-</body>
-</html>
