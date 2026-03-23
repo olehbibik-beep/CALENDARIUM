@@ -52,22 +52,30 @@
 
         .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
-        .auth-logo {
-    width: 60px;          /* Ширина иконки */
-    height: 60px;         /* Высота иконки */
-    margin: 0 auto 15px;  /* Центрируем и добавляем отступ снизу до заголовка */
-    display: block;       /* Чтобы margin: auto сработал */
-    filter: drop-shadow(0 0 10px rgba(0, 136, 204, 0.4)); /* Легкое синее свечение под цвет темы */
-    border-radius: 12px;  /* Если картинка квадратная, можно чуть скруглить углы */
-    object-fit: contain;  /* Чтобы картинка не растягивалась */
+        /* Контейнер для выравнивания в ряд */
+.auth-header {
+    display: flex;
+    align-items: center;    /* Центровка по вертикали */
+    justify-content: center; /* Центровка всего блока по горизонтали */
+    gap: 15px;              /* Расстояние между картинкой и текстом */
+    margin-bottom: 25px;    /* Отступ от всей шапки до инпута */
 }
 
-/* Немного уменьшим отступ у H1, чтобы композиция была плотнее */
-.auth-card h1 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.2rem;
-    letter-spacing: 2px;
+/* Стиль маленькой картинки сбоку */
+.auth-logo-side {
+    width: 40px;            /* Чуть меньше размер, раз она сбоку */
+    height: 40px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(0, 136, 204, 0.5));
+    border-radius: 8px;
+}
+
+/* Убираем лишние отступы у заголовка, чтобы он не прыгал */
+.auth-header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    line-height: 1;
 }
         /* ШТОРКА SYSTEM LOG */
         #notif-sidebar { 
