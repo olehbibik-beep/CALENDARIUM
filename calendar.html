@@ -48,10 +48,23 @@
         }
         .month-card:active { transform: scale(0.92); }
 
-        .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; height: 6px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; }
-        .dot.red { background: var(--ev-memorial); box-shadow: 0 0 8px var(--ev-memorial); }
-        .dot.blue { background: var(--ev-meeting); box-shadow: 0 0 8px var(--ev-meeting); }
+        .month-indicator { 
+    position: absolute; 
+    bottom: 0;         /* Прижимаем в самый низ */
+    left: 0;
+    display: flex; 
+    width: 100%;       /* На всю ширину карточки */
+    height: 4px; 
+}
+
+.dot { 
+    flex: 1;           /* Линии разделят ширину поровну */
+    height: 100%; 
+    border-radius: 0;  /* Прямые углы */
+}
+
+/* Закруглим только нижние углы карточки у индикатора */
+.month-card { overflow: hidden; }
 
         /* ФУТЕР КАК РАНЬШЕ */
         footer {
