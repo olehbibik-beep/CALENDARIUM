@@ -66,7 +66,11 @@
             .sidebar { width: 100%; padding: 15px; height: auto; border-right: none; border-bottom: 1px solid var(--footer-border); }
             .year-switcher { margin-bottom: 15px; }
             #display-year { font-size: 2.5rem; }
-            .main-content { padding: 20px; padding-bottom: 80px; }
+            .main-content { 
+    padding: 10px 15px 40px 15px; /* Сверху 10px (минимум), снизу 40px (для зазора перед футером) */
+    align-items: flex-start;      /* Прижать контент к верху */
+    justify-content: center;      /* Центрировать по горизонтали */
+}
             .months-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
             .month-card { border-radius: 12px; font-size: 0.65rem; }
         }
