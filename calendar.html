@@ -1,194 +1,209 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Главная | CALENDARIUM</title>
-    <style>
-        :root { 
-            --accent: #0088cc; --bg: #121416; --dark: #22272a; --card-bg: #1e2224;
-            --ev-memorial: #ff7675; --ev-meeting: #0984e3; --text-main: #e0e6ed;
-            --footer-bg: #0f1112; --footer-border: #222;
-        }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Главная | CALENDARIUM</title>
+    <style>
+        :root { 
+            --accent: #0088cc; --bg: #121416; --dark: #22272a; --card-bg: #1e2224;
+            --ev-memorial: #ff7675; --ev-meeting: #0984e3; --text-main: #e0e6ed;
+            --footer-bg: #0f1112; --footer-border: #222;
+        }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* SIDEBAR DESKTOP */
-        .sidebar { 
-            width: 300px; background: #0f1112; padding: 25px; 
-            display: flex; flex-direction: column; border-right: 1px solid var(--footer-border);
-            flex-shrink: 0; z-index: 10;
-        }
-        .user-header { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 25px; }
-        .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--accent); letter-spacing: 1px; }
-        .nav-btns { display: flex; gap: 8px; }
-        .btn-small { background: var(--dark); color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        /* САЙДБАР - СТАЛ ШИРЕ */
+        .sidebar { 
+            width: 300px; background: #0f1112; padding: 25px; 
+            display: flex; flex-direction: column; border-right: 1px solid var(--footer-border);
+            flex-shrink: 0; z-index: 10;
+        }
+        .user-header { display: flex; align-items: center; width: 100%; justify-content: space-between; margin-bottom: 25px; }
+        .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; color: var(--accent); letter-spacing: 1px; }
+        .nav-btns { display: flex; gap: 8px; }
+        .btn-small { background: var(--dark); color: #fff; border: 1px solid #333; padding: 6px 12px; border-radius: 8px; font-size: 0.6rem; font-weight: 800; cursor: pointer; text-transform: uppercase; }
 
-        .year-switcher { 
-            display: flex; align-items: center; justify-content: center; 
-            width: 100%; margin-bottom: 30px; gap: 20px;
-        }
-        #display-year { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; line-height: 1; color: #fff; text-align: center; }
-        .year-side { cursor: pointer; color: #3d444b; font-weight: 900; padding: 10px; font-size: 1.2rem; transition: 0.2s; }
+        /* ГОД ПО ЦЕНТРУ */
+        .year-switcher { 
+            display: flex; align-items: center; justify-content: center; 
+            width: 100%; margin-bottom: 30px; gap: 20px;
+        }
+        #display-year { font-size: 3.5rem; font-weight: 900; letter-spacing: -2px; line-height: 1; color: #fff; text-align: center; }
+        .year-side { cursor: pointer; color: #3d444b; font-weight: 900; padding: 10px; font-size: 1.2rem; transition: 0.2s; }
+        .year-side:hover { color: var(--accent); }
 
-        .upcoming-box { width: 100%; margin-top: auto; padding-bottom: 50px; }
-        .event-card-mini { background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid #2d3436; border-left: 4px solid var(--ev-meeting); }
+        .upcoming-box { width: 100%; margin-top: auto; padding-bottom: 50px; }
+        .event-card-mini { background: var(--card-bg); padding: 15px; border-radius: 15px; border: 1px solid #2d3436; border-left: 4px solid var(--ev-meeting); }
+        .ev-title { font-size: 0.8rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 4px; }
 
-        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; }
-        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 850px; }
-        
-        .month-card { 
-            background: var(--dark); border-radius: 18px; aspect-ratio: 1 / 1; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            color: #fff; font-weight: 900; cursor: pointer; position: relative; transition: 0.3s;
-            text-transform: uppercase; font-size: 0.75rem; border: 1px solid transparent;
-        }
-        .month-card:active { transform: scale(0.92); }
+        .main-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .months-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; width: 100%; max-width: 850px; }
+        
+        .month-card { 
+            background: var(--dark); border-radius: 18px; aspect-ratio: 1 / 1; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: #fff; font-weight: 900; cursor: pointer; position: relative; transition: 0.3s;
+            text-transform: uppercase; font-size: 0.75rem; border: 1px solid transparent;
+        }
+        .month-card:active { transform: scale(0.92); }
 
-        .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; height: 6px; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; }
-        .dot.red { background: var(--ev-memorial); box-shadow: 0 0 8px var(--ev-memorial); }
-        .dot.blue { background: var(--ev-meeting); box-shadow: 0 0 8px var(--ev-meeting); }
+        .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; height: 6px; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; }
+        .dot.red { background: var(--ev-memorial); box-shadow: 0 0 8px var(--ev-memorial); }
+        .dot.blue { background: var(--ev-meeting); box-shadow: 0 0 8px var(--ev-meeting); }
 
-        footer {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--footer-bg); 
-            padding: 15px 25px; display: flex; align-items: center; border-top: 1px solid var(--footer-border); z-index: 100;
-        }
-        .footer-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-right: 12px; box-shadow: 0 0 10px #2ecc71; }
-        .footer-text { font-size: 10px; color: #576574; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        /* ФУТЕР КАК РАНЬШЕ */
+        footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: var(--footer-bg); 
+            padding: 15px 25px; display: flex; align-items: center; border-top: 1px solid var(--footer-border); z-index: 100;
+        }
+        .footer-dot { width: 8px; height: 8px; background: #2ecc71; border-radius: 50%; margin-right: 12px; box-shadow: 0 0 10px #2ecc71; }
+        .footer-text { font-size: 10px; color: #576574; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
-        /* ULTRA COMPACT MOBILE */
-        @media (max-width: 850px) {
-            body { flex-direction: column; overflow: hidden; }
-            .sidebar { 
-                width: 100%; 
-                padding: 10px 15px 5px 15px; /* Минимальные отступы */
-                height: auto; 
-                border-bottom: 1px solid var(--footer-border); 
-            }
-            .user-header { margin-bottom: 8px; }
-            .year-switcher { margin-bottom: 5px; gap: 15px; }
-            #display-year { font-size: 2rem; }
-            .year-side { font-size: 0.9rem; padding: 5px; }
-            
-            .upcoming-box { display: none; }
-
-            .main-content { 
-                padding: 10px; 
-                align-items: flex-start; /* Поднять вверх */
-                justify-content: center;
-                padding-top: 10px; /* Минимум от края тулбара */
-            }
-            .months-grid { 
-                grid-template-columns: repeat(4, 1fr); 
-                gap: 6px; /* Плотная сетка */
-                padding-bottom: 60px;
-            }
-            .month-card { border-radius: 10px; font-size: 0.6rem; }
-            .month-indicator { bottom: 6px; }
-            .dot { width: 4px; height: 4px; }
-        }
-    </style>
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; padding: 15px; height: auto; border-right: none; border-bottom: 1px solid var(--footer-border); }
+            .year-switcher { margin-bottom: 15px; }
+            #display-year { font-size: 2.5rem; }
+            .main-content { padding: 20px; padding-bottom: 80px; }
+            .months-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+            .month-card { border-radius: 12px; font-size: 0.65rem; }
+        }
+    </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="user-header">
-            <div id="user-display" class="user-name">...</div>
-            <div class="nav-btns">
-                <button id="admin-btn" class="btn-small" onclick="location.href='admin.html'" style="display:none; color:var(--accent);">АДМИН</button>
-                <button class="btn-small" onclick="localStorage.clear(); location.href='index.html'">ВЫХОД</button>
-            </div>
-        </div>
-        <div class="year-switcher">
-            <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
-            <div id="display-year"></div>
-            <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
-        </div>
-        <div class="upcoming-box" id="next-event-container"></div>
-    </div>
+    <div class="sidebar">
+        <div class="user-header">
+            <div id="user-display" class="user-name">...</div>
+            <div class="nav-btns">
+                <button id="admin-btn" class="btn-small" onclick="location.href='admin.html'" style="display:none; color:var(--accent);">АДМИН</button>
+                <button class="btn-small" onclick="localStorage.clear(); location.href='index.html'">ВЫХОД</button>
+            </div>
+        </div>
+        <div class="year-switcher">
+            <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
+            <div id="display-year"></div>
+            <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
+        </div>
+        <div class="upcoming-box" id="next-event-container">
+            <div style="font-size:0.6rem; opacity:0.3; text-align:center;">SCANNING...</div>
+        </div>
+    </div>
 
-    <div class="main-content">
-        <div class="months-grid" id="months"></div>
-    </div>
+    <div class="main-content">
+        <div class="months-grid" id="months"></div>
+    </div>
 
-    <footer>
-        <div class="footer-dot"></div>
-        <div class="footer-text">Cloud Plan Ecosystem • v2.8</div>
-    </footer>
+    <footer>
+        <div class="footer-dot"></div>
+        <div class="footer-text">Cloud Plan Ecosystem • Main Terminal v2.6</div>
+    </footer>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-            authDomain: "calendarium-1f7d7.firebaseapp.com",
-            projectId: "calendarium-1f7d7",
-            storageBucket: "calendarium-1f7d7.firebasestorage.app",
-            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
-        };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
 
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        
-        let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
-        const user = localStorage.getItem('currentUser') || 'ГОСТЬ';
-        document.getElementById('user-display').innerText = user;
-        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
+        const db = getFirestore(initializeApp(firebaseConfig));
+        const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        
+        let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
+        const user = localStorage.getItem('currentUser') || 'ГОСТЬ';
+        document.getElementById('user-display').innerText = user;
+        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
 
-        function initGrid() {
-            const grid = document.getElementById('months');
-            grid.innerHTML = '';
-            monthsNames.forEach((m, i) => {
-                grid.innerHTML += `<div class="month-card" onclick="goToMonth(${i})"><span>${m.substring(0, 3)}</span><div class="month-indicator" id="ind-${i}"></div></div>`;
-            });
-        }
+        function initGrid() {
+            const grid = document.getElementById('months');
+            grid.innerHTML = '';
+            monthsNames.forEach((m, i) => {
+                grid.innerHTML += `
+                    <div class="month-card" onclick="goToMonth(${i})">
+                        <span>${m.substring(0, 3)}</span>
+                        <div class="month-indicator" id="ind-${i}"></div>
+                    </div>`;
+            });
+        }
 
-        window.goToMonth = (i) => {
-            localStorage.setItem('selectedMonth', i);
-            localStorage.setItem('selectedYear', currentYear);
-            window.location.href = 'notes.html';
-        };
+        window.goToMonth = (i) => {
+            localStorage.setItem('selectedMonth', i);
+            localStorage.setItem('selectedYear', currentYear);
+            window.location.href = 'notes.html';
+        };
 
-        async function loadData() {
-            for(let i=0; i<12; i++) {
-                const el = document.getElementById(`ind-${i}`);
-                if(el) el.innerHTML = '';
-            }
-            const monthPromises = Array.from({length: 12}, (_, i) => getDoc(doc(db, "calendar", `${currentYear}_${i}`)));
-            const snapshots = await Promise.all(monthPromises);
-            snapshots.forEach((snap, i) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    let red = false, blue = false;
-                    Object.values(data).forEach(dayNotes => {
-                        if(Array.isArray(dayNotes)) {
-                            dayNotes.forEach(note => {
-                                if (note.category === 'memorial' || note.category === 'congress') red = true;
-                                else blue = true;
-                            });
-                        }
-                    });
-                    const ind = document.getElementById(`ind-${i}`);
-                    if (ind) {
-                        if (red) ind.innerHTML += '<div class="dot red"></div>';
-                        if (blue) ind.innerHTML += '<div class="dot blue"></div>';
-                    }
-                }
-            });
-        }
+        async function loadData() {
+            const container = document.getElementById('next-event-container');
+            let firstFound = null;
 
-        window.changeYear = (dir) => { currentYear += dir; updateDisp(); loadData(); };
-        function updateDisp() {
-            document.getElementById('display-year').innerText = currentYear;
-            document.getElementById('prev-year').innerText = currentYear - 1;
-            document.getElementById('next-year').innerText = currentYear + 1;
-            localStorage.setItem('selectedYear', currentYear);
-        }
+            for(let i=0; i<12; i++) {
+                const el = document.getElementById(`ind-${i}`);
+                if(el) el.innerHTML = '';
+            }
 
-        updateDisp();
-        initGrid();
-        loadData();
-    </script>
+            const monthPromises = Array.from({length: 12}, (_, i) => 
+                getDoc(doc(db, "calendar", `${currentYear}_${i}`))
+            );
+
+            const snapshots = await Promise.all(monthPromises);
+
+            snapshots.forEach((snap, i) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const ind = document.getElementById(`ind-${i}`);
+                    let red = false, blue = false;
+
+                    Object.values(data).forEach(dayNotes => {
+                        if(Array.isArray(dayNotes)) {
+                            dayNotes.forEach(note => {
+                                if (note.category === 'memorial' || note.category === 'congress') red = true;
+                                else blue = true;
+                                if (!firstFound) firstFound = { text: note.text, m: monthsNames[i], cat: note.category };
+                            });
+                        }
+                    });
+
+                    if (ind) {
+                        if (red) ind.innerHTML += '<div class="dot red"></div>';
+                        if (blue) ind.innerHTML += '<div class="dot blue"></div>';
+                    }
+                }
+            });
+
+            if (firstFound) {
+                const col = firstFound.cat === 'memorial' ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
+                container.innerHTML = `
+                    <div class="event-card-mini" style="border-left-color: ${col}">
+                        <div class="ev-title">${firstFound.text}</div>
+                        <div style="font-size:0.6rem; opacity:0.5;">${firstFound.m}</div>
+                    </div>`;
+            } else {
+                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center;">CLEAR</div>';
+            }
+        }
+
+        window.changeYear = (dir) => { 
+            currentYear += dir; 
+            updateDisp(); 
+            loadData(); 
+        };
+
+        function updateDisp() {
+            document.getElementById('display-year').innerText = currentYear;
+            document.getElementById('prev-year').innerText = currentYear - 1;
+            document.getElementById('next-year').innerText = currentYear + 1;
+            localStorage.setItem('selectedYear', currentYear);
+        }
+
+        updateDisp();
+        initGrid();
+        loadData();
+    </script>
 </body>
-</html>
+</html> еще раз попробуем уменьшить отступ плиточки и верхний тулбар
