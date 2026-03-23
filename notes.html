@@ -3,94 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Modern & Secure</title>
+    <title>CALENDARIUM | Pro Black</title>
     <style>
         :root { 
-            --accent: #00a8ff; --bg: #0f1113; --panel: #1c1f22; 
+            --accent: #00a8ff; 
+            --bg: #0b0d0e; 
+            --panel: #16191b; 
+            --border: #262a2d;
             --ev-mem: #ff5252; --ev-meet: #00a8ff; --ev-pers: #95a5a6;
             --text: #f5f6fa;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px; }
         
-        .header { width: 100%; padding: 20px; text-align: center; background: rgba(15,17,19,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #2d3436; }
-        .back-btn { position: absolute; left: 15px; top: 18px; background: var(--panel); border: 1px solid #3d444b; padding: 8px 15px; border-radius: 12px; color: white; cursor: pointer; }
+        /* HEADER */
+        .header { width: 100%; padding: 20px; text-align: center; background: var(--bg); position: sticky; top: 0; z-index: 100; }
+        .back-btn { position: absolute; left: 20px; top: 22px; background: none; border: none; color: #576574; font-size: 20px; cursor: pointer; }
         
-        .main { width: 100%; max-width: 450px; padding: 10px; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 10px; font-weight: 800; color: #576574; text-transform: uppercase; margin-bottom: 15px; }
+        .main { width: 100%; max-width: 450px; padding: 0 15px; }
         
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        /* GRID */
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 10px; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day-box { 
-            aspect-ratio: 1/1; background: var(--panel); border-radius: 14px; display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 17px; cursor: pointer; position: relative; border: 1px solid transparent; transition: 0.3s;
+            aspect-ratio: 1/1; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 16px; cursor: pointer; position: relative; border: 1px solid var(--border); transition: 0.2s;
         }
-        .day-box.weekend { color: #576574; background: #16191c; }
-        .day-box.selected { border-color: var(--accent); box-shadow: 0 0 15px rgba(0,168,255,0.2); transform: scale(1.05); }
-        .day-box.has-memorial { background: rgba(255,82,82,0.1) !important; color: var(--ev-mem); border-color: rgba(255,82,82,0.3); }
+        .day-box.weekend { color: #555; background: #0f1112; }
+        .day-box.selected { border-color: var(--accent); background: #1a2024; color: var(--accent); }
+        .day-box.has-memorial { border-color: var(--ev-mem); color: var(--ev-mem); }
 
-        .indicator-row { position: absolute; bottom: 8px; display: flex; gap: 3px; }
-        .mark { width: 6px; height: 6px; border-radius: 50%; }
+        .indicator-row { position: absolute; bottom: 6px; display: flex; gap: 3px; }
+        .mark { width: 5px; height: 5px; border-radius: 50%; }
         
-        .preview { background: var(--panel); width: 100%; padding: 20px; margin-top: 25px; border-radius: 20px; border: 1px solid #2d3436; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        /* PREVIEW */
+        .preview { background: var(--panel); width: 100%; padding: 15px; margin-top: 20px; border-radius: 15px; border: 1px solid var(--border); min-height: 80px; }
 
-        /* СОВРЕМЕННОЕ МОДАЛЬНОЕ ОКНО */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: flex-end; justify-content: center; }
-        .modal-box { 
-            background: #1c1f22; width: 100%; max-width: 500px; padding: 25px; 
-            border-radius: 30px 30px 0 0; animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-top: 1px solid #3d444b;
+        /* BOTTOM NAV - как на авторизации */
+        .bottom-nav { 
+            position: fixed; bottom: 0; width: 100%; max-width: 500px; height: 70px; 
+            background: var(--panel); display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            border-top: 1px solid var(--border); z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
         }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #576574; font-size: 10px; font-weight: bold; cursor: pointer; text-decoration: none; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
 
-        .note-card { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: #252a2e; padding: 12px 15px; border-radius: 15px; margin-bottom: 10px; border-left: 4px solid #555;
-        }
+        /* MODAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: var(--panel); width: 100%; max-width: 380px; padding: 25px; border-radius: 25px; border: 1px solid var(--border); }
         
-        textarea { 
-            width: 100%; height: 80px; background: #0f1113; border: 1px solid #3d444b; border-radius: 15px; 
-            color: white; padding: 15px; margin: 15px 0; resize: none; font-size: 16px;
-        }
+        .note-card { display: flex; justify-content: space-between; align-items: center; background: #202428; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
+        textarea { width: 100%; height: 70px; background: #0b0d0e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin: 15px 0; resize: none; }
 
-        .type-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .type-btn { 
-            padding: 15px 5px; border: none; border-radius: 15px; color: white; font-size: 10px; font-weight: bold;
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.2s;
-        }
-        .type-btn:active { transform: scale(0.95); }
-        .type-btn:disabled { opacity: 0.2; filter: grayscale(1); }
-
-        .close-btn { width: 100%; padding: 15px; background: none; border: 1px solid #3d444b; color: #95a5a6; border-radius: 15px; margin-top: 15px; font-weight: bold; }
+        .type-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .type-btn { padding: 12px 5px; border: none; border-radius: 12px; color: white; font-size: 9px; font-weight: bold; cursor: pointer; transition: 0.1s; }
+        .type-btn:disabled { opacity: 0.1; cursor: not-allowed; }
+        
+        .action-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="back-btn" onclick="location.href='calendar.html'">←</button>
-    <div id="m-name" onclick="checkAdmin()" style="font-size: 20px; font-weight: 800; letter-spacing: 2px;">...</div>
+    <button class="back-btn" onclick="location.href='index.html'">✕</button>
+    <div id="m-name" onclick="checkAdmin()" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #eee;">...</div>
 </div>
 
 <div class="main">
     <div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
     <div id="grid" class="grid"></div>
-    <div id="preview" class="preview">Выберите дату</div>
-    <button id="edit-btn" style="display:none; width:100%; padding:18px; background:var(--accent); border:none; border-radius:18px; color:white; font-weight:bold; margin-top:15px; box-shadow: 0 5px 15px rgba(0,168,255,0.3);" onclick="openModal()">+ ДОБАВИТЬ ЗАПИСЬ</button>
+    <div id="preview" class="preview">Нажмите на дату...</div>
+    <button id="add-trigger" style="display:none; width:100%; padding:16px; background:var(--accent); border:none; border-radius:15px; color:white; font-weight:bold; margin-top:15px;" onclick="openModal()">+ ДОБАВИТЬ ЗАПИСЬ</button>
 </div>
 
-<div id="modal" class="modal" onclick="if(event.target==this)closeModal()">
+<nav class="bottom-nav">
+    <a href="calendar.html" class="nav-item active">
+        <span class="nav-icon">📅</span>
+        <span>ПЛАН</span>
+    </a>
+    <a href="index.html" class="nav-item">
+        <span class="nav-icon">🏠</span>
+        <span>ГЛАВНАЯ</span>
+    </a>
+    <a href="#" class="nav-item" onclick="alert('Версия 2.0')">
+        <span class="nav-icon">⚙️</span>
+        <span>ИНФО</span>
+    </a>
+</nav>
+
+<div id="modal" class="modal">
     <div class="modal-box">
-        <div style="width:40px; height:4px; background:#3d444b; border-radius:2px; margin: 0 auto 20px;"></div>
-        <h3 id="modal-title" style="margin:0; font-size:22px;"></h3>
-        <div id="modal-list" style="margin-top:20px; max-height:200px; overflow-y:auto;"></div>
+        <h3 id="modal-title" style="margin:0; font-size:20px; text-align:center;"></h3>
+        <div id="modal-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
         
-        <textarea id="note-input" placeholder="Введите описание..."></textarea>
+        <textarea id="note-input" placeholder="Текст..."></textarea>
         
         <div class="type-selector">
-            <button id="btn-memorial" class="type-btn" style="background:#c0392b;" onclick="save('memorial')"><span>🔴</span>ВЕЧЕРЯ</button>
-            <button id="btn-meeting" class="type-btn" style="background:#2980b9;" onclick="save('meeting')"><span>🔵</span>СОБРАНИЕ</button>
-            <button class="type-btn" style="background:#2d3436; border:1px solid #3d444b;" onclick="save('personal')"><span>⚪</span>ЛИЧНОЕ</button>
+            <button id="btn-memorial" class="type-btn" style="background:#d63031;" onclick="save('memorial')">ВЕЧЕРЯ</button>
+            <button id="btn-meeting" class="type-btn" style="background:#0984e3;" onclick="save('meeting')">СОБРАНИЕ</button>
+            <button class="type-btn" style="background:#2d3436; border:1px solid var(--border);" onclick="save('personal')">ЛИЧНОЕ</button>
         </div>
-        <button class="close-btn" onclick="closeModal()">ГОТОВО</button>
+        <button class="action-btn" style="background:none; color:#576574;" onclick="closeModal()">ЗАКРЫТЬ</button>
     </div>
 </div>
 
@@ -108,8 +122,7 @@
 
     const db = getFirestore(initializeApp(cfg));
     
-    // Идентификация пользователя
-    if(!localStorage.getItem('userId')) localStorage.setItem('userId', 'user_' + Math.random().toString(36).substr(2, 9));
+    if(!localStorage.getItem('userId')) localStorage.setItem('userId', 'u' + Date.now().toString(36));
     const myId = localStorage.getItem('userId');
     let isAdmin = localStorage.getItem('isAdmin') === 'true';
     let clickCount = 0;
@@ -118,13 +131,12 @@
         if(++clickCount >= 5) {
             isAdmin = !isAdmin;
             localStorage.setItem('isAdmin', isAdmin);
-            alert(isAdmin ? "Вход выполнен" : "Выход выполнен");
+            alert(isAdmin ? "Админ: ВКЛ" : "Админ: ВЫКЛ");
             location.reload();
         }
     };
 
-    const savedMonth = localStorage.getItem('selectedMonth');
-    const mIdx = (savedMonth !== null) ? parseInt(savedMonth) : 0;
+    const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
     const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
     const docId = `${year}_${mIdx}`;
     const months = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
@@ -153,12 +165,12 @@
             const row = document.getElementById(`marks-${d}`);
             if (!tile || !row) continue;
             const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-            tile.className = tile.className.replace('has-memorial', '');
+            tile.classList.remove('has-memorial');
             row.innerHTML = '';
             notes.forEach(n => {
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
-                const color = n.category === 'memorial' ? '#ff5252' : n.category === 'meeting' ? '#00a8ff' : '#95a5a6';
-                row.innerHTML += `<div class="mark" style="background:${color}"></div>`;
+                const col = n.category === 'memorial' ? 'var(--ev-mem)' : n.category === 'meeting' ? 'var(--ev-meet)' : '#555';
+                row.innerHTML += `<div class="mark" style="background:${col}"></div>`;
             });
         }
         if (selectedDay) selectDay(selectedDay);
@@ -168,10 +180,10 @@
         selectedDay = d;
         document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
         document.getElementById(`tile-${d}`).classList.add('selected');
-        document.getElementById('edit-btn').style.display = 'block';
+        document.getElementById('add-trigger').style.display = 'block';
         const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-        document.getElementById('preview').innerHTML = `<h4 style="margin:0 0 10px; color:var(--accent)">${d} ${months[mIdx]}</h4>` + 
-            (notes.map(n => `<div style="font-size:14px; margin-bottom:5px; opacity:0.9">• ${n.text}</div>`).join('') || 'Нет планов');
+        document.getElementById('preview').innerHTML = `<div style="font-weight:900; color:var(--accent); margin-bottom:8px">${d} ${months[mIdx]}</div>` + 
+            (notes.map(n => `<div style="font-size:13px; margin-bottom:4px; color:#ccc;">• ${n.text}</div>`).join('') || 'Событий нет');
     };
 
     window.openModal = () => {
@@ -184,11 +196,8 @@
 
         list.innerHTML = notes.map((n, idx) => {
             const canDelete = isAdmin || n.author === myId;
-            const borderCol = n.category === 'memorial' ? 'var(--ev-mem)' : n.category === 'meeting' ? 'var(--ev-meet)' : '#555';
-            return `
-            <div class="note-card" style="border-left-color:${borderCol}">
-                <span>${n.text}</span>
-                ${canDelete ? `<b onclick="delNote(${idx})" style="color:#ff5252; cursor:pointer; font-size:20px;">×</b>` : ''}
+            return `<div class="note-card"><span>${n.text}</span>
+                ${canDelete ? `<b onclick="delNote(${idx})" style="color:var(--ev-mem); padding-left:10px; cursor:pointer">✕</b>` : ''}
             </div>`;
         }).join('');
         document.getElementById('modal').style.display = 'flex';
@@ -201,10 +210,7 @@
         const val = document.getElementById('note-input').value.trim();
         const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'СОБРАНИЕ' : 'ЗАМЕТКА');
         const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
-        
-        // К каждой заметке приклеиваем ID автора
         notes.push({ text, category: cat, author: myId });
-        
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
         document.getElementById('note-input').value = '';
         openModal();
@@ -212,9 +218,7 @@
 
     window.delNote = async (idx) => {
         const notes = [...dbData[selectedDay]];
-        // Проверка на всякий случай перед удалением в базе
         if(!isAdmin && notes[idx].author !== myId) return;
-        
         notes.splice(idx, 1);
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
         openModal();
