@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Final Release</title>
+    <title>CALENDARIUM | Stable Final</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
@@ -12,14 +12,11 @@
         }
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
         .header { width: 100%; background: #1e2122; color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 100; }
         .back-btn { position: absolute; left: 15px; background: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
-        
         .main { width: 100%; max-width: 500px; padding: 10px; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 8px; color: #666; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 15px 5px; }
-        
         .day-unit { display: flex; flex-direction: column; align-items: center; min-height: 65px; }
         .day-box { 
             width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 8px; color: white;
@@ -29,12 +26,10 @@
         .day-box.weekend { background: var(--weekend); color: #ccc; }
         .day-box.selected { border-color: var(--accent) !important; box-shadow: 0 0 8px rgba(0,136,204,0.4); }
         .day-box.has-memorial { background: var(--ev-mem-bg) !important; color: var(--ev-mem) !important; }
-        
         .indicator-row { height: 6px; width: 100%; margin-top: 4px; display: flex; gap: 2px; justify-content: center; min-height: 6px; }
         .mark { height: 6px; width: 12px; border-radius: 2px; }
-        .m-meeting { background: var(--ev-meet); }
-        .m-personal { background: #555; }
-
+        .m-meeting { background: var(--ev-meet) !important; }
+        .m-personal { background: #555 !important; }
         .preview { background: white; width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
@@ -46,7 +41,7 @@
 
 <div class="header">
     <button class="back-btn" onclick="location.href='calendar.html'">←</button>
-    <div id="m-name" style="font-size: 18px; font-weight: bold;">...</div>
+    <div id="m-name" style="font-size: 18px; font-weight: bold;">ЗАГРУЗКА...</div>
 </div>
 
 <div class="main">
@@ -83,10 +78,8 @@
     };
 
     const db = getFirestore(initializeApp(cfg));
-    
-    // Получаем месяц и год. Если пусто — ставим Январь 2026
     const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
-    const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
+    const year = parseInt(localStorage.getItem('selectedYear') || 2026);
     const docId = `${year}_${mIdx}`;
     
     const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
@@ -95,41 +88,72 @@
     let dbData = {};
     let selectedDay = null;
 
+    // ПЕРЕПИСАННАЯ ФУНКЦИЯ ГРИДА (МЕТОД "ЛОМА")
     function buildGrid() {
         const grid = document.getElementById('grid');
         grid.innerHTML = '';
 
+        // Прямой расчет первого дня без умных формул
         const firstDate = new Date(year, mIdx, 1);
-        const dayOfWeek = firstDate.getDay(); 
-        const shift = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
-        const total = new Date(year, mIdx + 1, 0).getDate();
-
-        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>';
+        let firstDay = firstDate.getDay(); // 0-вс, 1-пн...
         
-        for (let i = 1; i <= total; i++) {
-            const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
-            grid.innerHTML += `
-                <div class="day-unit">
-                    <div class="day-box ${isW ? 'weekend' : ''}" id="tile-${i}" onclick="selectDay(${i})">${i}</div>
-                    <div class="indicator-row" id="marks-${i}"></div>
-                </div>`;
+        // Превращаем в ПН=0, ВТ=1, СР=2, ЧТ=3, ПТ=4, СБ=5, ВС=6
+        let shift = 0;
+        if (firstDay === 0) shift = 6;
+        else shift = firstDay - 1;
+
+        const totalDays = new Date(year, mIdx + 1, 0).getDate();
+
+        // Рисуем пустые дырки
+        for (let i = 0; i < shift; i++) {
+            const empty = document.createElement('div');
+            grid.appendChild(empty);
+        }
+        
+        // Рисуем дни
+        for (let i = 1; i <= totalDays; i++) {
+            const dayUnit = document.createElement('div');
+            dayUnit.className = 'day-unit';
+            
+            const currentDayDate = new Date(year, mIdx, i);
+            const dayNum = currentDayDate.getDay();
+            const isWeekend = (dayNum === 0 || dayNum === 6);
+            
+            dayUnit.innerHTML = `
+                <div class="day-box ${isWeekend ? 'weekend' : ''}" id="tile-${i}" onclick="selectDay(${i})">${i}</div>
+                <div class="indicator-row" id="marks-${i}"></div>
+            `;
+            grid.appendChild(dayUnit);
         }
     }
 
     function syncUI() {
+        // Проходим по всем числам от 1 до 31
         for (let i = 1; i <= 31; i++) {
             const tile = document.getElementById(`tile-${i}`);
             const marks = document.getElementById(`marks-${i}`);
-            if (!tile || !marks) continue;
+            
+            if (!tile || !marks) continue; // Если дня нет в этом месяце - пропускаем
 
             const dayData = dbData[i] || [];
+            
+            // Сброс
             tile.classList.remove('has-memorial');
             marks.innerHTML = '';
             
-            dayData.forEach(n => {
-                if (n.category === 'memorial') tile.classList.add('has-memorial');
-                else if (n.category === 'meeting') marks.innerHTML += '<div class="mark m-meeting"></div>';
-                else if (n.category === 'personal') marks.innerHTML += '<div class="mark m-personal"></div>';
+            // Отрисовка
+            dayData.forEach(item => {
+                if (item.category === 'memorial') {
+                    tile.classList.add('has-memorial');
+                } else if (item.category === 'meeting') {
+                    const m = document.createElement('div');
+                    m.className = 'mark m-meeting';
+                    marks.appendChild(m);
+                } else if (item.category === 'personal') {
+                    const p = document.createElement('div');
+                    p.className = 'mark m-personal';
+                    marks.appendChild(p);
+                }
             });
         }
         showPreview();
