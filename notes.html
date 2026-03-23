@@ -3,108 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Pro Black</title>
+    <title>CALENDARIUM | Roles Control</title>
     <style>
         :root { 
-            --accent: #00a8ff; 
-            --bg: #0b0d0e; 
-            --panel: #16191b; 
-            --border: #262a2d;
-            --ev-mem: #ff5252; --ev-meet: #00a8ff; --ev-pers: #95a5a6;
-            --text: #f5f6fa;
+            --accent: #0088cc; --bg: #121416; --dark: #22272a; 
+            --ev-mem: #ff7675; --ev-mem-bg: #3b1e22; --ev-meet: #0984e3; 
+            --weekend: #1a1e20; --text-main: #e0e6ed;
         }
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding-bottom: 80px; }
-        
-        /* HEADER */
-        .header { width: 100%; padding: 20px; text-align: center; background: var(--bg); position: sticky; top: 0; z-index: 100; }
-        .back-btn { position: absolute; left: 20px; top: 22px; background: none; border: none; color: #576574; font-size: 20px; cursor: pointer; }
-        
-        .main { width: 100%; max-width: 450px; padding: 0 15px; }
-        
-        /* GRID */
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 10px; font-weight: 800; color: #444; text-transform: uppercase; margin-bottom: 15px; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .header { width: 100%; background: #0f1112; padding: 15px; text-align: center; position: relative; border-bottom: 1px solid #222; }
+        .back-btn { position: absolute; left: 15px; top: 12px; background: #2d3436; border: none; padding: 6px 12px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; }
+        .main { width: 100%; max-width: 500px; padding: 15px 10px; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: bold; margin-bottom: 12px; color: #7f8c8d; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px 8px; }
         .day-box { 
-            aspect-ratio: 1/1; background: var(--panel); border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-weight: 600; font-size: 16px; cursor: pointer; position: relative; border: 1px solid var(--border); transition: 0.2s;
+            width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 18px; cursor: pointer; border: 2px solid transparent;
+            position: relative; transition: 0.2s;
         }
-        .day-box.weekend { color: #555; background: #0f1112; }
-        .day-box.selected { border-color: var(--accent); background: #1a2024; color: var(--accent); }
-        .day-box.has-memorial { border-color: var(--ev-mem); color: var(--ev-mem); }
-
-        .indicator-row { position: absolute; bottom: 6px; display: flex; gap: 3px; }
-        .mark { width: 5px; height: 5px; border-radius: 50%; }
-        
-        /* PREVIEW */
-        .preview { background: var(--panel); width: 100%; padding: 15px; margin-top: 20px; border-radius: 15px; border: 1px solid var(--border); min-height: 80px; }
-
-        /* BOTTOM NAV - как на авторизации */
-        .bottom-nav { 
-            position: fixed; bottom: 0; width: 100%; max-width: 500px; height: 70px; 
-            background: var(--panel); display: grid; grid-template-columns: 1fr 1fr 1fr; 
-            border-top: 1px solid var(--border); z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
-        }
-        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #576574; font-size: 10px; font-weight: bold; cursor: pointer; text-decoration: none; }
-        .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 20px; margin-bottom: 4px; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: var(--panel); width: 100%; max-width: 380px; padding: 25px; border-radius: 25px; border: 1px solid var(--border); }
-        
-        .note-card { display: flex; justify-content: space-between; align-items: center; background: #202428; padding: 12px; border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
-        textarea { width: 100%; height: 70px; background: #0b0d0e; border: 1px solid var(--border); border-radius: 12px; color: white; padding: 12px; margin: 15px 0; resize: none; }
-
-        .type-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .type-btn { padding: 12px 5px; border: none; border-radius: 12px; color: white; font-size: 9px; font-weight: bold; cursor: pointer; transition: 0.1s; }
-        .type-btn:disabled { opacity: 0.1; cursor: not-allowed; }
-        
-        .action-btn { width: 100%; padding: 15px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .day-box.empty { background: transparent; cursor: default; }
+        .day-box.weekend { background: var(--weekend); color: #888; }
+        .day-box.selected { border-color: var(--accent) !important; }
+        .day-box.has-memorial { background: var(--ev-mem-bg) !important; color: var(--ev-mem) !important; border-color: var(--ev-mem) !important; }
+        .indicator-row { position: absolute; bottom: 6px; display: flex; gap: 3px; justify-content: center; width: 100%; }
+        .mark { height: 4px; width: 8px; border-radius: 2px; }
+        .m-meeting { background: var(--ev-meet) !important; }
+        .m-personal { background: #888 !important; }
+        .preview { background: #1e2224; width: 100%; padding: 15px; margin-top: 25px; border-radius: 12px; border: 1px solid #2d3436; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-box { background: #1e2224; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; border: 1px solid #333; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; margin-bottom: 5px; cursor: pointer; color: white; }
+        .btn:disabled { background: #333 !important; color: #555 !important; cursor: not-allowed; opacity: 0.5; }
+        textarea { width: 100%; height: 60px; margin-bottom: 10px; padding: 10px; border-radius: 8px; border: none; background: #0f1112; color: white; resize: none; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="back-btn" onclick="location.href='index.html'">✕</button>
-    <div id="m-name" onclick="checkAdmin()" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #eee;">...</div>
+    <button class="back-btn" onclick="location.href='calendar.html'">←</button>
+    <div id="m-name" onclick="checkAdmin()" style="font-size: 18px; font-weight: bold; letter-spacing: 1px; cursor: pointer;">...</div>
 </div>
 
 <div class="main">
-    <div class="weekdays"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
+    <div class="weekdays"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div></div>
     <div id="grid" class="grid"></div>
-    <div id="preview" class="preview">Нажмите на дату...</div>
-    <button id="add-trigger" style="display:none; width:100%; padding:16px; background:var(--accent); border:none; border-radius:15px; color:white; font-weight:bold; margin-top:15px;" onclick="openModal()">+ ДОБАВИТЬ ЗАПИСЬ</button>
+    <div id="preview" class="preview">Нажмите на дату</div>
+    <button class="btn" id="edit-btn" style="display:none; background: #2d3436; margin-top:10px;" onclick="openModal()">ДОБАВИТЬ ЗАМЕТКУ</button>
 </div>
-
-<nav class="bottom-nav">
-    <a href="calendar.html" class="nav-item active">
-        <span class="nav-icon">📅</span>
-        <span>ПЛАН</span>
-    </a>
-    <a href="index.html" class="nav-item">
-        <span class="nav-icon">🏠</span>
-        <span>ГЛАВНАЯ</span>
-    </a>
-    <a href="#" class="nav-item" onclick="alert('Версия 2.0')">
-        <span class="nav-icon">⚙️</span>
-        <span>ИНФО</span>
-    </a>
-</nav>
 
 <div id="modal" class="modal">
     <div class="modal-box">
-        <h3 id="modal-title" style="margin:0; font-size:20px; text-align:center;"></h3>
-        <div id="modal-list" style="margin-top:15px; max-height:150px; overflow-y:auto;"></div>
-        
-        <textarea id="note-input" placeholder="Текст..."></textarea>
-        
-        <div class="type-selector">
-            <button id="btn-memorial" class="type-btn" style="background:#d63031;" onclick="save('memorial')">ВЕЧЕРЯ</button>
-            <button id="btn-meeting" class="type-btn" style="background:#0984e3;" onclick="save('meeting')">СОБРАНИЕ</button>
-            <button class="type-btn" style="background:#2d3436; border:1px solid var(--border);" onclick="save('personal')">ЛИЧНОЕ</button>
+        <h3 id="modal-title" style="margin:0 0 15px 0; text-align:center;"></h3>
+        <div id="modal-list" style="margin-bottom:15px; max-height:150px; overflow-y:auto;"></div>
+        <textarea id="note-input" placeholder="Текст заметки..."></textarea>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <button id="btn-memorial" class="btn" style="background:var(--ev-mem); font-size: 9px;" onclick="save('memorial')">ВЕЧЕРЯ</button>
+            <button id="btn-meeting" class="btn" style="background:var(--ev-meet); font-size: 9px;" onclick="save('meeting')">СОБРАНИЕ</button>
+            <button class="btn" style="background:#555; font-size: 9px;" onclick="save('personal')">ЛИЧНОЕ</button>
         </div>
-        <button class="action-btn" style="background:none; color:#576574;" onclick="closeModal()">ЗАКРЫТЬ</button>
+        <button class="btn" style="background:#0f1112; margin-top:10px;" onclick="closeModal()">ЗАКРЫТЬ</button>
     </div>
 </div>
 
@@ -122,26 +81,29 @@
 
     const db = getFirestore(initializeApp(cfg));
     
-    if(!localStorage.getItem('userId')) localStorage.setItem('userId', 'u' + Date.now().toString(36));
-    const myId = localStorage.getItem('userId');
+    // ПРАВА ДОСТУПА
     let isAdmin = localStorage.getItem('isAdmin') === 'true';
     let clickCount = 0;
 
+    // Секретный вход: 5 нажатий на имя месяца
     window.checkAdmin = () => {
-        if(++clickCount >= 5) {
+        clickCount++;
+        if(clickCount >= 5) {
             isAdmin = !isAdmin;
             localStorage.setItem('isAdmin', isAdmin);
-            alert(isAdmin ? "Админ: ВКЛ" : "Админ: ВЫКЛ");
+            alert(isAdmin ? "Режим АДМИНА включен" : "Режим ПОЛЬЗОВАТЕЛЯ");
+            clickCount = 0;
             location.reload();
         }
     };
 
-    const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
+    const savedMonth = localStorage.getItem('selectedMonth');
+    const mIdx = (savedMonth !== null) ? parseInt(savedMonth) : 0;
     const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
     const docId = `${year}_${mIdx}`;
     const months = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
     
-    document.getElementById('m-name').innerText = months[mIdx];
+    document.getElementById('m-name').innerText = months[mIdx] + " " + year;
 
     let dbData = {};
     let selectedDay = null;
@@ -150,13 +112,14 @@
         const grid = document.getElementById('grid');
         const firstDay = new Date(year, mIdx, 1).getDay();
         const shift = firstDay === 0 ? 6 : firstDay - 1;
-        const total = new Date(year, mIdx + 1, 0).getDate();
-        grid.innerHTML = '';
-        for (let i = 0; i < shift; i++) grid.innerHTML += `<div class="day-box" style="visibility:hidden"></div>`;
-        for (let d = 1; d <= total; d++) {
-            const isW = new Date(year, mIdx, d).getDay() % 6 === 0;
-            grid.innerHTML += `<div class="day-box ${isW ? 'weekend' : ''}" id="tile-${d}" onclick="selectDay(${d})">${d}<div class="indicator-row" id="marks-${d}"></div></div>`;
+        const totalDays = new Date(year, mIdx + 1, 0).getDate();
+        let html = '';
+        for (let i = 0; i < shift; i++) html += `<div class="day-box empty"></div>`;
+        for (let d = 1; d <= totalDays; d++) {
+            const isWeekend = new Date(year, mIdx, d).getDay() % 6 === 0;
+            html += `<div class="day-box ${isWeekend ? 'weekend' : ''}" id="tile-${d}" onclick="selectDay(${d})">${d}<div class="indicator-row" id="marks-${d}"></div></div>`;
         }
+        grid.innerHTML = html;
     }
 
     function updateUI() {
@@ -169,8 +132,8 @@
             row.innerHTML = '';
             notes.forEach(n => {
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
-                const col = n.category === 'memorial' ? 'var(--ev-mem)' : n.category === 'meeting' ? 'var(--ev-meet)' : '#555';
-                row.innerHTML += `<div class="mark" style="background:${col}"></div>`;
+                else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
+                else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
             });
         }
         if (selectedDay) selectDay(selectedDay);
@@ -180,48 +143,51 @@
         selectedDay = d;
         document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
         document.getElementById(`tile-${d}`).classList.add('selected');
-        document.getElementById('add-trigger').style.display = 'block';
-        const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-        document.getElementById('preview').innerHTML = `<div style="font-weight:900; color:var(--accent); margin-bottom:8px">${d} ${months[mIdx]}</div>` + 
-            (notes.map(n => `<div style="font-size:13px; margin-bottom:4px; color:#ccc;">• ${n.text}</div>`).join('') || 'Событий нет');
+        document.getElementById('edit-btn').style.display = 'block';
+        const preview = document.getElementById('preview');
+        const notes = Array.isArray(dbData[d]) ? dbData[d] : []; 
+        preview.innerHTML = `<b style="color: var(--accent);">${d} ${months[mIdx]}:</b><br><br>` + 
+                           (notes.map(n => `• ${n.text}`).join('<br>') || '<span style="color:#666;">Нет событий</span>');
     };
 
     window.openModal = () => {
         document.getElementById('modal-title').innerText = selectedDay + " " + months[mIdx];
         const list = document.getElementById('modal-list');
-        const notes = Array.isArray(dbData[selectedDay]) ? dbData[selectedDay] : [];
+        const notes = Array.isArray(dbData[selectedDay]) ? dbData[selectedDay] : []; 
         
+        // Управление доступностью кнопок
         document.getElementById('btn-memorial').disabled = !isAdmin;
         document.getElementById('btn-meeting').disabled = !isAdmin;
 
-        list.innerHTML = notes.map((n, idx) => {
-            const canDelete = isAdmin || n.author === myId;
-            return `<div class="note-card"><span>${n.text}</span>
-                ${canDelete ? `<b onclick="delNote(${idx})" style="color:var(--ev-mem); padding-left:10px; cursor:pointer">✕</b>` : ''}
-            </div>`;
-        }).join('');
+        list.innerHTML = notes.map((n, idx) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#0f1112; padding:10px; margin-bottom:5px; border-radius:8px;">
+                <span style="font-size:13px; color:#e0e6ed;">${n.text}</span>
+                ${isAdmin ? `<b onclick="delNote(${idx})" style="color:#ff7675; cursor:pointer; padding:0 5px;">✕</b>` : ''}
+            </div>`).join('');
         document.getElementById('modal').style.display = 'flex';
     };
 
     window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
     window.save = async (cat) => {
+        // Дополнительная проверка безопасности
         if((cat === 'memorial' || cat === 'meeting') && !isAdmin) return;
+
         const val = document.getElementById('note-input').value.trim();
-        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'СОБРАНИЕ' : 'ЗАМЕТКА');
+        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'СОБРАНИЕ' : 'ЛИЧНОЕ');
         const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
-        notes.push({ text, category: cat, author: myId });
+        notes.push({ text, category: cat });
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
         document.getElementById('note-input').value = '';
-        openModal();
+        closeModal();
     };
 
     window.delNote = async (idx) => {
-        const notes = [...dbData[selectedDay]];
-        if(!isAdmin && notes[idx].author !== myId) return;
+        if(!isAdmin) return;
+        const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
         notes.splice(idx, 1);
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
-        openModal();
+        closeModal();
     };
 
     renderGrid();
