@@ -146,24 +146,24 @@
         document.getElementById('user-display').innerText = user;
         if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
 
-        function initGrid() {
+  function initGrid() {
     const grid = document.getElementById('months');
     grid.innerHTML = '';
     
-    // Получаем текущие данные из системы
+    // Получаем текущую системную дату
     const now = new Date();
     const todayMonth = now.getMonth(); 
     const todayYear = now.getFullYear();
 
     monthsNames.forEach((m, i) => {
-        // Проверяем: совпадает ли цикл с текущим месяцем и годом
-        const isCurrent = (i === todayMonth && currentYear === todayYear);
+        // Проверяем, совпадает ли месяц и год с текущим
+        const isToday = (i === todayMonth && currentYear === todayYear);
         
-        // Если это текущий месяц, добавляем инлайн-стиль рамки
-        const borderStyle = isCurrent ? 'style="bgcolor: 1px solid var(--accent); shadow: 0 0 10px rgba(0,136,204,0.3);"' : '';
+        // Если да — добавляем класс подсветки
+        const statusClass = isToday ? 'current-active' : '';
 
         grid.innerHTML += `
-            <div class="month-card" ${borderStyle} onclick="goToMonth(${i})">
+            <div class="month-card ${statusClass}" onclick="goToMonth(${i})">
                 <span>${m.substring(0, 3)}</span>
                 <div class="month-indicator" id="ind-${i}"></div>
             </div>`;
