@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Classic Marks</title>
+    <title>CALENDARIUM | Fixed & External</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
             --ev-memorial: #ff4757; --ev-memorial-bg: #ffebeb;
-            --ev-meeting: #0984e3; 
-            --weekend: #4a5558;
+            --ev-meeting: #0984e3; --weekend: #4a5558;
         }
         * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
@@ -18,56 +17,75 @@
         .back-btn { position: absolute; left: 15px; background: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
         
         .main { width: 100%; max-width: 500px; padding: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         
-        /* ПЛИТКА */
-        .day-box { 
+        /* СЕТКА ДНЕЙ НЕДЕЛИ */
+        .weekdays { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            text-align: center; 
+            font-size: 11px; 
+            font-weight: bold; 
+            margin-bottom: 10px; 
+            color: var(--dark);
+            opacity: 0.7;
+        }
+
+        /* ОСНОВНАЯ СЕТКА КАЛЕНДАРЯ */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 12px 5px; /* Увеличил вертикальный отступ для индикаторов */
+        }
+        
+        /* КОНТЕЙНЕР ДНЯ */
+        .day-unit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ПЛИТКА (КВАДРАТ С ЧИСЛОМ) */
+        .day-tile { 
+            width: 100%;
             aspect-ratio: 1/1; 
             background: var(--dark); 
             border-radius: 8px; 
             color: white;
             display: flex; 
-            flex-direction: column;
             align-items: center; 
             justify-content: center;
             font-weight: bold; 
-            cursor: pointer; 
             font-size: 18px; 
+            cursor: pointer;
             border: 2px solid transparent;
             position: relative;
         }
-        .empty { background: transparent; pointer-events: none; }
-        .day-box.weekend { background: var(--weekend); color: #d1d8db; }
-        .day-box.selected { border-color: var(--accent) !important; }
+        .day-tile.weekend { background: var(--weekend); color: #d1d8db; }
+        .day-tile.selected { border-color: var(--accent) !important; }
+        .day-tile.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
         
-        /* ВЕЧЕРЯ */
-        .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
-
-        /* КОНТЕЙНЕР ДЛЯ ПОЛОСОК ВНУТРИ */
-        .marks-row {
-            position: absolute;
-            bottom: 4px;
-            left: 0;
-            right: 0;
+        /* ЗОНА ИНДИКАЦИИ ПОД ПЛИТКОЙ */
+        .external-marks {
+            height: 4px;
+            width: 80%;
+            margin-top: 4px;
             display: flex;
-            justify-content: center;
             gap: 2px;
-            padding: 0 4px;
+            justify-content: center;
         }
 
-        /* ПОЛОСКИ */
-        .m-line {
-            height: 3px;
+        /* ПОЛОСКИ ПОД ПЛИТКОЙ */
+        .mark-bar {
+            height: 4px;
             flex: 1;
-            max-width: 14px;
+            max-width: 12px;
             border-radius: 2px;
+            display: block;
         }
-        .m-meeting { background: #0984e3; }
-        .m-personal { background: #ffffff; }
-        /* Если фон розовый, белую полоску делаем темнее */
-        .has-memorial .m-personal { background: #888; }
+        .mark-meeting { background: #0984e3; }
+        .mark-personal { background: #555; } /* Темно-серый, чтобы было видно на светлом фоне */
 
-        .preview { background: white; width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .preview { background: white; width: 100%; padding: 15px; margin-top: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
@@ -77,12 +95,15 @@
 
 <div class="header">
     <button class="back-btn" onclick="location.href='calendar.html'">←</button>
-    <div id="m-name" style="font-size: 18px; font-weight: 900;">ЗАГРУЗКА...</div>
+    <div id="m-name" style="font-size: 18px; font-weight: bold;">...</div>
 </div>
 
 <div class="main">
+    <div class="weekdays">
+        <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+    </div>
     <div class="grid" id="grid"></div>
-    <div class="preview" id="preview">Выберите дату</div>
+    <div class="preview" id="preview">Нажмите на дату</div>
     <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
 </div>
 
@@ -130,42 +151,40 @@
         const total = new Date(year, mIdx + 1, 0).getDate();
 
         grid.innerHTML = '';
-        for (let i = 0; i < shift; i++) grid.innerHTML += '<div class="day-box empty"></div>';
+        for (let i = 0; i < shift; i++) grid.innerHTML += '<div></div>'; // Пустоты
         for (let i = 1; i <= total; i++) {
             const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
             grid.innerHTML += `
-                <div class="day-box ${isW ? 'weekend' : ''}" id="box-${i}" onclick="selectDay(${i})">
-                    ${i}
-                    <div class="marks-row" id="marks-${i}"></div>
+                <div class="day-unit">
+                    <div class="day-tile ${isW ? 'weekend' : ''}" id="tile-${i}" onclick="selectDay(${i})">${i}</div>
+                    <div class="external-marks" id="marks-${i}"></div>
                 </div>`;
         }
     }
 
     window.selectDay = (i) => {
         selectedDay = i;
-        document.querySelectorAll('.day-box').forEach(d => d.classList.remove('selected'));
-        document.getElementById(`box-${i}`).classList.add('selected');
+        document.querySelectorAll('.day-tile').forEach(t => t.classList.remove('selected'));
+        document.getElementById(`tile-${i}`).classList.add('selected');
         document.getElementById('edit-btn').style.display = 'block';
         updatePreview();
     };
 
     function updateVisuals() {
         for (let i = 1; i <= 31; i++) {
-            const box = document.getElementById(`box-${i}`);
-            const row = document.getElementById(`marks-${i}`);
-            if (!box || !row) continue;
+            const tile = document.getElementById(`tile-${i}`);
+            const marks = document.getElementById(`marks-${i}`);
+            if (!tile || !marks) continue;
 
             const notes = dbData[i] || [];
-            const hasMem = notes.some(n => n.category === 'memorial');
+            tile.classList.toggle('has-memorial', notes.some(n => n.category === 'memorial'));
             
-            box.classList.toggle('has-memorial', hasMem);
-            row.innerHTML = '';
-
+            marks.innerHTML = '';
             notes.forEach(n => {
                 if (n.category !== 'memorial') {
                     const line = document.createElement('div');
-                    line.className = `m-line m-${n.category}`;
-                    row.appendChild(line);
+                    line.className = `mark-bar mark-${n.category}`;
+                    marks.appendChild(line);
                 }
             });
         }
