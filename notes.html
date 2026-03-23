@@ -7,12 +7,13 @@
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436;
-            --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #2ecc71; /* Новый цвет */
+            --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #2ecc71;
+            --weekend-bg: #3d4446; /* Более светлый для выходных */
         }
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; display: flex; height: 100vh; background: var(--bg); overflow: hidden; }
 
-        /* Левая панель */
+        /* САЙДБАР */
         .sidebar { 
             width: 320px; background: #1e2122; padding: 25px; color: white;
             display: flex; flex-direction: column; align-items: flex-end; text-align: right; flex-shrink: 0;
@@ -27,45 +28,57 @@
             text-align: left; overflow-y: auto;
         }
 
-        /* Календарная сетка */
-        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
+        /* ОСНОВНАЯ ЧАСТЬ */
+        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        /* Сетка дней недели */
+        .weekdays-bar { 
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
+            width: 100%; max-width: 700px; margin-bottom: 8px; 
+        }
+        .wd-name { 
+            text-align: center; font-size: 0.7rem; font-weight: 900; 
+            color: var(--dark); opacity: 0.4; text-transform: uppercase; 
+        }
+
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; max-width: 700px; }
+        
         .day { 
             background: var(--dark); aspect-ratio: 1/1; border-radius: 12px; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
             position: relative; font-weight: 800; font-size: 1.1rem; transition: 0.2s;
         }
         .day.empty { background: transparent; cursor: default; }
+        .day.weekend { background: var(--weekend-bg); }
         .day.selected { border: 3px solid var(--accent); transform: scale(1.05); z-index: 2; }
         
-        /* Исправленные индикаторы */
+        /* СТИЛЬ ДЛЯ ВЕЧЕРИ */
+        .day.has-memorial { background: #b33939 !important; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); }
+
         .dots { 
             position: absolute; bottom: 6px; left: 0; right: 0;
             display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; padding: 0 4px;
         }
         .dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* Модальное окно */
-        .modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            z-index: 1000; align-items: center; justify-content: center; padding: 15px;
-        }
-        .modal-box { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; color: black; }
-        textarea { width: 100%; height: 80px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 1rem; }
-        .btn-save { width: 100%; background: black; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; }
-        
-        .cat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .cat-opt { padding: 8px 4px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; font-weight: 800; font-size: 0.6rem; color: white; text-transform: uppercase; }
-
+        /* МОБИЛЬНАЯ ВЕРСИЯ */
         @media (max-width: 800px) {
             body { flex-direction: column; overflow-y: auto; }
             .sidebar { width: 100%; height: auto; align-items: center; padding: 15px; text-align: center; }
             #month-title { font-size: 1.8rem; }
-            #year-label { margin-bottom: 10px; }
-            .grid { gap: 5px; }
+            .weekdays-bar, .grid { gap: 4px; }
+            .wd-name { font-size: 0.6rem; }
             .day { font-size: 0.9rem; border-radius: 8px; }
             .dot { width: 4px; height: 4px; }
         }
+
+        /* Остальные стили модалки как были */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
+        .modal-box { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; color: black; }
+        textarea { width: 100%; height: 80px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 1rem; }
+        .btn-save { width: 100%; background: black; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .cat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .cat-opt { padding: 8px 4px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; font-weight: 800; font-size: 0.6rem; color: white; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -74,12 +87,16 @@
         <button class="back-btn" onclick="location.href='calendar.html'">← НАЗАД</button>
         <div id="month-title">...</div>
         <div id="year-label">...</div>
-        <div style="width:100%; font-size:0.65rem; opacity:0.5; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px;">События дня:</div>
         <div id="live-preview">Выберите дату</div>
         <button id="edit-btn" style="display:none; width:100%; padding:12px; background:var(--accent); border:none; color:white; border-radius:10px; font-weight:800; cursor:pointer;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
     </div>
 
     <div class="main">
+        <div class="weekdays-bar">
+            <div class="wd-name">Пн</div><div class="wd-name">Вт</div><div class="wd-name">Ср</div>
+            <div class="wd-name">Чт</div><div class="wd-name">Пт</div><div class="wd-name">Сб</div>
+            <div class="wd-name">Вс</div>
+        </div>
         <div class="grid" id="grid"></div>
     </div>
 
@@ -133,15 +150,26 @@
         function draw() {
             const container = document.getElementById('grid');
             container.innerHTML = '';
-            const first = new Date(year, monthIdx, 1).getDay();
-            const shift = first === 0 ? 6 : first - 1;
+            
+            // Расчет смещения (чтобы Пн был первым)
+            let first = new Date(year, monthIdx, 1).getDay();
+            let shift = (first === 0) ? 6 : first - 1; 
+            
             const total = new Date(year, monthIdx + 1, 0).getDate();
 
             for(let i=0; i<shift; i++) container.innerHTML += '<div class="day empty"></div>';
 
             for(let i=1; i<=total; i++) {
                 const card = document.createElement('div');
-                card.className = 'day' + (selDay === i ? ' selected' : '');
+                const date = new Date(year, monthIdx, i);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const hasMemorial = data[i] && data[i].some(n => n.category === 'memorial');
+
+                card.className = 'day';
+                if(selDay === i) card.classList.add('selected');
+                if(isWeekend) card.classList.add('weekend');
+                if(hasMemorial) card.classList.add('has-memorial');
+
                 card.innerHTML = `<span>${i}</span>`;
                 
                 if(data[i] && data[i].length > 0) {
@@ -150,7 +178,7 @@
                     data[i].forEach(n => {
                         const dot = document.createElement('div');
                         dot.className = 'dot';
-                        if(n.category === 'memorial') dot.style.background = 'var(--ev-memorial)';
+                        if(n.category === 'memorial') dot.style.background = '#fff'; // Белая точка на красном фоне
                         else if(n.category === 'personal') dot.style.background = 'var(--ev-personal)';
                         else dot.style.background = 'var(--ev-meeting)';
                         dBox.appendChild(dot);
@@ -162,16 +190,15 @@
             }
         }
 
-        function updatePreview() {
+        // Остальные функции без изменений для экономии места
+        window.updatePreview = () => {
             const p = document.getElementById('live-preview');
             const notes = data[selDay] || [];
             p.innerHTML = notes.length ? notes.map(n => {
-                let color = 'var(--accent)';
-                if(n.category === 'memorial') color = 'var(--ev-memorial)';
-                if(n.category === 'personal') color = 'var(--ev-personal)';
+                let color = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
                 return `<div style="border-left: 3px solid ${color}; padding-left: 8px; margin-bottom: 5px;">${n.text}</div>`;
             }).join('') : 'Нет записей';
-        }
+        };
 
         window.setCat = (c) => { 
             curCat = c; 
