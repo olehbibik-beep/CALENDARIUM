@@ -3,77 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM v4 | NEW LOGIC</title>
+    <title>CALENDARIUM FIX</title>
     <style>
-        :root { 
-            --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
-            --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #ffffff;
-            --weekend: #3d4446;
-        }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
+        :root { --bg: #f4f7f6; --dark: #2d3436; --accent: #0088cc; }
+        * { box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
         .header { width: 100%; background: #1e2122; color: white; padding: 20px; text-align: center; position: sticky; top: 0; z-index: 10; }
-        .back-btn { position: absolute; left: 15px; top: 20px; background: white; border: none; padding: 6px 12px; border-radius: 8px; font-weight: 900; color: black; cursor: pointer; }
-
         .main { width: 100%; max-width: 500px; padding: 10px; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 11px; font-weight: 900; margin-bottom: 8px; opacity: 0.5; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         
+        /* Базовая плитка */
         .day { 
-            background: var(--dark); aspect-ratio: 1/1; border-radius: 10px; color: white;
+            background: #2d3436; aspect-ratio: 1/1; border-radius: 10px; color: white;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            position: relative; font-weight: 800; cursor: pointer; font-size: 17px; border: 3px solid transparent;
-            transition: all 0.2s ease;
+            position: relative; font-weight: bold; cursor: pointer; font-size: 18px;
+            border: 2px solid transparent; transition: 0.2s;
         }
         .day.empty { background: transparent; pointer-events: none; }
-        .day.weekend { background: var(--weekend); color: #888; }
-        .day.selected { border-color: var(--accent) !important; transform: scale(1.02); z-index: 5; }
-        
-        /* Контейнер для черточек внизу плитки */
-        .marks-container { position: absolute; bottom: 6px; width: 80%; display: flex; flex-direction: column; gap: 2px; pointer-events: none; }
-        .line-mark { width: 100%; height: 3px; border-radius: 1px; }
+        .day.selected { border-color: var(--accent) !important; }
 
-        .preview { background: white; width: 100%; border-radius: 15px; padding: 15px; margin-top: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .preview-title { font-weight: 900; margin-bottom: 10px; color: var(--dark); font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .event-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-weight: 600; padding: 10px; background: #f8f9fa; border-radius: 10px; font-size: 14px; }
-        .event-color { width: 5px; height: 18px; border-radius: 3px; }
+        /* Контейнер для черточек */
+        .lines-container { 
+            position: absolute; bottom: 5px; width: 80%; 
+            display: flex; flex-direction: column; gap: 2px; 
+        }
+        .u-line { width: 100%; height: 3px; border-radius: 1px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: white; padding: 20px; border-radius: 20px; width: 100%; max-width: 350px; }
-        textarea { width: 100%; height: 70px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; font-size: 16px; outline: none; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; margin-bottom: 6px; transition: 0.2s; }
+        .preview { background: white; width: 100%; border-radius: 15px; padding: 15px; margin-top: 15px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <button class="back-btn" onclick="location.href='calendar.html'">←</button>
-    <div id="month-name">Загрузка...</div>
+    <div id="m-name" style="font-weight: 900; font-size: 20px;">ЗАГРУЗКА...</div>
 </div>
 
 <div class="main">
-    <div class="weekdays"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div></div>
-    <div id="grid" class="grid"></div>
-    
-    <div class="preview">
-        <div id="prev-date" class="preview-title">Выберите дату</div>
-        <div id="events-list"></div>
-        <button class="btn" id="edit-btn" style="display:none; background: #1e2122; color:white; margin-top:10px;" onclick="window.openModal()">РЕДАКТИРОВАТЬ</button>
-    </div>
+    <div class="grid" id="main-grid"></div>
+    <div class="preview" id="p-box">Выберите день</div>
+    <button class="btn" id="add-btn" style="display:none; background:#000; color:#fff; margin-top:10px;" onclick="showAdd()">ИЗМЕНИТЬ</button>
 </div>
 
-<div class="modal" id="modal">
+<div class="modal" id="m-win">
     <div class="modal-box">
-        <h3 id="modal-date-title" style="margin:0; color: #1e2122;">Дата</h3>
-        <div id="modal-items-list" style="margin: 10px 0; max-height: 120px; overflow-y: auto;"></div>
-        <textarea id="note-input" placeholder="Введите текст..."></textarea>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
-            <button class="btn" style="background:#ff4757; color:white; font-size: 9px;" onclick="window.save('memorial')">ВЕЧЕРЯ</button>
-            <button class="btn" style="background:#0984e3; color:white; font-size: 9px;" onclick="window.save('meeting')">СОБРАНИЕ</button>
-            <button class="btn" style="background:#f0f0f0; color:black; font-size: 9px; border:1px solid #ccc;" onclick="window.save('personal')">ЛИЧНОЕ</button>
-        </div>
-        <button class="btn" style="background:#000; color:#fff; margin-top:10px;" onclick="window.closeModal()">ЗАКРЫТЬ</button>
+        <h3 id="m-date"></h3>
+        <div id="m-list" style="margin-bottom:10px"></div>
+        <textarea id="t-input" style="width:100%; height:60px; margin-bottom:10px;"></textarea>
+        <button class="btn" style="background:#ff4757; color:#fff" onclick="doSave('memorial')">ВЕЧЕРЯ</button>
+        <button class="btn" style="background:#0984e3; color:#fff" onclick="doSave('meeting')">СОБРАНИЕ</button>
+        <button class="btn" style="background:#ddd" onclick="doSave('personal')">ЛИЧНОЕ</button>
+        <button class="btn" style="background:#000; color:#fff" onclick="hideAdd()">ЗАКРЫТЬ</button>
     </div>
 </div>
 
@@ -81,143 +63,119 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const cfg = {
         apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
         authDomain: "calendarium-1f7d7.firebaseapp.com",
         projectId: "calendarium-1f7d7",
         storageBucket: "calendarium-1f7d7.firebasestorage.app",
-        messagingSenderId: "204240857105",
         appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
     };
 
-    const db = getFirestore(initializeApp(firebaseConfig));
+    const db = getFirestore(initializeApp(cfg));
     const mIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
     const year = parseInt(localStorage.getItem('selectedYear') || 2026);
-    const docId = `${year}_${mIdx}`;
+    const docID = `${year}_${mIdx}`;
     const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-    document.getElementById('month-name').innerText = months[mIdx] + " " + year;
+    document.getElementById('m-name').innerText = months[mIdx];
 
-    let dbData = {};
-    let selectedDay = null;
+    let data = {};
+    let sel = null;
 
-    // СЕТКА СТРОИТСЯ ОДИН РАЗ
-    function initGrid() {
-        const container = document.getElementById('grid');
-        const firstDay = new Date(year, mIdx, 1).getDay();
-        const shift = (firstDay === 0) ? 6 : firstDay - 1;
-        const total = new Date(year, mIdx + 1, 0).getDate();
+    // СТРОИМ СЕТКУ
+    const grid = document.getElementById('main-grid');
+    const start = new Date(year, mIdx, 1).getDay();
+    const shift = start === 0 ? 6 : start - 1;
+    const days = new Date(year, mIdx + 1, 0).getDate();
 
-        container.innerHTML = '';
-        for (let i = 0; i < shift; i++) container.innerHTML += '<div class="day empty"></div>';
-        
-        for (let i = 1; i <= total; i++) {
-            const dObj = new Date(year, mIdx, i);
-            const isW = dObj.getDay() === 0 || dObj.getDay() === 6;
-            container.innerHTML += `
-                <div class="day ${isW ? 'weekend' : ''}" id="day-${i}" onclick="window.selectDay(${i})">
-                    <span>${i}</span>
-                    <div class="marks-container"></div>
-                </div>`;
-        }
+    for(let i=0; i<shift; i++) grid.innerHTML += '<div class="day empty"></div>';
+    for(let i=1; i<=days; i++) {
+        grid.innerHTML += `<div class="day" id="d-${i}" onclick="window.goSelect(${i})"><span>${i}</span><div class="lines-container"></div></div>`;
     }
 
-    window.selectDay = (num) => {
-        selectedDay = num;
-        document.getElementById('edit-btn').style.display = 'block';
-        document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
-        const el = document.getElementById(`day-${num}`);
-        if(el) el.classList.add('selected');
-        window.renderPreview();
-    };
+    // ЛОГИКА ОБНОВЛЕНИЯ (ПРЯМАЯ КРАСКА)
+    window.refreshAll = () => {
+        for(let i=1; i<=31; i++) {
+            const el = document.getElementById(`d-${i}`);
+            if(!el) continue;
 
-    // ОБНОВЛЕНИЕ ЦВЕТОВ И ЧЕРТОЧЕК
-    window.updateVisuals = () => {
-        for (let i = 1; i <= 31; i++) {
-            const el = document.getElementById(`day-${i}`);
-            if (!el) continue;
-
-            const notes = dbData[i] || [];
+            const notes = data[i] || [];
             const hasMem = notes.some(n => n.category === 'memorial');
             
-            // 1. Сброс стилей перед обновлением
-            el.style.backgroundColor = ""; 
-            el.style.color = "";
-
-            // 2. Если есть ВЕЧЕРЯ - красим плитку в розовый, цифру в красный
-            if (hasMem) {
-                el.style.backgroundColor = "#ffebeb"; // Розовый фон
-                el.style.color = "#ff4757";           // Красные цифры
+            // ПРИНУДИТЕЛЬНЫЕ СТИЛИ (ОБХОДИМ КЭШ CSS)
+            if(hasMem) {
+                el.style.backgroundColor = "#ffebeb"; // РОЗОВЫЙ
+                el.style.color = "#ff4757";           // КРАСНЫЙ ТЕКСТ
+            } else {
+                const isW = new Date(year, mIdx, i).getDay() % 6 === 0;
+                el.style.backgroundColor = isW ? "#3d4446" : "#2d3436";
+                el.style.color = isW ? "#888" : "#fff";
             }
 
-            // 3. Рисуем черточки
-            const markBox = el.querySelector('.marks-container');
-            markBox.innerHTML = '';
+            // РИСУЕМ ЧЕРТОЧКИ
+            const box = el.querySelector('.lines-container');
+            box.innerHTML = '';
             notes.forEach(n => {
-                if (n.category !== 'memorial') {
+                if(n.category !== 'memorial') {
                     const line = document.createElement('div');
-                    line.className = 'line-mark';
-                    // Синий для собраний, Белый для личного
+                    line.className = 'u-line';
                     line.style.background = (n.category === 'personal') ? '#ffffff' : '#0984e3';
-                    markBox.appendChild(line);
+                    box.appendChild(line);
                 }
             });
         }
-        if (selectedDay) window.renderPreview();
+        window.updateText();
     };
 
-    window.renderPreview = () => {
-        const title = document.getElementById('prev-date');
-        const list = document.getElementById('events-list');
-        if (!selectedDay) return;
-
-        title.innerText = `${selectedDay} ${months[mIdx]}`;
-        const notes = dbData[selectedDay] || [];
-        
-        list.innerHTML = notes.length ? notes.map(n => {
-            const color = n.category === 'memorial' ? '#ff4757' : (n.category === 'personal' ? '#ddd' : '#0984e3');
-            return `<div class="event-item"><div class="event-color" style="background:${color}"></div><span>${n.text}</span></div>`;
-        }).join('') : '<div style="opacity:0.5; padding:10px;">Событий нет</div>';
+    window.goSelect = (n) => {
+        sel = n;
+        document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
+        document.getElementById(`d-${n}`).classList.add('selected');
+        document.getElementById('add-btn').style.display = 'block';
+        window.updateText();
     };
 
-    window.openModal = () => {
-        document.getElementById('modal-date-title').innerText = selectedDay + " " + months[mIdx];
-        const list = document.getElementById('modal-items-list');
-        const notes = dbData[selectedDay] || [];
-        list.innerHTML = notes.map((n, idx) => `
-            <div style="display:flex; justify-content:space-between; align-items:center; background:#f4f7f6; padding:10px; border-radius:10px; margin-bottom:5px;">
-                <span style="font-weight:600; font-size:13px; color:#333;">${n.text}</span>
-                <button onclick="window.delNote(${idx})" style="color:#ff4757; border:none; background:none; font-weight:bold; cursor:pointer;">✖</button>
-            </div>
-        `).join('');
-        document.getElementById('modal').style.display = 'flex';
+    window.updateText = () => {
+        const box = document.getElementById('p-box');
+        if(!sel) return;
+        const notes = data[sel] || [];
+        box.innerHTML = `<b>${sel} ${months[mIdx]}:</b><br>` + 
+            (notes.map(n => `• ${n.text}`).join('<br>') || 'Нет событий');
     };
 
-    window.closeModal = () => document.getElementById('modal').style.display = 'none';
-
-    window.save = async (cat) => {
-        const val = document.getElementById('note-input').value.trim();
-        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'СОБРАНИЕ' : 'ЛИЧНОЕ');
-        const notes = [...(dbData[selectedDay] || [])];
-        notes.push({ text: text, category: cat });
-        await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
-        document.getElementById('note-input').value = '';
-        window.openModal();
+    window.showAdd = () => {
+        document.getElementById('m-date').innerText = sel + " " + months[mIdx];
+        const list = document.getElementById('m-list');
+        list.innerHTML = (data[sel] || []).map((n, idx) => `
+            <div style="display:flex; justify-content:space-between; padding:5px; background:#f0f0f0; margin-bottom:2px; border-radius:5px;">
+                <span>${n.text}</span>
+                <b onclick="window.doDel(${idx})" style="color:red; cursor:pointer">X</b>
+            </div>`).join('');
+        document.getElementById('m-win').style.display = 'flex';
     };
 
-    window.delNote = async (idx) => {
-        const notes = [...dbData[selectedDay]];
+    window.hideAdd = () => document.getElementById('m-win').style.display = 'none';
+
+    window.doSave = async (cat) => {
+        const val = document.getElementById('t-input').value.trim();
+        const notes = [...(data[sel] || [])];
+        notes.push({ text: val || cat.toUpperCase(), category: cat });
+        await setDoc(doc(db, "calendar", docID), { [sel]: notes }, { merge: true });
+        document.getElementById('t-input').value = '';
+        window.showAdd();
+    };
+
+    window.doDel = async (idx) => {
+        const notes = [...data[sel]];
         notes.splice(idx, 1);
-        await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
-        window.openModal();
+        await setDoc(doc(db, "calendar", docID), { [sel]: notes }, { merge: true });
+        window.showAdd();
     };
 
-    onSnapshot(doc(db, "calendar", docId), (s) => {
-        dbData = s.exists() ? s.data() : {};
-        window.updateVisuals();
+    onSnapshot(doc(db, "calendar", docID), (s) => {
+        data = s.exists() ? s.data() : {};
+        window.refreshAll();
     });
-
-    initGrid();
 </script>
 </body>
 </html>
