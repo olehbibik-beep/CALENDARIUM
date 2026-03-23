@@ -1,248 +1,163 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Планы | CALENDARIUM</title>
-    <style>
-        :root { 
-            --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436;
-            --ev-memorial: #ff4757; --ev-meeting: #0984e3; --ev-personal: #2ecc71;
-            --weekend-bg: #3d4446;
-        }
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        /* Исправление высоты для мобилок */
-        body { margin: 0; display: flex; min-height: 100vh; background: var(--bg); overflow-x: hidden; }
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        .sidebar { 
-            width: 320px; background: #1e2122; padding: 25px; color: white;
-            display: flex; flex-direction: column; align-items: flex-end; text-align: right; 
-            flex-shrink: 0; position: sticky; top: 0; height: 100vh;
-        }
-        .back-btn { background: #fff; color: #000; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; margin-bottom: 20px; }
-        #month-title { font-size: 2.2rem; font-weight: 800; text-transform: uppercase; margin: 0; line-height: 1; }
-        #year-label { font-size: 1.1rem; opacity: 0.3; margin-bottom: 20px; }
+    const firebaseConfig = {
+        apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+        authDomain: "calendarium-1f7d7.firebaseapp.com",
+        projectId: "calendarium-1f7d7",
+        storageBucket: "calendarium-1f7d7.firebasestorage.app",
+        messagingSenderId: "204240857105",
+        appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+    };
 
-        #live-preview { 
-            width: 100%; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 12px;
-            border-right: 4px solid var(--accent); min-height: 80px; margin-bottom: 15px; font-size: 0.85rem;
-            text-align: left; overflow-y: auto;
-        }
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
+    const year = parseInt(localStorage.getItem('selectedYear') || 2026);
+    const docId = `${year}_${monthIdx}`;
+    const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-        .main { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
-        
-        /* Шапка дней недели */
-        .weekdays { 
-            display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
-            width: 100%; max-width: 700px; margin-bottom: 10px; 
-        }
-        .wd { text-align: center; font-size: 0.7rem; font-weight: 900; color: var(--dark); opacity: 0.4; text-transform: uppercase; }
+    document.getElementById('month-title').innerText = months[monthIdx];
+    document.getElementById('year-label').innerText = year;
 
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; max-width: 700px; }
-        
-        .day { 
-            background: var(--dark); aspect-ratio: 1/1; border-radius: 12px; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;
-            position: relative; font-weight: 800; font-size: 1.1rem; transition: 0.2s;
-        }
-        .day.empty { background: transparent; cursor: default; }
-        .day.weekend { background: var(--weekend-bg); color: #888; }
-        .day.selected { border: 3px solid var(--accent); transform: scale(1.05); z-index: 2; }
-        
-        /* Стиль для Вечери */
-        .day.has-memorial { background: var(--ev-memorial) !important; color: white; }
+    let data = {};
+    let selDay = null;
+    let curCat = 'meeting';
 
-        .dots { 
-            position: absolute; bottom: 6px; left: 0; right: 0;
-            display: flex; justify-content: center; gap: 3px; flex-wrap: wrap; padding: 0 4px;
-        }
-        .dot { width: 5px; height: 5px; border-radius: 50%; }
+    // 1. ПЕРВЫЙ ШАГ: Сразу рисуем пустые плитки (они никуда не исчезнут)
+    drawEmptyCalendar();
 
-        /* Мобильная версия */
-        @media (max-width: 800px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: relative; padding: 15px; align-items: center; text-align: center; }
-            .main { padding: 10px; }
-            .weekdays, .grid { gap: 4px; }
-            .day { font-size: 0.9rem; border-radius: 8px; }
+    // 2. ВТОРОЙ ШАГ: Ждем данные из Firebase и просто "навешиваем" точки
+    onSnapshot(doc(db, "calendar", docId), (s) => {
+        if (s.exists()) {
+            data = s.data();
+        } else {
+            data = {}; // Если в базе пусто, данные обнуляются, но календарь не стирается
+        }
+        renderDotsAndColors(); // Обновляем только точки и цвета!
+        if(selDay) updatePreview();
+    });
+
+    // Рисует каркас календаря (числа от 1 до 30/31)
+    function drawEmptyCalendar() {
+        const container = document.getElementById('grid');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const firstDay = new Date(year, monthIdx, 1).getDay();
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
+        const total = new Date(year, monthIdx + 1, 0).getDate();
+
+        // Пустые ячейки
+        for (let i = 0; i < shift; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'day empty';
+            container.appendChild(empty);
         }
 
-        /* Модалка */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-box { background: white; padding: 25px; border-radius: 20px; width: 100%; max-width: 400px; color: black; }
-        textarea { width: 100%; height: 80px; margin: 10px 0; padding: 12px; border-radius: 10px; border: 1px solid #ddd; resize: none; font-size: 1rem; }
-        .btn-save { width: 100%; background: black; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .cat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .cat-opt { padding: 8px 4px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; font-weight: 800; font-size: 0.6rem; color: white; text-transform: uppercase; text-align: center; }
-    </style>
-</head>
-<body>
+        // Плитки дней
+        for (let i = 1; i <= total; i++) {
+            const card = document.createElement('div');
+            const dObj = new Date(year, monthIdx, i);
+            const isWeekend = dObj.getDay() === 0 || dObj.getDay() === 6;
 
-    <div class="sidebar">
-        <button class="back-btn" onclick="location.href='calendar.html'">← НАЗАД</button>
-        <div id="month-title">...</div>
-        <div id="year-label">...</div>
-        <div id="live-preview">Выберите дату</div>
-        <button id="edit-btn" style="display:none; width:100%; padding:12px; background:var(--accent); border:none; color:white; border-radius:10px; font-weight:800; cursor:pointer;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
-    </div>
+            card.className = 'day';
+            card.id = `day-cell-${i}`; // Даем каждой плитке уникальный ID
+            if (isWeekend) card.classList.add('weekend');
 
-    <div class="main">
-        <div class="weekdays">
-            <div class="wd">Пн</div><div class="wd">Вт</div><div class="wd">Ср</div>
-            <div class="wd">Чт</div><div class="wd">Пт</div><div class="wd">Сб</div>
-            <div class="wd">Вс</div>
-        </div>
-        <div class="grid" id="grid"></div>
-    </div>
+            card.innerHTML = `<span>${i}</span><div class="dots" id="dots-cell-${i}"></div>`;
 
-    <div class="modal" id="modal">
-        <div class="modal-box">
-            <h3 id="modal-date" style="margin-top:0">Дата</h3>
-            <div id="notes-list" style="margin-bottom:15px; max-height: 150px; overflow-y: auto;"></div>
-            <textarea id="note-input" placeholder="Что планируем?"></textarea>
-            <div class="cat-row">
-                <button class="cat-opt" id="opt-mem" style="background:var(--ev-memorial)" onclick="setCat('memorial')">ВЕЧЕРЯ</button>
-                <button class="cat-opt" id="opt-meet" style="background:var(--ev-meeting)" onclick="setCat('meeting')">СОБРАНИЕ</button>
-                <button class="cat-opt" id="opt-pers" style="background:var(--ev-personal)" onclick="setCat('personal')">ЛИЧНОЕ</button>
-            </div>
-            <button class="btn-save" onclick="save()">ДОБАВИТЬ</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; margin-top:10px; color:#aaa; cursor:pointer; font-weight:700;">ОТМЕНА</button>
-        </div>
-    </div>
+            card.onclick = () => {
+                selDay = i;
+                // Снимаем выделение со всех
+                document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
+                // Добавляем выделение нажатой плитке
+                card.classList.add('selected');
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+                updatePreview();
+                document.getElementById('edit-btn').style.display = 'block';
+            };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-            authDomain: "calendarium-1f7d7.firebaseapp.com",
-            projectId: "calendarium-1f7d7",
-            storageBucket: "calendarium-1f7d7.firebasestorage.app",
-            messagingSenderId: "204240857105",
-            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
-        };
+            container.appendChild(card);
+        }
+    }
 
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const monthIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
-        const year = parseInt(localStorage.getItem('selectedYear') || 2026);
-        const docId = `${year}_${monthIdx}`;
-        const months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    // Отрисовывает только точки внутри готовых плиток
+    function renderDotsAndColors() {
+        const total = new Date(year, monthIdx + 1, 0).getDate();
 
-        document.getElementById('month-title').innerText = months[monthIdx];
-        document.getElementById('year-label').innerText = year;
+        for (let i = 1; i <= total; i++) {
+            const cell = document.getElementById(`day-cell-${i}`);
+            const dotsContainer = document.getElementById(`dots-cell-${i}`);
 
-        let data = {};
-        let selDay = null;
-        let curCat = 'meeting';
+            if (!cell || !dotsContainer) continue;
 
-        // Слушаем базу
-        onSnapshot(doc(db, "calendar", docId), (s) => {
-            data = s.exists() ? s.data() : {};
-            draw();
-            if(selDay) updatePreview();
-        });
+            // Сбрасываем старые точки и класс Вечери
+            dotsContainer.innerHTML = '';
+            cell.classList.remove('has-memorial');
 
-        function draw() {
-            const container = document.getElementById('grid');
-            if(!container) return;
-            container.innerHTML = '';
-
-            const firstDay = new Date(year, monthIdx, 1).getDay();
-            const shift = firstDay === 0 ? 6 : firstDay - 1;
-            const total = new Date(year, monthIdx + 1, 0).getDate();
-
-            for(let i=0; i<shift; i++) {
-                const empty = document.createElement('div');
-                empty.className = 'day empty';
-                container.appendChild(empty);
-            }
-
-            for(let i=1; i<=total; i++) {
-                const card = document.createElement('div');
-                const dObj = new Date(year, monthIdx, i);
-                const isWekend = dObj.getDay() === 0 || dObj.getDay() === 6;
-                const hasMem = data[i] && data[i].some(n => n.category === 'memorial');
-
-                card.className = 'day';
-                if(selDay === i) card.classList.add('selected');
-                if(isWekend) card.classList.add('weekend');
-                if(hasMem) card.classList.add('has-memorial');
-
-                card.innerHTML = `<span>${i}</span>`;
-                
-                if(data[i] && data[i].length > 0) {
-                    const dBox = document.createElement('div');
-                    dBox.className = 'dots';
-                    data[i].forEach(n => {
-                        const dot = document.createElement('div');
-                        dot.className = 'dot';
-                        if(n.category === 'memorial') dot.style.background = '#fff';
-                        else if(n.category === 'personal') dot.style.background = 'var(--ev-personal)';
-                        else dot.style.background = 'var(--ev-meeting)';
-                        dBox.appendChild(dot);
-                    });
-                    card.appendChild(dBox);
+            if (data[i] && data[i].length > 0) {
+                const hasMemorial = data[i].some(n => n.category === 'memorial');
+                if (hasMemorial) {
+                    cell.classList.add('has-memorial');
                 }
-                card.onclick = () => { 
-                    selDay = i; 
-                    draw(); 
-                    updatePreview(); 
-                    document.getElementById('edit-btn').style.display='block'; 
-                };
-                container.appendChild(card);
+
+                data[i].forEach(n => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if (n.category === 'memorial') dot.style.background = '#fff';
+                    else if (n.category === 'personal') dot.style.background = 'var(--ev-personal)';
+                    else dot.style.background = 'var(--ev-meeting)';
+                    dotsContainer.appendChild(dot);
+                });
             }
         }
+    }
 
-        window.updatePreview = () => {
-            const p = document.getElementById('live-preview');
-            const notes = data[selDay] || [];
-            p.innerHTML = notes.length ? notes.map(n => {
-                let color = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
-                return `<div style="border-left: 3px solid ${color}; padding-left: 8px; margin-bottom: 5px;">${n.text}</div>`;
-            }).join('') : 'Нет записей';
-        };
+    window.updatePreview = () => {
+        const p = document.getElementById('live-preview');
+        const notes = data[selDay] || [];
+        p.innerHTML = notes.length ? notes.map(n => {
+            let color = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'personal' ? 'var(--ev-personal)' : 'var(--ev-meeting)');
+            return `<div style="border-left: 3px solid ${color}; padding-left: 8px; margin-bottom: 5px; font-weight:600;">${n.text}</div>`;
+        }).join('') : 'Нет записей';
+    };
 
-        window.setCat = (c) => { 
-            curCat = c; 
-            const ids = { 'memorial': 'opt-mem', 'meeting': 'opt-meet', 'personal': 'opt-pers' };
-            Object.values(ids).forEach(id => document.getElementById(id).style.borderColor = 'transparent');
-            document.getElementById(ids[c]).style.borderColor = 'black';
-        };
+    window.setCat = (c) => {
+        curCat = c;
+        const ids = { 'memorial': 'opt-mem', 'meeting': 'opt-meet', 'personal': 'opt-pers' };
+        Object.values(ids).forEach(id => document.getElementById(id).style.borderColor = 'transparent');
+        document.getElementById(ids[c]).style.borderColor = 'black';
+    };
 
-        window.openModal = () => {
-            document.getElementById('modal-date').innerText = selDay + ' ' + months[monthIdx];
-            const list = document.getElementById('notes-list');
-            list.innerHTML = (data[selDay] || []).map((n, idx) => `
-                <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f8f8; padding:10px; border-radius:8px; margin-bottom:5px; border-left: 4px solid ${n.category==='memorial'?'var(--ev-memorial)':(n.category==='personal'?'var(--ev-personal)':'var(--ev-meeting)')}">
-                    <span style="font-size:0.9rem">${n.text}</span>
-                    <button onclick="del(${idx})" style="color:#ff4757; border:none; background:none; cursor:pointer; font-size:1.2rem; font-weight:bold;">×</button>
-                </div>`).join('');
-            document.getElementById('modal').style.display = 'flex';
-            setCat('meeting');
-        };
+    window.openModal = () => {
+        document.getElementById('modal-date').innerText = selDay + ' ' + months[monthIdx];
+        const list = document.getElementById('notes-list');
+        list.innerHTML = (data[selDay] || []).map((n, idx) => `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8f8f8; padding:10px; border-radius:8px; margin-bottom:5px; border-left: 4px solid ${n.category==='memorial'?'var(--ev-memorial)':(n.category==='personal'?'var(--ev-personal)':'var(--ev-meeting)')}">
+                <span style="font-size:0.9rem">${n.text}</span>
+                <button onclick="del(${idx})" style="color:#ff4757; border:none; background:none; cursor:pointer; font-size:1.2rem; font-weight:bold;">×</button>
+            </div>`).join('');
+        document.getElementById('modal').style.display = 'flex';
+        setCat('meeting');
+    };
 
-        window.closeModal = () => document.getElementById('modal').style.display = 'none';
+    window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
-        window.save = async () => {
-            const txt = document.getElementById('note-input').value.trim();
-            if(!txt) return;
-            const notes = [...(data[selDay] || [])];
-            notes.push({ text: txt, category: curCat });
-            await setDoc(doc(db, "calendar", docId), { [selDay]: notes }, { merge: true });
-            document.getElementById('note-input').value = '';
-            openModal();
-        };
+    window.save = async () => {
+        const txt = document.getElementById('note-input').value.trim();
+        if (!txt) return;
+        const notes = [...(data[selDay] || [])];
+        notes.push({ text: txt, category: curCat });
+        await setDoc(doc(db, "calendar", docId), { [selDay]: notes }, { merge: true });
+        document.getElementById('note-input').value = '';
+        openModal();
+    };
 
-        window.del = async (idx) => {
-            const notes = [...data[selDay]];
-            notes.splice(idx, 1);
-            await setDoc(doc(db, "calendar", docId), { [selDay]: notes }, { merge: true });
-            openModal();
-        };
-
-        draw();
-    </script>
-</body>
-</html>
+    window.del = async (idx) => {
+        const notes = [...data[selDay]];
+        notes.splice(idx, 1);
+        await setDoc(doc(db, "calendar", docId), { [selDay]: notes }, { merge: true });
+        openModal();
+    };
+</script>
