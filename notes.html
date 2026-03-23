@@ -49,7 +49,17 @@
         .day-box.weekend { background: var(--weekend); color: #636e72; }
         .day-box.selected { border-color: var(--accent) !important; background: #1e272e; }
         .day-box.has-memorial { background: var(--ev-mem-bg) !important; color: var(--ev-mem) !important; border-color: var(--ev-mem) !important; }
+.day-box.today {
+    background: rgba(230, 126, 34, 0.2) !important; /* Мягкий оранжевый фон */
+    border: 2px solid rgba(230, 126, 34, 0.5) !important; /* Оранжевая рамка */
+    color: #ffaa66 !important; /* Цвет цифры чуть ярче */
+    box-shadow: 0 0 10px rgba(230, 126, 34, 0.2); /* Легкое свечение */
+}
 
+/* Чтобы выделение не пропадало на выходных */
+.day-box.today.weekend {
+    color: #ffaa66 !important;
+}
         /* ИНДИКАТОРЫ НА ПЛИТКАХ */
         .indicator-row { position: absolute; bottom: 8px; display: flex; gap: 3px; justify-content: center; width: 100%; }
         .mark { height: 4px; width: 8px; border-radius: 2px; }
@@ -160,18 +170,40 @@
     let dbData = {};
     let selectedDay = null;
 
-    function renderGrid() {
-        const grid = document.getElementById('grid');
-        const firstDay = new Date(year, mIdx, 1).getDay();
-        const shift = firstDay === 0 ? 6 : firstDay - 1;
-        const totalDays = new Date(year, mIdx + 1, 0).getDate();
-        grid.innerHTML = '';
-        for (let i = 0; i < shift; i++) grid.innerHTML += `<div class="day-box" style="visibility:hidden"></div>`;
-        for (let d = 1; d <= totalDays; d++) {
-            const isWeekend = new Date(year, mIdx, d).getDay() % 6 === 0;
-            grid.innerHTML += `<div class="day-box ${isWeekend ? 'weekend' : ''}" id="tile-${d}" onclick="selectDay(${d})">${d}<div class="indicator-row" id="marks-${d}"></div></div>`;
-        }
+   function renderGrid() {
+    const grid = document.getElementById('grid');
+    const firstDay = new Date(year, mIdx, 1).getDay();
+    const shift = firstDay === 0 ? 6 : firstDay - 1;
+    const totalDays = new Date(year, mIdx + 1, 0).getDate();
+    
+    // Получаем реальную дату сегодня
+    const now = new Date();
+    const tDay = now.getDate();
+    const tMonth = now.getMonth();
+    const tYear = now.getFullYear();
+
+    grid.innerHTML = '';
+    
+    for (let i = 0; i < shift; i++) {
+        grid.innerHTML += `<div class="day-box" style="visibility:hidden"></div>`;
     }
+
+    for (let d = 1; d <= totalDays; d++) {
+        const isWeekend = new Date(year, mIdx, d).getDay() % 6 === 0;
+        
+        // Проверяем: это число 'd' совпадает с сегодняшним днем, выбранным месяцем и годом?
+        const isToday = (d === tDay && mIdx === tMonth && year === tYear);
+        
+        // Если это сегодня, добавляем класс 'today'
+        grid.innerHTML += `
+            <div class="day-box ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}" 
+                 id="tile-${d}" 
+                 onclick="selectDay(${d})">
+                ${d}
+                <div class="indicator-row" id="marks-${d}"></div>
+            </div>`;
+    }
+}
 
     function updateUI() {
         for (let d = 1; d <= 31; d++) {
