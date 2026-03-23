@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | New Indicator System</title>
+    <title>CALENDARIUM | Split Tile System</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
@@ -20,51 +20,58 @@
         .main { width: 100%; max-width: 500px; padding: 10px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         
-        /* КЛЕТКА ДНЯ */
+        /* ПЛИТКА ДНЯ */
         .day { 
             background: var(--dark); 
             aspect-ratio: 1/1; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             color: white;
             display: flex; 
-            flex-direction: column; /* Элементы друг под другом */
-            align-items: center; 
-            justify-content: space-between; /* Число сверху, индикаторы снизу */
-            position: relative; 
-            cursor: pointer; 
+            flex-direction: column; 
+            overflow: hidden; 
+            cursor: pointer;
             border: 2px solid transparent;
-            overflow: hidden;
+            transition: 0.2s;
         }
         .day.empty { background: transparent; pointer-events: none; }
         .day.weekend { background: var(--weekend); color: #d1d8db; }
         .day.selected { border-color: var(--accent) !important; }
         
-        /* ЧИСЛО МЕСЯЦА */
-        .day-number { margin-top: auto; margin-bottom: 2px; font-weight: bold; font-size: 17px; }
+        /* ВЕРХНЯЯ ЧАСТЬ (ЧИСЛО) */
+        .day-top {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
 
-        /* РОЗОВЫЙ ДЕНЬ */
-        .day.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
-        
-        /* ПОДВАЛ ДЛЯ ИНДИКАТОРОВ */
-        .day-footer { 
-            width: 100%; 
-            height: 12px; 
-            background: rgba(255,255,255,0.1); /* Чуть светлее тоном */
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 3px; 
-            padding-bottom: 2px;
+        /* НИЖНЯЯ ЧАСТЬ (ИНДИКАТОРЫ) */
+        .day-infobar {
+            height: 12px;
+            background: rgba(255,255,255,0.08); /* Чуть светлее основной плитки */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            padding: 2px;
         }
-        
-        /* МАЛЕНЬКИЕ ТОЧКИ-ИНДИКАТОРЫ */
-        .dot { 
-            width: 6px; 
-            height: 6px; 
-            border-radius: 50%; 
+
+        /* ЦВЕТ ВЕЧЕРИ (КРАСИТ ВСЁ) */
+        .day.has-memorial { background: var(--ev-memorial-bg) !important; }
+        .day.has-memorial .day-top { color: var(--ev-memorial) !important; }
+        .day.has-memorial .day-infobar { background: rgba(0,0,0,0.05); }
+
+        /* ИНДИКАТОРЫ */
+        .mini-mark {
+            height: 4px;
+            flex: 1; /* Растягиваются по ширине */
+            max-width: 12px;
+            border-radius: 2px;
         }
-        .dot.meeting { background: #0984e3; box-shadow: 0 0 4px #0984e3; }
-        .dot.personal { background: #ffffff; box-shadow: 0 0 4px #ffffff; }
+        .mark-meeting { background: #0984e3; }
+        .mark-personal { background: #ffffff; border: 0.5px solid #ccc; }
 
         .preview { background: white; width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
@@ -81,15 +88,15 @@
 
 <div class="main">
     <div class="grid" id="grid"></div>
-    <div class="preview" id="preview">Выберите дату</div>
-    <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">ИЗМЕНИТЬ</button>
+    <div class="preview" id="preview">Нажмите на дату</div>
+    <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
 </div>
 
 <div class="modal" id="modal">
     <div class="modal-box">
         <h3 id="modal-title" style="margin-top:0"></h3>
         <div id="modal-list" style="margin-bottom:10px;"></div>
-        <textarea id="note-input" placeholder="Текст заметки..." style="width:100%; height:50px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; padding:8px;"></textarea>
+        <textarea id="note-input" placeholder="Текст..." style="width:100%; height:50px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd; padding:8px;"></textarea>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
             <button class="btn" style="background:#ff4757; color:white; font-size: 10px;" onclick="save('memorial')">ВЕЧЕРЯ</button>
             <button class="btn" style="background:#0984e3; color:white; font-size: 10px;" onclick="save('meeting')">СОБРАНИЕ</button>
@@ -103,7 +110,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const firebaseConfig = {
+    const cfg = {
         apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
         authDomain: "calendarium-1f7d7.firebaseapp.com",
         projectId: "calendarium-1f7d7",
@@ -111,7 +118,7 @@
         appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
     };
 
-    const db = getFirestore(initializeApp(firebaseConfig));
+    const db = getFirestore(initializeApp(cfg));
     const mIdx = parseInt(localStorage.getItem('selectedMonth') || 0);
     const year = parseInt(localStorage.getItem('selectedYear') || 2026);
     const docId = `${year}_${mIdx}`;
@@ -134,8 +141,8 @@
             const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
             grid.innerHTML += `
                 <div class="day ${isW ? 'weekend' : ''}" id="day-${i}" onclick="selectDay(${i})">
-                    <div class="day-number">${i}</div>
-                    <div class="day-footer" id="foot-${i}"></div>
+                    <div class="day-top">${i}</div>
+                    <div class="day-infobar" id="infobar-${i}"></div>
                 </div>`;
         }
     }
@@ -151,26 +158,20 @@
     function updateVisuals() {
         for (let i = 1; i <= 31; i++) {
             const el = document.getElementById(`day-${i}`);
-            const foot = document.getElementById(`foot-${i}`);
-            if (!el || !foot) continue;
+            const bar = document.getElementById(`infobar-${i}`);
+            if (!el || !bar) continue;
 
             const notes = dbData[i] || [];
             const hasMem = notes.some(n => n.category === 'memorial');
             
-            // Розовый фон всей плитки
             el.classList.toggle('has-memorial', hasMem);
-            
-            // Очистка индикаторов
-            foot.innerHTML = '';
+            bar.innerHTML = '';
 
-            // Добавляем точки-индикаторы
             notes.forEach(n => {
-                if (n.category === 'meeting' || n.category === 'personal') {
-                    const dot = document.createElement('div');
-                    dot.className = `dot ${n.category}`;
-                    // Если фон розовый, белую точку делаем серой для видимости
-                    if (hasMem && n.category === 'personal') dot.style.background = '#888';
-                    foot.appendChild(dot);
+                if (n.category !== 'memorial') {
+                    const mark = document.createElement('div');
+                    mark.className = `mini-mark mark-${n.category}`;
+                    bar.appendChild(mark);
                 }
             });
         }
