@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CALENDARIUM | Split Tile System</title>
+    <title>CALENDARIUM | External Indicators</title>
     <style>
         :root { 
             --accent: #0088cc; --bg: #f4f7f6; --dark: #2d3436; 
@@ -18,62 +18,65 @@
         .back-btn { position: absolute; left: 15px; background: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; color: black; font-weight: bold; }
         
         .main { width: 100%; max-width: 500px; padding: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
         
-        /* ПЛИТКА ДНЯ */
-        .day { 
-            background: var(--dark); 
+        /* СЕТКА С УВЕЛИЧЕННЫМ ГЭПОМ ПО ВЕРТИКАЛИ */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 10px 5px; /* 10px между рядами, чтобы влезли индикаторы */
+        }
+        
+        /* КОНТЕЙНЕР ЯЧЕЙКИ */
+        .day-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* САМА ПЛИТКА (КВАДРАТ) */
+        .day-box { 
+            width: 100%;
             aspect-ratio: 1/1; 
+            background: var(--dark); 
             border-radius: 8px; 
             color: white;
             display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            cursor: pointer;
+            align-items: center; 
+            justify-content: center;
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 18px; 
             border: 2px solid transparent;
-            transition: 0.2s;
+            position: relative;
         }
-        .day.empty { background: transparent; pointer-events: none; }
-        .day.weekend { background: var(--weekend); color: #d1d8db; }
-        .day.selected { border-color: var(--accent) !important; }
+        .day-container.empty { visibility: hidden; }
+        .day-box.weekend { background: var(--weekend); color: #d1d8db; }
+        .day-box.selected { border-color: var(--accent) !important; }
         
-        /* ВЕРХНЯЯ ЧАСТЬ (ЧИСЛО) */
-        .day-top {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-        }
+        /* РОЗОВЫЙ ДЕНЬ */
+        .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
 
-        /* НИЖНЯЯ ЧАСТЬ (ИНДИКАТОРЫ) */
-        .day-infobar {
-            height: 12px;
-            background: rgba(255,255,255,0.08); /* Чуть светлее основной плитки */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2px;
-            padding: 2px;
-        }
-
-        /* ЦВЕТ ВЕЧЕРИ (КРАСИТ ВСЁ) */
-        .day.has-memorial { background: var(--ev-memorial-bg) !important; }
-        .day.has-memorial .day-top { color: var(--ev-memorial) !important; }
-        .day.has-memorial .day-infobar { background: rgba(0,0,0,0.05); }
-
-        /* ИНДИКАТОРЫ */
-        .mini-mark {
+        /* ЗОНА ИНДИКАТОРОВ ПОД ПЛИТКОЙ */
+        .indicator-area {
+            width: 80%;
             height: 4px;
-            flex: 1; /* Растягиваются по ширине */
-            max-width: 12px;
-            border-radius: 2px;
+            margin-top: 4px;
+            display: flex;
+            gap: 2px;
+            justify-content: center;
         }
-        .mark-meeting { background: #0984e3; }
-        .mark-personal { background: #ffffff; border: 0.5px solid #ccc; }
 
-        .preview { background: white; width: 100%; padding: 15px; margin-top: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        /* ПОЛОСКИ ПОД ПЛИТКОЙ */
+        .under-mark {
+            height: 100%;
+            flex: 1;
+            border-radius: 2px;
+            max-width: 15px;
+        }
+        .mark-meeting { background: var(--ev-meeting); box-shadow: 0 0 5px var(--ev-meeting); }
+        .mark-personal { background: #888; } /* Серый/Темный, чтобы было видно на светлом фоне страницы */
+
+        .preview { background: white; width: 100%; padding: 15px; margin-top: 10px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
         .modal-box { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 350px; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 5px; }
@@ -88,7 +91,7 @@
 
 <div class="main">
     <div class="grid" id="grid"></div>
-    <div class="preview" id="preview">Нажмите на дату</div>
+    <div class="preview" id="preview">Выберите число</div>
     <button class="btn" id="edit-btn" style="display:none; background: #000; color:white; margin-top:10px;" onclick="openModal()">РЕДАКТИРОВАТЬ</button>
 </div>
 
@@ -136,42 +139,42 @@
         const total = new Date(year, mIdx + 1, 0).getDate();
 
         grid.innerHTML = '';
-        for (let i = 0; i < shift; i++) grid.innerHTML += '<div class="day empty"></div>';
+        for (let i = 0; i < shift; i++) grid.innerHTML += '<div class="day-container empty"></div>';
         for (let i = 1; i <= total; i++) {
             const isW = (new Date(year, mIdx, i).getDay() % 6 === 0);
             grid.innerHTML += `
-                <div class="day ${isW ? 'weekend' : ''}" id="day-${i}" onclick="selectDay(${i})">
-                    <div class="day-top">${i}</div>
-                    <div class="day-infobar" id="infobar-${i}"></div>
+                <div class="day-container">
+                    <div class="day-box ${isW ? 'weekend' : ''}" id="box-${i}" onclick="selectDay(${i})">${i}</div>
+                    <div class="indicator-area" id="ind-${i}"></div>
                 </div>`;
         }
     }
 
     window.selectDay = (i) => {
         selectedDay = i;
-        document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
-        document.getElementById(`day-${i}`).classList.add('selected');
+        document.querySelectorAll('.day-box').forEach(d => d.classList.remove('selected'));
+        document.getElementById(`box-${i}`).classList.add('selected');
         document.getElementById('edit-btn').style.display = 'block';
         updatePreview();
     };
 
     function updateVisuals() {
         for (let i = 1; i <= 31; i++) {
-            const el = document.getElementById(`day-${i}`);
-            const bar = document.getElementById(`infobar-${i}`);
-            if (!el || !bar) continue;
+            const box = document.getElementById(`box-${i}`);
+            const area = document.getElementById(`ind-${i}`);
+            if (!box || !area) continue;
 
             const notes = dbData[i] || [];
             const hasMem = notes.some(n => n.category === 'memorial');
             
-            el.classList.toggle('has-memorial', hasMem);
-            bar.innerHTML = '';
+            box.classList.toggle('has-memorial', hasMem);
+            area.innerHTML = '';
 
             notes.forEach(n => {
                 if (n.category !== 'memorial') {
                     const mark = document.createElement('div');
-                    mark.className = `mini-mark mark-${n.category}`;
-                    bar.appendChild(mark);
+                    mark.className = `under-mark mark-${n.category}`;
+                    area.appendChild(mark);
                 }
             });
         }
