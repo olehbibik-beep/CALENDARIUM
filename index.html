@@ -179,19 +179,30 @@
         }
 
         window.checkName = (val) => {
-            const name = val.trim().toLowerCase();
-            const isOk = name.length > 0;
-            if (name === 'admin') {
-                canvas.classList.add('hidden');
-                adminBox.classList.remove('hidden');
-                document.getElementById('status').innerText = "Режим администратора";
-            } else {
-                canvas.classList.remove('hidden');
-                adminBox.classList.add('hidden');
-                canvas.classList.toggle('disabled', !isOk);
-                document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
-            }
-        };
+    // 1. ОЧИСТКА: Разрешаем только буквы (RU/EN) и цифры
+    const cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '');
+    const inputField = document.getElementById('username');
+
+    // Если ввели запрещенный символ — мгновенно удаляем его из поля
+    if (val !== cleanValue) {
+        inputField.value = cleanValue;
+    }
+
+    // 2. ЛОГИКА (как была у тебя, но на чистом имени)
+    const name = cleanValue.trim().toLowerCase();
+    const isOk = name.length > 0;
+    
+    if (name === 'admin') {
+        canvas.classList.add('hidden');
+        adminBox.classList.remove('hidden');
+        document.getElementById('status').innerText = "Режим администратора";
+    } else {
+        canvas.classList.remove('hidden');
+        adminBox.classList.add('hidden');
+        canvas.classList.toggle('disabled', !isOk);
+        document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
+    }
+};
 
         function initDots() {
             dots = [];
