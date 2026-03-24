@@ -245,10 +245,11 @@
         }
 
         window.changeYear = (dir) => { 
-            currentYear += dir; 
-            updateDisp(); 
-            loadData(); 
-        };
+    currentYear += dir; 
+    updateDisp(); 
+    initGrid(); // Перерисовываем сетку, чтобы обновить подсветку
+    loadData(); 
+};
 
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
