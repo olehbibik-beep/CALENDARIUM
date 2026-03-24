@@ -102,15 +102,18 @@
         .footer-text { font-size: 10px; color: #576574; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
         @media (max-width: 850px) {
-            body { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; padding: 15px; height: auto; border-right: none; border-bottom: 1px solid var(--footer-border); }
-            .year-switcher { margin-bottom: 15px; }
-            #display-year { font-size: 2.5rem; }
-            .main-content { 
-    padding: 10px 15px 40px 15px; /* Сверху 10px (минимум), снизу 40px (для зазора перед футером) */
-    align-items: flex-start;      /* Прижать контент к верху */
-    justify-content: center;      /* Центрировать по горизонтали */
-}
+            body { flex-direction: column; overflow-y: auto; display: flex; }
+            /* "Распаковываем" сайдбар, чтобы его дети стали элементами body */
+            .sidebar { display: contents; } 
+            
+            /* Расставляем порядок отображения на мобильных */
+            .user-header { order: 1; padding: 15px 15px 0 15px; width: 100%; }
+            .year-switcher { order: 2; padding: 0 15px 15px 15px; width: 100%; border-bottom: 1px solid var(--footer-border); margin-bottom: 10px; }
+            .main-content { order: 3; padding: 10px 15px 0 15px; align-items: flex-start; }
+            
+            /* Блок событий теперь будет строго ПОД календарем */
+            .upcoming-box { order: 4; width: 100%; padding: 15px; padding-bottom: 60px; margin-top: 10px; }
+            
             .months-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
             .month-card { border-radius: 12px; font-size: 0.9rem; }
         }
@@ -165,28 +168,24 @@
         if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
 
   function initGrid() {
-    const grid = document.getElementById('months');
-    grid.innerHTML = '';
-    
-    // Получаем текущую системную дату
-    const now = new Date();
-    const todayMonth = now.getMonth(); 
-    const todayYear = now.getFullYear();
+            const grid = document.getElementById('months');
+            const now = new Date();
+            const todayMonth = now.getMonth(); 
+            const todayYear = now.getFullYear();
 
-    monthsNames.forEach((m, i) => {
-        // Проверяем, совпадает ли месяц и год с текущим
-        const isToday = (i === todayMonth && currentYear === todayYear);
-        
-        // Если да — добавляем класс подсветки
-        const statusClass = isToday ? 'current-active' : '';
+            let gridHTML = '';
+            monthsNames.forEach((m, i) => {
+                const isToday = (i === todayMonth && currentYear === todayYear);
+                const statusClass = isToday ? 'current-active' : '';
 
-        grid.innerHTML += `
-            <div class="month-card ${statusClass}" onclick="goToMonth(${i})">
-                <span>${m.substring(0, 3)}</span>
-                <div class="month-indicator" id="ind-${i}"></div>
-            </div>`;
-    });
-}
+                gridHTML += `
+                    <div class="month-card ${statusClass}" onclick="goToMonth(${i})">
+                        <span>${m.substring(0, 3)}</span>
+                        <div class="month-indicator" id="ind-${i}"></div>
+                    </div>`;
+            });
+            grid.innerHTML = gridHTML; // Вставляем в DOM один раз
+        }
 
         window.goToMonth = (i) => {
             localStorage.setItem('selectedMonth', i);
@@ -194,10 +193,22 @@
             window.location.href = 'notes.html';
         };
 
+        window.changeYear = (dir) => { 
+            currentYear += dir; 
+            updateDisp(); 
+            initGrid(); // Обновляем сетку, чтобы не ломалась подсветка текущего месяца
+            loadData(); 
+        };
+
         async function loadData() {
             const container = document.getElementById('next-event-container');
-            let firstFound = null;
+            container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center;">ОБНОВЛЕНИЕ...</div>';
 
+            const now = new Date();
+            const today = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
+            let upcomingEvents = [];
+
+            // Очищаем индикаторы перед загрузкой
             for(let i=0; i<12; i++) {
                 const el = document.getElementById(`ind-${i}`);
                 if(el) el.innerHTML = '';
@@ -206,7 +217,6 @@
             const monthPromises = Array.from({length: 12}, (_, i) => 
                 getDoc(doc(db, "calendar", `${currentYear}_${i}`))
             );
-
             const snapshots = await Promise.all(monthPromises);
 
             snapshots.forEach((snap, i) => {
@@ -215,16 +225,42 @@
                     const ind = document.getElementById(`ind-${i}`);
                     let red = false, blue = false;
 
-                    Object.values(data).forEach(dayNotes => {
+                    // Object.entries позволяет получить и день (ключ), и массив заметок
+                    Object.entries(data).forEach(([dayKey, dayNotes]) => {
+                        const dayNum = parseInt(dayKey);
+                        
                         if(Array.isArray(dayNotes)) {
                             dayNotes.forEach(note => {
+                                // Определение цвета точек
                                 if (note.category === 'memorial' || note.category === 'congress') red = true;
                                 else blue = true;
-                                if (!firstFound) firstFound = { text: note.text, m: monthsNames[i], cat: note.category };
+
+                                // Проверяем, является ли событие будущим (или сегодняшним)
+                                let isUpcoming = false;
+                                if (currentYear > today.y) {
+                                    isUpcoming = true; // Будущий год
+                                } else if (currentYear === today.y) {
+                                    if (i > today.m) {
+                                        isUpcoming = true; // Будущий месяц в этом году
+                                    } else if (i === today.m && dayNum >= today.d) {
+                                        isUpcoming = true; // Этот месяц, сегодняшний или будущий день
+                                    }
+                                }
+
+                                if (isUpcoming) {
+                                    upcomingEvents.push({
+                                        text: note.text,
+                                        m: monthsNames[i],
+                                        monthIdx: i,
+                                        day: dayNum,
+                                        cat: note.category
+                                    });
+                                }
                             });
                         }
                     });
 
+                    // Отрисовываем точки для месяца
                     if (ind) {
                         if (red) ind.innerHTML += '<div class="dot red"></div>';
                         if (blue) ind.innerHTML += '<div class="dot blue"></div>';
@@ -232,17 +268,31 @@
                 }
             });
 
-            if (firstFound) {
-                const col = firstFound.cat === 'memorial' ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
-                container.innerHTML = `
-                    <div class="event-card-mini" style="border-left-color: ${col}">
-                        <div class="ev-title">${firstFound.text}</div>
-                        <div style="font-size:0.6rem; opacity:0.5;">${firstFound.m}</div>
-                    </div>`;
+            // Сортируем предстоящие события по месяцу и дню
+            upcomingEvents.sort((a, b) => {
+                if (a.monthIdx !== b.monthIdx) return a.monthIdx - b.monthIdx;
+                return a.day - b.day;
+            });
+
+            // Выводим максимум 3 ближайших события
+            if (upcomingEvents.length > 0) {
+                let html = '<div style="font-size:0.6rem; opacity:0.5; margin-bottom: 12px; text-align:center;">БЛИЖАЙШИЕ СОБЫТИЯ</div>';
+                
+                // Берем первые 3 события
+                upcomingEvents.slice(0, 3).forEach(ev => {
+                    const col = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
+                    html += `
+                        <div class="event-card-mini" style="border-left-color: ${col}; margin-bottom: 10px;">
+                            <div class="ev-title">${ev.text}</div>
+                            <div style="font-size:0.6rem; opacity:0.7;">${ev.day} ${ev.m}</div>
+                        </div>`;
+                });
+                container.innerHTML = html;
             } else {
-                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center;">CLEAR</div>';
+                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center;">НЕТ ПРЕДСТОЯЩИХ СОБЫТИЙ</div>';
             }
         }
+
 
         window.changeYear = (dir) => { 
     currentYear += dir; 
