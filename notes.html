@@ -15,7 +15,7 @@
     <style>
         :root { 
             --accent: #0088cc; --bg: #121416; --dark: #22272a; 
-            --ev-mem: #ff7675; --ev-mem-bg: #3b1e22; --ev-meet: #0984e3; 
+            --ev-mem: #ff7675; --ev-mem-bg: #3b1e22; --ev-meet: #09e0e3; 
             --weekend: #1a1e20; --text-main: #e0e6ed;
             --footer-bg: #0f1112; --footer-border: #222;
         }
@@ -51,7 +51,7 @@
         .day-box { 
             width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 12px; 
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 18px; cursor: pointer; border: 2px solid transparent;
+            font-weight: 900; font-size: 18px; cursor: pointer; border: 0px solid transparent;
             position: relative; transition: 0.2s;
         }
         .day-box.weekend { background: var(--weekend); color: #636e72; }
@@ -68,7 +68,7 @@
 }
         /* ИНДИКАТОРЫ НА ПЛИТКАХ */
         .indicator-row { position: absolute; bottom: 8px; display: flex; gap: 3px; justify-content: center; width: 100%; }
-        .mark { height: 2px; width: 80%; border-radius: 2px; }
+        .mark { height: 4px; width: 80%; border-radius: 2px; }
         .m-meeting { background: var(--ev-meet); }
         .m-personal { background: #555; }
 
