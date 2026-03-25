@@ -96,16 +96,16 @@
         /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 600px) {
             .auth-card { 
-                transform: translateY(-10vh); /* Поднимаем карточку чуть выше центра */
+                transform: translateY(-5vh); /* Поднимаем карточку чуть выше центра */
                 padding: 20px;
             }
             
             #notif-sidebar { 
                 top: auto; bottom: 30px; left: 15px; right: 15px; 
                 width: auto; height: auto; min-height: 200px;
-                transform: translateZ(50%); /* Выезжает снизу вверх для удобства */
+                transform: translateX(150%); /* Выезжает снизу вверх для удобства */
             }
-            #notif-sidebar.active { transform: translateY(0); }
+            #notif-sidebar.active { transform: translateX(0); }
         }
 
         footer {
