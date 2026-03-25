@@ -90,36 +90,21 @@
         #notif-sidebar.active { transform: translateX(0); }
         
         @media (max-width: 300px) {
-            #notif-sidebar { 
-    position: fixed; right: 0; top: 0; width: 350px; height: 100vh; 
-    background: var(--orange); color: white; z-index: 9999;
-    transform: translateX(100%); transition: transform 0.4s ease;
-    padding: 30px; box-sizing: border-box;
-    /* Добавляем центрирование */
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-}
+           #notif-sidebar { width: 100%; } /* На совсем мелких — на весь экран */
 
-        .notif-header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    width: 100%; /* Чтобы заголовок растянулся на всю ширину */
-    margin-bottom: 30px; 
-    font-weight: 900; 
-}
-        .close-x { cursor: pointer; font-size: 28px; line-height: 1; }
-        .log-card { 
-    background: rgba(255,255,255,0.2); 
-    width: 100%;      /* Лучше использовать 100%, чтобы не вылезало за края */
-    max-width: 300px; /* Но не шире 300px */
-    padding: 16px; 
-    border-radius: 10px; 
-    margin-bottom: 20px; 
-    text-align: center;
-    box-sizing: border-box;
+            .auth-card { padding: 20px; border-radius: 10px; }
+
+            h1 { font-size: 1.5rem; }
+
         }
+
+
+
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: 900; }
+
+        .close-x { cursor: pointer; font-size: 28px; line-height: 1; }
+
+        .log-card { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
         .orange-btn { width: 300px; padding: 16px; border-radius: 10px; border: none; background: white; color: var(--orange); font-weight: bold; cursor: pointer; font-size: 1rem; }
         .admin-btn { width: 300px; padding: 15px; border-radius: 10px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
