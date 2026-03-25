@@ -75,24 +75,25 @@
         .btn-delete { background: transparent; color: #555; border: 1px solid #333; }
         .btn-delete:hover { color: #ff7675; border-color: #ff7675; }
 
-        /* ШТОРКА */
+        /* ШТОРКА (ИСПРАВЛЕН ФОН) */
         #confirm-sidebar { 
-            position: fixed; right: 0; top: 0; width: 320px; height: 100vh; 
-            background: var(--orange); color: white; z-index: 2000;
+            position: fixed; right: 0; top: 0; width: 320px; height: 100vh; 
+            background: #f39c12 !important; /* Насыщенный оранжевый без прозрачности */
+            color: white; z-index: 2000;
             transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
             padding: 40px 30px; box-sizing: border-box; display: flex; flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
         }
         #confirm-sidebar.active { transform: translateX(0); }
         .sh-title { font-size: 2rem; font-weight: 900; margin-bottom: 10px; line-height: 0.9; }
-        .sh-desc { font-size: 0.8rem; opacity: 0.9; margin-bottom: 30px; font-weight: 600; text-transform: uppercase; }
+        .sh-desc { font-size: 0.8rem; opacity: 1; margin-bottom: 30px; font-weight: 700; text-transform: uppercase; }
         .sh-btn { 
             width: 100%; padding: 15px; border-radius: 15px; border: none; 
             font-weight: 900; cursor: pointer; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;
         }
         .sh-confirm { background: white; color: var(--orange); }
-        .sh-cancel { background: rgba(0,0,0,0.1); color: white; }
+        .sh-cancel { background: rgba(0,0,0,0.2); color: white; }
 
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
         @media (max-width: 800px) {
             main { grid-template-columns: 1fr; overflow-y: auto; }
             .column { height: auto; overflow: visible; padding: 20px; }
@@ -130,6 +131,13 @@
     </main>
 
     <script type="module">
+        // --- ЗАЩИТА АДМИНКИ ---
+        const currentUser = (localStorage.getItem('currentUser') || '').toLowerCase();
+        if (currentUser !== 'admin') {
+            window.location.replace('index.html');
+        }
+        // ----------------------
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -162,6 +170,7 @@
             closeSidebar();
         };
 
+        // Запросы
         onSnapshot(collection(db, "requests"), (snapshot) => {
             const list = document.getElementById('request-list');
             list.innerHTML = snapshot.empty ? '<p style="color:#222; font-size:0.6rem; font-weight:900;">ПУСТО</p>' : '';
@@ -173,12 +182,13 @@
                         <div class="user-avatar">?</div>
                         <span class="user-name">${res.id}</span>
                     </div>
-                    <button class="card-btn btn-approve" onclick="openConfirm('Одобрить ${res.id}?', () => approveUser('${res.id}'))">OK</button>
+                    <button class="card-btn btn-approve" onclick="openConfirm('Одобрить ${res.id}?', () => window.approveUser('${res.id}'))">OK</button>
                 `;
                 list.appendChild(card);
             });
         });
 
+        // Активные пользователи
         onSnapshot(collection(db, "users"), (snapshot) => {
             const list = document.getElementById('user-list');
             list.innerHTML = '';
@@ -191,7 +201,7 @@
                         <div class="user-avatar">${res.id[0].toUpperCase()}</div>
                         <span class="user-name">${res.id}</span>
                     </div>
-                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${res.id}?', () => deleteDocById('users', '${res.id}'))">DEL</button>
+                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${res.id}?', () => window.deleteDocById('users', '${res.id}'))">DEL</button>
                 `;
                 list.appendChild(card);
             });
