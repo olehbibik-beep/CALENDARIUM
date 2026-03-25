@@ -95,9 +95,24 @@
             h1 { font-size: 1.5rem; }
         }
 
-        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-weight: 300px; }
+        .notif-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; /* Чтобы заголовок растянулся на всю ширину */
+    margin-bottom: 30px; 
+    font-weight: 900; 
+}
         .close-x { cursor: pointer; font-size: 28px; line-height: 1; }
-        .log-card { background: rgba(255,255,255,0.2); center; width: 300px; padding: 16px; border-radius: 10px; margin-bottom: 20px; }
+        .log-card { 
+    background: rgba(255,255,255,0.2); 
+    width: 100%;      /* Лучше использовать 100%, чтобы не вылезало за края */
+    max-width: 300px; /* Но не шире 300px */
+    padding: 16px; 
+    border-radius: 10px; 
+    margin-bottom: 20px; 
+    text-align: center;
+    box-sizing: border-box;
         
         .orange-btn { width: 300px; padding: 16px; border-radius: 10px; border: none; background: white; color: var(--orange); font-weight: bold; cursor: pointer; font-size: 1rem; }
         .admin-btn { width: 300px; padding: 15px; border-radius: 10px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
