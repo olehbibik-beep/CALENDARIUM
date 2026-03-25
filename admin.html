@@ -13,6 +13,7 @@
             --text: #ffffff;
             --muted: #444;
             --border: #222;
+            --danger: #ff4757;
         }
         
         body { 
@@ -44,8 +45,27 @@
             display: flex; flex-direction: column;
         }
 
-        h2 { font-size: 1.2rem; font-weight: 900; margin: 0 0 20px; text-transform: uppercase; letter-spacing: -1px; }
+        h2 { 
+            font-size: 1.2rem; font-weight: 900; margin: 0 0 20px; text-transform: uppercase; letter-spacing: -1px; 
+            display: flex; align-items: center;
+        }
+        
+        /* СЧЕТЧИКИ */
+        .badge {
+            background: var(--orange); color: white; padding: 2px 8px; border-radius: 12px; 
+            font-size: 0.7rem; margin-left: 10px; font-weight: 800;
+        }
+
         .section-label { font-size: 0.55rem; font-weight: 900; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+
+        /* ПОИСК */
+        .search-input {
+            width: 100%; padding: 12px 15px; margin-bottom: 20px; border-radius: 12px;
+            border: 1px solid var(--border); background: #000; color: white;
+            font-family: inherit; font-size: 0.8rem; box-sizing: border-box; outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus { border-color: var(--accent); }
 
         /* СЕТКА КАРТОЧЕК */
         .cards-grid { 
@@ -59,27 +79,31 @@
         }
         .user-card:hover { border-color: #444; }
         
-        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info { display: flex; align-items: center; gap: 10px; overflow: hidden; }
         .user-avatar { 
-            width: 32px; height: 32px; background: #1a1a1a; border-radius: 50%; 
+            width: 32px; height: 32px; min-width: 32px; background: #1a1a1a; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
             font-size: 0.8rem; color: var(--accent); font-weight: 900; border: 1px solid var(--border);
         }
-        .user-name { font-weight: 800; font-size: 0.85rem; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .user-name { font-weight: 800; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
+        .card-actions { display: flex; gap: 5px; }
+
         .card-btn { 
             padding: 6px 10px; border-radius: 8px; border: none;
             font-weight: 900; cursor: pointer; font-size: 0.55rem; text-transform: uppercase;
         }
         .btn-approve { background: var(--accent); color: #000; }
+        .btn-reject { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+        .btn-reject:hover { background: var(--danger); color: white; }
+        
         .btn-delete { background: transparent; color: #555; border: 1px solid #333; }
-        .btn-delete:hover { color: #ff7675; border-color: #ff7675; }
+        .btn-delete:hover { color: var(--danger); border-color: var(--danger); }
 
-        /* ШТОРКА (ИСПРАВЛЕН ФОН) */
+        /* ШТОРКА */
         #confirm-sidebar { 
             position: fixed; right: 0; top: 0; width: 320px; height: 100vh; 
-            background: #f39c12 !important; /* Насыщенный оранжевый без прозрачности */
-            color: white; z-index: 2000;
+            background: #f39c12 !important; color: white; z-index: 2000;
             transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
             padding: 40px 30px; box-sizing: border-box; display: flex; flex-direction: column;
             box-shadow: -10px 0 30px rgba(0,0,0,0.5);
@@ -119,13 +143,16 @@
     <main>
         <div class="column">
             <span class="section-label">Signal Inbound</span>
-            <h2>Запросы</h2>
+            <h2>Запросы <span class="badge" id="req-count">0</span></h2>
             <div class="cards-grid" id="request-list"></div>
         </div>
 
         <div class="column" style="border-left: 1px solid var(--border);">
             <span class="section-label">Active Users</span>
-            <h2>База данных</h2>
+            <h2>База данных <span class="badge" id="usr-count">0</span></h2>
+            
+            <input type="text" id="user-search" class="search-input" placeholder="Поиск пользователя...">
+            
             <div class="cards-grid" id="user-list"></div>
         </div>
     </main>
@@ -153,6 +180,7 @@
         const db = getFirestore(initializeApp(firebaseConfig));
         const sidebar = document.getElementById('confirm-sidebar');
         let pendingAction = null;
+        let allActiveUsers = []; // Хранилище для поиска
 
         window.openConfirm = (text, action) => {
             document.getElementById('confirm-text').innerText = text;
@@ -170,10 +198,13 @@
             closeSidebar();
         };
 
-        // Запросы
+        // --- ЗАПРОСЫ (Добавлена функция отклонения и счетчик) ---
         onSnapshot(collection(db, "requests"), (snapshot) => {
             const list = document.getElementById('request-list');
-            list.innerHTML = snapshot.empty ? '<p style="color:#222; font-size:0.6rem; font-weight:900;">ПУСТО</p>' : '';
+            document.getElementById('req-count').innerText = snapshot.size; // Обновляем счетчик
+            
+            list.innerHTML = snapshot.empty ? '<p style="color:#444; font-size:0.7rem; font-weight:900;">НЕТ НОВЫХ ЗАПРОСОВ</p>' : '';
+            
             snapshot.forEach(res => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
@@ -182,31 +213,58 @@
                         <div class="user-avatar">?</div>
                         <span class="user-name">${res.id}</span>
                     </div>
-                    <button class="card-btn btn-approve" onclick="openConfirm('Одобрить ${res.id}?', () => window.approveUser('${res.id}'))">OK</button>
+                    <div class="card-actions">
+                        <button class="card-btn btn-approve" onclick="openConfirm('Одобрить ${res.id}?', () => window.approveUser('${res.id}'))">OK</button>
+                        <button class="card-btn btn-reject" onclick="openConfirm('Отклонить заявку ${res.id}?', () => window.deleteDocById('requests', '${res.id}'))">✕</button>
+                    </div>
                 `;
                 list.appendChild(card);
             });
         });
 
-        // Активные пользователи
+        // --- БАЗА ДАННЫХ (Добавлен поиск и счетчик) ---
         onSnapshot(collection(db, "users"), (snapshot) => {
-            const list = document.getElementById('user-list');
-            list.innerHTML = '';
+            allActiveUsers = [];
             snapshot.forEach(res => {
-                if (res.id === 'admin') return;
+                if (res.id !== 'admin') {
+                    allActiveUsers.push({ id: res.id, data: res.data() });
+                }
+            });
+            document.getElementById('usr-count').innerText = allActiveUsers.length; // Обновляем счетчик
+            renderUsers(); // Отрисовываем пользователей
+        });
+
+        // Функция отрисовки пользователей (с учетом поиска)
+        function renderUsers() {
+            const list = document.getElementById('user-list');
+            const searchQuery = document.getElementById('user-search').value.toLowerCase();
+            list.innerHTML = '';
+
+            const filteredUsers = allActiveUsers.filter(user => user.id.toLowerCase().includes(searchQuery));
+
+            if (filteredUsers.length === 0) {
+                list.innerHTML = '<p style="color:#444; font-size:0.7rem; font-weight:900;">НИЧЕГО НЕ НАЙДЕНО</p>';
+                return;
+            }
+
+            filteredUsers.forEach(user => {
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.innerHTML = `
                     <div class="user-info">
-                        <div class="user-avatar">${res.id[0].toUpperCase()}</div>
-                        <span class="user-name">${res.id}</span>
+                        <div class="user-avatar">${user.id[0].toUpperCase()}</div>
+                        <span class="user-name">${user.id}</span>
                     </div>
-                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${res.id}?', () => window.deleteDocById('users', '${res.id}'))">DEL</button>
+                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${user.id}?', () => window.deleteDocById('users', '${user.id}'))">DEL</button>
                 `;
                 list.appendChild(card);
             });
-        });
+        }
 
+        // Слушатель для строки поиска
+        document.getElementById('user-search').addEventListener('input', renderUsers);
+
+        // --- ДЕЙСТВИЯ ---
         window.approveUser = async (id) => {
             const snap = await getDoc(doc(db, "requests", id));
             if (snap.exists()) {
