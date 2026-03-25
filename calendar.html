@@ -4,11 +4,11 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
     <meta name="apple-mobile-web-app-title" content="Calendarium">
-<meta name="application-name" content="Calendarium">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#121416">
+    <meta name="application-name" content="Calendarium">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121416">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Главная | CALENDARIUM</title>
@@ -21,7 +21,7 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* САЙДБАР - СТАЛ ШИРЕ */
+        /* САЙДБАР */
         .sidebar { 
             width: 300px; background: #0f1112; padding: 25px; 
             display: flex; flex-direction: column; border-right: 1px solid var(--footer-border);
@@ -56,44 +56,21 @@
         }
         .month-card:active { transform: scale(0.92); }
 
-        /* Обновляем контейнер для индикаторов */
-.month-indicator { 
-    position: absolute; 
-    bottom: 10px; 
-    display: flex; 
-    gap: 3px; 
-    height: 4px; /* Высота линии */
-    width: 80%;  /* Растягиваем почти на всю ширину карточки */
-    justify-content: center;
-}
+        .month-indicator { 
+            position: absolute; bottom: 10px; display: flex; gap: 3px; height: 4px; width: 80%; justify-content: center;
+        }
 
-/* Общий стиль для индикатора */
-.dot { 
-    width: 100%;      /* Ширина полоски */
-    height: 4px;      /* Высота полоски */
-    border-radius: 2px; /* Легкое закругление углов */
-    transition: 0.3s;
-}
+        .dot { width: 100%; height: 4px; border-radius: 2px; transition: 0.3s; }
+        .dot.red { background: var(--ev-memorial); }
+        .dot.blue { background: var(--ev-meeting);  }
 
-/* Цвета */
-.dot.red { 
-    background: var(--ev-memorial); 
-}
-.dot.blue { 
-    background: var(--ev-meeting);  
-}
-/* Стиль для плитки текущего месяца */
-.month-card.current-active {
-    background: rgba(112, 111, 111, 0.9) !important; /* Очень прозрачный оранжевый */
-    border: 0px solid rgba(230, 126, 34, 0.25) !important; /* Тонкая рамка в цвет */
-}
+        .month-card.current-active {
+            background: rgba(112, 111, 111, 0.9) !important; 
+            border: 0px solid rgba(230, 126, 34, 0.25) !important; 
+        }
+        .month-card.current-active span { color: #ffffff; text-shadow: 0 0 8px rgba(230, 126, 34, 0.4); }
 
-/* Опционально: сделаем текст месяца чуть ярче для контраста */
-.month-card.current-active span {
-    color: #ffffff; 
-    text-shadow: 0 0 8px rgba(230, 126, 34, 0.4);
-}
-        /* ФУТЕР КАК РАНЬШЕ */
+        /* ФУТЕР */
         footer {
             position: fixed; bottom: 0; left: 0; width: 100%; background: var(--footer-bg); 
             padding: 15px 25px; display: flex; align-items: center; border-top: 1px solid var(--footer-border); z-index: 100;
@@ -103,17 +80,11 @@
 
         @media (max-width: 850px) {
             body { flex-direction: column; overflow-y: auto; display: flex; }
-            /* "Распаковываем" сайдбар, чтобы его дети стали элементами body */
             .sidebar { display: contents; } 
-            
-            /* Расставляем порядок отображения на мобильных */
             .user-header { order: 1; padding: 15px 15px 0 15px; width: 100%; }
             .year-switcher { order: 2; padding: 0 15px 15px 15px; width: 100%; border-bottom: 1px solid var(--footer-border); margin-bottom: 10px; }
             .main-content { order: 3; padding: 10px 15px 0 15px; align-items: flex-start; }
-            
-            /* Блок событий теперь будет строго ПОД календарем */
             .upcoming-box { order: 4; width: 100%; padding: 0px; padding-bottom: 60px; margin-top: 10px; }
-            
             .months-grid { grid-template-columns: repeat(4, 1fr); gap: 8px; }
             .month-card { border-radius: 12px; font-size: 0.9rem; }
         }
@@ -148,6 +119,17 @@
     </footer>
 
     <script type="module">
+        // ==========================================
+        // 1. ЗАЩИТА СТРАНИЦЫ (БЛОК БЕЗОПАСНОСТИ)
+        // ==========================================
+        const user = localStorage.getItem('currentUser');
+        
+        // Если пользователя нет в памяти, выкидываем на страницу входа
+        if (!user) {
+            window.location.replace('index.html');
+        }
+        // ==========================================
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -163,11 +145,14 @@
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || 2026;
-        const user = localStorage.getItem('currentUser') || 'ГОСТЬ';
+        
+        // Отображаем имя пользователя и кнопку админа, если это admin
         document.getElementById('user-display').innerText = user;
-        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'block';
+        if(user.toLowerCase() === 'admin') {
+            document.getElementById('admin-btn').style.display = 'block';
+        }
 
-  function initGrid() {
+        function initGrid() {
             const grid = document.getElementById('months');
             const now = new Date();
             const todayMonth = now.getMonth(); 
@@ -184,7 +169,7 @@
                         <div class="month-indicator" id="ind-${i}"></div>
                     </div>`;
             });
-            grid.innerHTML = gridHTML; // Вставляем в DOM один раз
+            grid.innerHTML = gridHTML;
         }
 
         window.goToMonth = (i) => {
@@ -196,7 +181,7 @@
         window.changeYear = (dir) => { 
             currentYear += dir; 
             updateDisp(); 
-            initGrid(); // Обновляем сетку, чтобы не ломалась подсветка текущего месяца
+            initGrid(); 
             loadData(); 
         };
 
@@ -208,7 +193,6 @@
             const today = { y: now.getFullYear(), m: now.getMonth(), d: now.getDate() };
             let upcomingEvents = [];
 
-            // Очищаем индикаторы перед загрузкой
             for(let i=0; i<12; i++) {
                 const el = document.getElementById(`ind-${i}`);
                 if(el) el.innerHTML = '';
@@ -225,25 +209,22 @@
                     const ind = document.getElementById(`ind-${i}`);
                     let red = false, blue = false;
 
-                    // Object.entries позволяет получить и день (ключ), и массив заметок
                     Object.entries(data).forEach(([dayKey, dayNotes]) => {
                         const dayNum = parseInt(dayKey);
                         
                         if(Array.isArray(dayNotes)) {
                             dayNotes.forEach(note => {
-                                // Определение цвета точек
                                 if (note.category === 'memorial' || note.category === 'congress') red = true;
                                 else blue = true;
 
-                                // Проверяем, является ли событие будущим (или сегодняшним)
                                 let isUpcoming = false;
                                 if (currentYear > today.y) {
-                                    isUpcoming = true; // Будущий год
+                                    isUpcoming = true;
                                 } else if (currentYear === today.y) {
                                     if (i > today.m) {
-                                        isUpcoming = true; // Будущий месяц в этом году
+                                        isUpcoming = true; 
                                     } else if (i === today.m && dayNum >= today.d) {
-                                        isUpcoming = true; // Этот месяц, сегодняшний или будущий день
+                                        isUpcoming = true; 
                                     }
                                 }
 
@@ -260,7 +241,6 @@
                         }
                     });
 
-                    // Отрисовываем точки для месяца
                     if (ind) {
                         if (red) ind.innerHTML += '<div class="dot red"></div>';
                         if (blue) ind.innerHTML += '<div class="dot blue"></div>';
@@ -268,17 +248,14 @@
                 }
             });
 
-            // Сортируем предстоящие события по месяцу и дню
             upcomingEvents.sort((a, b) => {
                 if (a.monthIdx !== b.monthIdx) return a.monthIdx - b.monthIdx;
                 return a.day - b.day;
             });
 
-            // Выводим максимум 3 ближайших события
             if (upcomingEvents.length > 0) {
                 let html = '<div style="font-size:0.6rem; opacity:0.5; margin-bottom: 12px; text-align:center;">БЛИЖАЙШИЕ СОБЫТИЯ</div>';
                 
-                // Берем первые 3 события
                 upcomingEvents.slice(0, 3).forEach(ev => {
                     const col = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
                     html += `
@@ -292,14 +269,6 @@
                 container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center;">НЕТ ПРЕДСТОЯЩИХ СОБЫТИЙ</div>';
             }
         }
-
-
-        window.changeYear = (dir) => { 
-    currentYear += dir; 
-    updateDisp(); 
-    initGrid(); // Перерисовываем сетку, чтобы обновить подсветку
-    loadData(); 
-};
 
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
