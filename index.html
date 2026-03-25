@@ -38,13 +38,13 @@
 
         input { 
             width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 20px; 
-            border: 1px solid #f0f0f0; background: #fafafa; text-align: center; 
+            border: 1px solid #f0f0f0; background: #454545; text-align: center; 
             font-size: 1rem; outline: none; box-sizing: border-box; 
         }
         
         /* Адаптивный холст */
         canvas { 
-            background: #fff; border: 0px solid #f0f0f0; border-radius: 30px; 
+            background: #fff; border: 0px solid #f0f0f0; border-radius: 20px; 
             cursor: crosshair; max-width: 100%; height: auto; touch-action: none;
         }
         canvas.disabled { opacity: 0.1; pointer-events: none; }
@@ -89,9 +89,6 @@
         #notif-sidebar.active { transform: translateX(0); }
         
         @media (max-width: 300px) {
-            .auth-header {
-        margin-bottom: 15px; /* Уменьшили с 25px */
-    }
             #notif-sidebar { width: 100%; } /* На совсем мелких — на весь экран */
             .auth-card { padding: 20px; border-radius: 10px; }
             h1 { font-size: 1.5rem; }
