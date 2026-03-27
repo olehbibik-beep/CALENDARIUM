@@ -14,7 +14,7 @@
     <title>Главная | CALENDARIUM</title>
     <style>
         :root { 
-            --accent: #0088cc; --bg: #121416; --dark: #22272a; --card-bg: #1e2224;
+            --accent: #0088cc; --bg: #121416; --dark: #22272a; --card-bg: #5a5a5a;
             --ev-memorial: #ff7675; --ev-meeting: #09e0e3; --text-main: #e0e6ed;
             --footer-bg: #0f1112; --footer-border: #222;
         }
@@ -53,11 +53,11 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             color: #fff; font-weight: 900; cursor: pointer; position: relative; transition: 0.3s;
             text-transform: uppercase; font-size: 0.9rem; border: 0px solid transparent;
-        } /* ВОТ ЭТА СКОБКА БЫЛА ПРОПУЩЕНА! */
+        }
 
         .month-card.current-active {
             /* 1. Убираем фон и бордер у самой плитки */
-            background: rgba(60, 60, 60, 0.6);
+            background: rgba(40, 70, 70, 0.9);
             border: none !important; 
             
             /* 2. Подготовка для внутреннего слоя */
@@ -71,7 +71,7 @@
             position: absolute;
             
             /* Прижимаем к краям, но делаем отступ */
-            top: 80%; left: 0px; right: 0px; bottom: 0%; 
+            top: 0px; left: 0px; right: 0px; bottom: 20px; 
             
             /* Твой цвет фона */
             background: rgba(90, 90, 90, 0.9); 
