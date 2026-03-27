@@ -138,13 +138,14 @@
         /* МОБИЛЬНАЯ АДАПТАЦИЯ (СВЕРХУ) */
         @media (max-width: 600px) {
             .auth-card { 
-                z-index: 9999 !important;
+                z-index: 10;
                 transform: translateY(-8vh); 
                 padding: 20px;
             }
             
             #notif-sidebar { 
                 position: fixed; /* На мобилках фиксируем сверху */
+                z-index: 9999 !important;
                 top: 20px; 
                 left: 10px; right: 10px; 
                 bottom: auto;
