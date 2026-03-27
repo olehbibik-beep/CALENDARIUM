@@ -134,15 +134,40 @@
         .footer-text { font-size: 9px; color: #444; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .footer-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 10px #2ecc71; }
 
-        /* МОБИЛЬНАЯ ВЕРСИЯ */
-        @media (max-width: 850px) {
-            .app-container { height: 98vh; width: 95vw; flex-direction: column; border-radius: 20px; }
-            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--inner-border); padding: 20px; }
-            .main-view { padding: 20px; padding-bottom: 80px; }
-            .months-grid { grid-template-columns: repeat(3, 1fr); }
-            .upcoming-box { display: none; } /* Скрываем на мобилках для экономии места */
-            .inner-footer { bottom: 10px; left: 20px; right: 20px; }
+        /* МОБИЛЬНАЯ АДАПТАЦИЯ (ИСПРАВЛЕНО) */
+    @media (max-width: 850px) {
+        body { overflow: auto; height: auto; padding: 10px 0; }
+        .app-container { 
+            flex-direction: column; 
+            height: auto; 
+            min-height: 95vh;
+            width: 95vw;
+            overflow: visible;
         }
+        .sidebar { 
+            width: 100%; 
+            border-right: none; 
+            border-bottom: 1px solid var(--inner-border); 
+            padding: 20px;
+        }
+        .upcoming-box { 
+            display: block; /* Возвращаем видимость */
+            margin-top: 20px;
+        }
+        .main-view { 
+            padding: 20px; 
+            overflow: visible;
+        }
+        .months-grid { 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px;
+        }
+        #display-year { font-size: 2.5rem; }
+        
+        /* На мобилках переносим блок событий из сайдбара ВНИЗ под календарь для удобства */
+        .sidebar { order: 1; }
+        .main-view { order: 2; }
+    }
     </style>
 </head>
 <body>
