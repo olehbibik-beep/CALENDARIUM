@@ -296,13 +296,6 @@ async function loadData() {
     }
 }
 
-            // Рендер уведомлений в сайдбар
-            let html = '<div style="font-size:0.6rem; color:var(--accent); margin-bottom:15px; font-weight:800;">СОБЫТИЯ</div>';
-            upcomingEvents.slice(0, 5).forEach(ev => {
-                html += `<div class="event-card-mini"><div class="ev-title">${ev.text}</div><div style="font-size:0.6rem; opacity:0.5;">${ev.day} ${ev.m}</div></div>`;
-            });
-            container.innerHTML = html;
-        }
 
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
