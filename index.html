@@ -65,7 +65,7 @@
         /* УВЕДОМЛЕНИЯ (PC: ВЫЕЗД ИЗ-ПОД ПЛИТКИ БЕЗ ПОТЕРИ РАЗМЕРА) */
 #notif-sidebar { 
     position: absolute; 
-    top: 50%; left: 10%; 
+    top: 50%; left: 50%; 
     width: 300px; /* УВЕЛИЧИЛИ ШИРИНУ */
     height: 45%;
     background: var(--orange); 
@@ -90,13 +90,42 @@
     opacity: 1;
 }
 
-     .notif-header { 
-            display: flex; justify-content: space-between; align-items: right; 
-            margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2);
-            padding-bottom: 10px;
-        }
-        .notif-header span:first-child { font-weight: 900; font-size: 0.7rem; letter-spacing: 1.5px; opacity: 0.9; }
-        .close-x { cursor: pointer; font-size: 24px; line-height: 1; opacity: 0.7; }
+.notif-header { 
+    display: flex; 
+    /* Сдвигаем всё вправо */
+    justify-content: flex-end; 
+    /* Расстояние между заголовком и крестиком */
+    gap: 15px; 
+    /* Выравнивание по вертикали (чтобы крестик не прыгал выше текста) */
+    align-items: center; 
+    
+    margin-bottom: 20px; 
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    padding-bottom: 10px;
+}
+
+.notif-header span:first-child { 
+    font-weight: 900; 
+    font-size: 0.7rem; 
+    letter-spacing: 1.5px; 
+    opacity: 0.9; 
+    /* Убираем лишние отступы, если они были */
+    margin: 0;
+}
+
+.close-x { 
+    cursor: pointer; 
+    font-size: 24px; 
+    line-height: 1; 
+    opacity: 0.7; 
+    /* Чтобы крестик всегда был крайним справа */
+    order: 2; 
+}
+
+.notif-header span:first-child {
+    /* Чтобы заголовок был перед крестиком */
+    order: 1;
+}
 
         #log-container { flex: 1; display: flex; flex-direction: column; justify-content: right; text-align: right; }
 
