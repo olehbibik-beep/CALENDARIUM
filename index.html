@@ -62,29 +62,32 @@
 
         .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
-        /* УВЕДОМЛЕНИЯ (PC: ПРЯЧЕТСЯ ПОД КАРТОЧКОЙ И ВЫЕЗЖАЕТ ВПРАВО) */
-        #notif-sidebar { 
-            position: absolute; 
-            top: 50%; left: 50%; /* Ставим ровно по центру экрана */
-            width: 300px; 
-            background: var(--orange); color: white; 
-            z-index: 5; /* Уведомление ПОД карточкой (т.к. у карточки z-index: 10) */
-            border-radius: 8px;
-            padding: 25px; box-sizing: border-box;
-            
-            /* Изначально прячем точно за карточкой и немного уменьшаем */
-            transform: translate(-50%, -100%) scale(0.9); 
-            opacity: 0;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            display: flex; flex-direction: column;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
-        }
-        
-        #notif-sidebar.active { 
-            /* Выдвигаем вправо (сдвиг +200px от центра) и возвращаем нормальный размер */
-            transform: translate(calc(-50% + 300px), -50%) scale(1); 
-            opacity: 1;
-        }
+        /* УВЕДОМЛЕНИЯ (PC: ВЫЕЗД ИЗ-ПОД ПЛИТКИ БЕЗ ПОТЕРИ РАЗМЕРА) */
+#notif-sidebar { 
+    position: absolute; 
+    top: 50%; left: 50%; 
+    width: 400px; /* УВЕЛИЧИЛИ ШИРИНУ */
+    background: var(--orange); 
+    color: white; 
+    z-index: 5; 
+    border-radius: 8px;
+    padding: 30px; /* Немного больше внутренних отступов для солидности */
+    box-sizing: border-box;
+    
+    /* УБРАЛИ SCALE(0.9): теперь размер не меняется при появлении */
+    transform: translate(-50%, -50%); 
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); /* Более плавный "дорогой" выезд */
+    display: flex; 
+    flex-direction: column;
+    box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+}
+
+#notif-sidebar.active { 
+    /* УВЕЛИЧИЛИ СДВИГ: теперь выезжает на 280px вправо */
+    transform: translate(calc(-50% + 280px), -50%); 
+    opacity: 1;
+}
 
         .notif-header { 
             display: flex; justify-content: space-between; align-items: center; 
