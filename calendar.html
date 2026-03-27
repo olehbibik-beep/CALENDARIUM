@@ -36,7 +36,7 @@
         /* ЛЕВАЯ СТОРОНА (САЙДБАР ВНУТРИ ПЛИТКИ) */
         .sidebar { 
             width: 300px; 
-            background: rgba(60,60,60,0.2); 
+            background: rgba(80,80,80,0.2); 
             padding: 30px; 
             display: flex; 
             flex-direction: column; 
@@ -101,12 +101,12 @@
 
         /* ВНУТРЕННИЙ ФУТЕР */
         .inner-footer {
-            position: absolute; bottom: 20px; left: 40px; right: 40px;
+            position: absolute; bottom: 20px; left: 0px; right: 0px;
             display: flex; align-items: center; justify-content: space-between;
-            padding-top: 20px; border-top: 1px solid var(--inner-border);
+            background: rgba(90, 90, 90, 0.4);
+            padding-top: 20px; border-top: 0px solid var(--inner-border);
         }
-        .footer-text { font-size: 9px; color: #444; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-        .footer-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 10px #2ecc71; }
+        .footer-text { font-size: 9px; color: #fff; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
         /* МОБИЛЬНАЯ АДАПТАЦИЯ (ОБНОВЛЕННАЯ) */
 @media (max-width: 850px) {
