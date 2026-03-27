@@ -354,10 +354,14 @@
         };
 
         function showLog(title, text) {
-            document.getElementById('log-container').innerHTML = `<div class="log-card"><h3>${title}</h3><p>${text}</p></div>`;
-            sidebar.classList.add('active');
-            // Убрал автоматическое закрытие, чтобы было время нажать кнопку "ОТПРАВИТЬ"
-        }
+    // Убрали ${title}, оставляем только текст события/инфо
+    document.getElementById('log-container').innerHTML = `
+        <div class="log-card">
+            <p style="margin:0; line-height:1.4;">${text}</p>
+        </div>`;
+    
+    sidebar.classList.add('active');
+}
 
         initDots(); draw();
     </script>
