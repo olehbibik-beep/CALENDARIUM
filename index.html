@@ -354,10 +354,18 @@
         };
 
 function showLog(title, text) {
-    // Убрали ${title}, оставляем только текст события/инфо
-    document.getElementById('log-container').innerHTML = `
+    const logContainer = document.getElementById('log-container');
+    const sidebar = document.getElementById('notif-sidebar');
+
+    if (!logContainer || !sidebar) return;
+
+    // Выводим ТОЛЬКО текст сообщения (параметр text)
+    // Параметр title (в котором обычно летит имя) просто игнорируем
+    logContainer.innerHTML = `
         <div class="log-card">
-            ${text}
+            <p style="margin:0; font-size:0.8rem; line-height:1.4; color:#fff; font-weight:500;">
+                ${text}
+            </p>
         </div>`;
     
     sidebar.classList.add('active');
