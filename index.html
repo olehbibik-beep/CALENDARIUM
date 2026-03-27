@@ -355,10 +355,10 @@
 
         function showLog(title, text) {
     // Убрали ${title}, оставляем только текст события/инфо
-    document.getElementById('log-container').innerHTML = `
+    document.getElementById('log-container').innerHTML = 
         <div class="log-card">
             <p style="margin:0; line-height:1.4;">${text}</p>
-        </div>`;
+        </div>;
     
     sidebar.classList.add('active');
 }
