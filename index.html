@@ -188,7 +188,7 @@
             <h1>CALENDARIUM</h1>
         </div>
 
-        <input type="text" id="username" placeholder="имя пользователя" oninput="checkName(this.value)" autocomplete="off">
+        <input type="text" id="username" oninput="checkName(this.value)" maxlength="20" placeholder="Ваше имя">
         
         <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
         
@@ -237,24 +237,30 @@
         }
 
         window.checkName = (val) => {
-            const cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '');
-            const inputField = document.getElementById('username');
-            if (val !== cleanValue) inputField.value = cleanValue;
+    // 1. Убираем лишние символы и обрезаем до 20 знаков
+    let cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 20);
+    
+    const inputField = document.getElementById('username');
+    
+    // Обновляем значение в поле, если оно изменилось (из-за фильтра или длины)
+    if (val !== cleanValue) {
+        inputField.value = cleanValue;
+    }
 
-            const name = cleanValue.trim().toLowerCase();
-            const isOk = name.length > 0;
-            
-            if (name === 'admin') {
-                canvas.classList.add('hidden');
-                adminBox.classList.remove('hidden');
-                document.getElementById('status').innerText = "Режим администратора";
-            } else {
-                canvas.classList.remove('hidden');
-                adminBox.classList.add('hidden');
-                canvas.classList.toggle('disabled', !isOk);
-                document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
-            }
-        };
+    const name = cleanValue.trim().toLowerCase();
+    const isOk = name.length > 0;
+    
+    if (name === 'admin') {
+        canvas.classList.add('hidden');
+        adminBox.classList.remove('hidden');
+        document.getElementById('status').innerText = "Режим администратора";
+    } else {
+        canvas.classList.remove('hidden');
+        adminBox.classList.add('hidden');
+        canvas.classList.toggle('disabled', !isOk);
+        document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
+    }
+};
 
         function initDots() {
             dots = [];
