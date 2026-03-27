@@ -134,40 +134,79 @@
         .footer-text { font-size: 9px; color: #444; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .footer-dot { width: 6px; height: 6px; background: #2ecc71; border-radius: 50%; box-shadow: 0 0 10px #2ecc71; }
 
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ (ИСПРАВЛЕНО) */
-    @media (max-width: 850px) {
-        body { overflow: auto; height: auto; padding: 10px 0; }
-        .app-container { 
-            flex-direction: column; 
-            height: auto; 
-            min-height: 95vh;
-            width: 95vw;
-            overflow: visible;
-        }
-        .sidebar { 
-            width: 100%; 
-            border-right: none; 
-            border-bottom: 1px solid var(--inner-border); 
-            padding: 20px;
-        }
-        .upcoming-box { 
-            display: block; /* Возвращаем видимость */
-            margin-top: 20px;
-        }
-        .main-view { 
-            padding: 20px; 
-            overflow: visible;
-        }
-        .months-grid { 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 8px;
-        }
-        #display-year { font-size: 2.5rem; }
-        
-        /* На мобилках переносим блок событий из сайдбара ВНИЗ под календарь для удобства */
-        .sidebar { order: 1; }
-        .main-view { order: 2; }
+       /* МОБИЛЬНАЯ АДАПТАЦИЯ (ОБНОВЛЕННАЯ) */
+@media (max-width: 850px) {
+    body { 
+        overflow: auto; 
+        height: auto; 
+        padding: 0; 
     }
+
+    .app-container { 
+        flex-direction: column; 
+        height: auto; 
+        min-height: 100vh;
+        width: 100vw;
+        border-radius: 0; /* На весь экран смартфона */
+        overflow: visible;
+        display: flex;
+    }
+
+    /* "Раскрываем" сайдбар, чтобы управлять его детьми по отдельности */
+    .sidebar { 
+        display: contents; 
+    }
+
+    /* 1. Шапка пользователя — ВСЕГДА СВЕРХУ */
+    .user-header { 
+        order: 1; 
+        width: 100%;
+        padding: 20px;
+        background: #0f1112;
+        border-bottom: 1px solid var(--inner-border);
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: row; /* На мобилке кнопки в ряд */
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* 2. Календарь — В ЦЕНТРЕ */
+    .main-view { 
+        order: 2; 
+        padding: 20px;
+        width: 100%;
+        overflow: visible;
+    }
+
+    .months-grid { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px;
+    }
+
+    /* 3. Уведомления — ТЕПЕРЬ ВНИЗУ */
+    .upcoming-box { 
+        order: 3; 
+        display: block;
+        width: 100%;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.02);
+        border-top: 1px solid var(--inner-border);
+        margin-top: 10px;
+        padding-bottom: 100px; /* Запас, чтобы не перекрывалось футером */
+    }
+
+    /* 4. Футер — В САМОМ НИЗУ */
+    .inner-footer {
+        order: 4;
+        position: static; /* Отменяем абсолютное позиционирование */
+        padding: 20px;
+        width: 100%;
+    }
+
+    #display-year { font-size: 2.8rem; }
+    .year-side { font-size: 1.5rem; }
+}
     </style>
 </head>
 <body>
