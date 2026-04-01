@@ -99,20 +99,20 @@
     .footer-text { font-size: 9px; color: #fff; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
     /* МОДАЛЬНОЕ ОКНО */
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
-    .modal-box { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 1px solid var(--inner-border); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-    .modal-btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.7rem; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
+    .modal-box { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 0px solid var(--inner-border); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+    .modal-btn { width: 100%; padding: 14px; border: none; border-radius: 4px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.7rem; }
     .modal-btn:active { transform: scale(0.96); }
     .modal-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     
-    textarea { width: 100%; height: 80px; margin-bottom: 15px; padding: 15px; border-radius: 12px; border: 1px solid var(--inner-border); background: var(--dark); color: white; resize: none; outline: none; font-size: 0.9rem; }
+    textarea { width: 100%; height: 80px; margin-bottom: 15px; padding: 15px; border-radius: 4px; border: 0px solid var(--inner-border); background: var(--dark); color: white; resize: none; outline: none; font-size: 0.9rem; }
     textarea:focus { border-color: var(--accent); }
     
     #modal-list { margin-bottom: 20px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
-    .note-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 15px; margin-bottom: 8px; border-radius: 10px; }
+    .note-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 12px 15px; margin-bottom: 8px; border-radius: 4px; }
     
     ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
     /* МОБИЛЬНАЯ АДАПТАЦИЯ */
     @media (max-width: 850px) {
