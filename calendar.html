@@ -64,10 +64,10 @@
         text-transform: uppercase; font-size: 0.9rem; min-height: 50px; 
     }
 
-    .month-card.current-active { background: transparent !important; backdrop-filter: blur(10px); z-index: 1; }
+    .month-card.current-active { background: transparent !important; z-index: 1; }
     .month-card.current-active::before {
-        content: ''; position: absolute; inset: 0; background: transparent; 
-        border-radius: 4px; z-index: -1; border: 1px solid rgba(255,255,255,0.1);
+        content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); 
+        border-radius: 18px; z-index: -1; border: 1px solid rgba(255,255,255,0.1);
     }
 
     .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; width: 60%; }
