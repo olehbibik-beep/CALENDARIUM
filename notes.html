@@ -115,39 +115,77 @@
 /* МОБИЛЬНАЯ АДАПТАЦИЯ */
     @media (max-width: 850px) {
         body { 
-            overflow: auto; 
+            overflow-x: hidden; /* Защита от горизонтальной прокрутки */
+            overflow-y: auto; 
             height: auto; 
             padding: 0; 
-            flex-direction: column; /* ЭТО СТРОКА РЕШАЕТ ПРОБЛЕМУ С ФУТЕРОМ */
+            display: flex;           /* ВКЛЮЧАЕМ ФЛЕКС */
+            flex-direction: column;  /* ВЫСТРАИВАЕМ ВСЁ В КОЛОНКУ */
         }
-        .app-container { flex-direction: column; height: auto; min-height: 100vh; width: 100vw; border-radius: 0; display: flex; }
+
+        .app-container { 
+            flex-direction: column; 
+            height: auto; 
+            min-height: auto; /* На странице заметок лучше убрать 100vh, чтобы не тянуло лишнего */
+            width: 100vw; 
+            border-radius: 0; 
+            display: flex; 
+            flex: none; /* Убираем жадное поглощение места */
+        }
         
         .sidebar { display: contents; }
+        
         .user-header { 
-            order: 1; width: 100%; padding: 20px; background: #0f1112; 
-            border-bottom: 1px solid var(--inner-border); margin-bottom: 0; display: flex; 
+            order: 1; 
+            width: 100%; 
+            padding: 20px; 
+            background: #0f1112; 
+            border-bottom: 1px solid var(--inner-border); 
+            margin-bottom: 0; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: space-between; 
         }
         
-        .main-view { order: 2; padding: 15px; width: 100%; }
+        .main-view { order: 2; padding: 15px; width: 100%; flex: none; }
         
-        .months-grid { 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 10px; 
-        }
-        .month-card { aspect-ratio: 1 / 1; }
+        .month-title-wrapper { margin-bottom: 15px; }
+        #m-name { font-size: 1.8rem; }
+        
+        .grid { gap: 3px; } 
+        .day-box { font-size: 0.9rem; border-radius: 6px; }
 
-        /* События аккуратно встанут под календарем */
-        .upcoming-box { 
-            order: 3; display: block; width: 100%; padding: 20px; 
-            background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); 
-            margin-top: 10px; padding-bottom: 20px; 
+        /* БЛОК ЗАМЕТОК */
+        .preview-box { 
+            order: 3; 
+            display: flex; 
+            width: 100%; 
+            padding: 20px; 
+            background: rgba(255, 255, 255, 0.02); 
+            border-top: 1px solid var(--inner-border); 
+            margin-top: 10px; 
+            flex: none; 
+        }
+
+        .preview {
+            flex: none; 
+            min-height: 120px; 
+            height: auto;
         }
         
-        /* Футер ляжет в самый низ страницы */
-        .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
-        
-        #display-year { font-size: 2.8rem; }
-        .year-side { font-size: 1.5rem; }
+        /* ФУТЕР — теперь он точно будет внизу */
+        .inner-footer { 
+            order: 4; 
+            position: static; 
+            padding: 30px 20px; 
+            width: 100%; 
+            background: #0f1112; /* Можно оставить прозрачным или задать цвет фона */
+            display: flex;
+            flex-direction: column; /* На мобилке текст футера лучше в столбик */
+            align-items: center;
+            gap: 10px;
+        }
     }
 </style>
 </head>
