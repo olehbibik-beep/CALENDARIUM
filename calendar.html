@@ -294,8 +294,7 @@ async function loadData() {
 
     // Вывод в HTML
     if (upcomingEvents.length > 0) {
-        let html = '<div style="font-size:0.6rem; color:var(--accent); margin-bottom:15px; font-weight:800; letter-spacing:1px; text-align:center;">АКТУАЛЬНОЕ</div>';
-        
+        let html = '<div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">АКТУАЛЬНОЕ</div>';
         // Берем только первые 5 для компактности
         upcomingEvents.slice(0, 5).forEach(ev => {
             const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
