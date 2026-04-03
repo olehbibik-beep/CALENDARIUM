@@ -68,7 +68,6 @@
     /* НОВЫЙ БЛОК ДЛЯ ПОДСВЕТКИ ПРИ НАВЕДЕНИИ */
     .month-card:hover {
         background: #2b3236; 
-        transform: translateY();
         box-shadow: 0 8px 15px rgba(0,0,0,0.4);
     }
 
@@ -95,9 +94,14 @@
     }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
-    /* МОБИЛЬНАЯ АДАПТАЦИЯ */
+   /* МОБИЛЬНАЯ АДАПТАЦИЯ */
     @media (max-width: 850px) {
-        body { overflow: auto; height: auto; padding: 0; }
+        body { 
+            overflow: auto; 
+            height: auto; 
+            padding: 0; 
+            flex-direction: column; /* ЭТО СТРОКА РЕШАЕТ ПРОБЛЕМУ С ФУТЕРОМ */
+        }
         .app-container { flex-direction: column; height: auto; min-height: 100vh; width: 100vw; border-radius: 0; display: flex; }
         
         .sidebar { display: contents; }
@@ -109,18 +113,21 @@
         .main-view { order: 2; padding: 15px; width: 100%; }
         
         .months-grid { 
-            grid-template-columns: repeat(2, 1fr); /* ИЗМЕНЕНО: 2 колонки лучше помещаются на телефоне */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 10px; 
         }
         .month-card { aspect-ratio: 1 / 1; }
 
+        /* События аккуратно встанут под календарем */
         .upcoming-box { 
             order: 3; display: block; width: 100%; padding: 20px; 
             background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); 
-            margin-top: 10px; padding-bottom: 20px; /* ИЗМЕНЕНО: убрали гигантский отступ в 100px */
+            margin-top: 10px; padding-bottom: 20px; 
         }
         
+        /* Футер ляжет в самый низ страницы */
         .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
+        
         #display-year { font-size: 2.8rem; }
         .year-side { font-size: 1.5rem; }
     }
