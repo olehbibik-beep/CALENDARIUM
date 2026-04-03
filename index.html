@@ -347,7 +347,7 @@
                     
                     document.getElementById('send-req').onclick = async () => {
                         await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
-                        showLog("Готово", "Заявка отправлена администратору.");
+                        showLog("Готово", "Заявка отправлена");
                     };
                 }
             } catch (e) { console.error(e); }
