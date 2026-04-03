@@ -170,6 +170,63 @@
 
 
         .hidden { display: none; }
+        /* --- СТИЛИ ДЛЯ ИНФО-ОКНА --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px); /* Красивое размытие фона */
+        }
+        
+        .modal-overlay.active {
+            opacity: 1; pointer-events: all;
+        }
+
+        .info-modal {
+            background: #ffffff; width: 90%; max-width: 450px; max-height: 85vh;
+            border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
+            transform: translateY(30px); transition: transform 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            color: #222; /* Темный текст для светлого фона */
+        }
+
+        .modal-overlay.active .info-modal {
+            transform: translateY(0);
+        }
+
+        .info-modal-header {
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            background: #f8f9fa; border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #333; text-transform: uppercase;}
+        
+        .close-info { font-size: 30px; line-height: 1; cursor: pointer; color: #888; transition: 0.2s; }
+        .close-info:hover { color: #f39c12; }
+
+        .info-modal-content {
+            padding: 20px; overflow-y: auto; text-align: left;
+        }
+
+        /* Список обновлений */
+        .changelog-box { background: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 25px; }
+        .changelog-box h3 { margin: 0 0 10px 0; font-size: 1rem; color: #0984e3; }
+        .changelog-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: #444;}
+        .changelog-box li { margin-bottom: 5px; }
+
+        /* Инструкция */
+        .tutorial-box h3 { font-size: 1.1rem; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
+        .tut-step { margin-bottom: 25px; }
+        .tut-step p { font-size: 0.85rem; line-height: 1.5; color: #555; margin-top: 10px;}
+        .tut-step strong { color: #222; }
+        
+        /* Заглушка под картинки */
+        .tut-img {
+            width: 100%; height: 160px; background: #eef2f5; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; color: #aaa; border: 1px dashed #ccc; overflow: hidden;
+        }
+        .tut-img img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -228,7 +285,21 @@
             sidebar.classList.remove('active');
             resetCanvas();
         };
+// Открытие инфо-окна
+        window.openInfoModal = () => {
+            const modal = document.getElementById('info-modal-overlay');
+            modal.classList.remove('hidden');
+            // Небольшая задержка, чтобы сработала плавная CSS анимация
+            setTimeout(() => modal.classList.add('active'), 10);
+        };
 
+        // Закрытие инфо-окна
+        window.closeInfoModal = (e) => {
+            const modal = document.getElementById('info-modal-overlay');
+            modal.classList.remove('active');
+            // Ждем завершения анимации исчезновения перед тем как скрыть блок полностью
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
         function resetCanvas() {
             pattern = "";
             initDots();
@@ -372,5 +443,53 @@ function showLog(title, text) {
 
         initDots(); draw();
     </script>
+    <footer>
+        <div class="inner-footer">
+            <span style="color: #aaa; font-size: 10px; cursor: pointer; text-decoration: underline;" onclick="openInfoModal()">Как пользоваться? / Обновления</span>
+        </div>
+        <div class="footer-text">Group 5 • Version v2.6.18</div>
+    </footer>
+
+    <div id="info-modal-overlay" class="modal-overlay hidden" onclick="closeInfoModal(event)">
+        <div class="info-modal" onclick="event.stopPropagation()">
+            
+            <div class="info-modal-header">
+                <h2>Справка и Обновления</h2>
+                <span class="close-info" onclick="closeInfoModal()">×</span>
+            </div>
+
+            <div class="info-modal-content">
+                
+                <div class="changelog-box">
+                    <h3>🚀 Последние изменения (v2.6.18)</h3>
+                    <ul>
+                        <li>Добавлено светлое окно информации.</li>
+                        <li>Улучшена работа системы графического ключа.</li>
+                        <li>Исправлены мелкие баги отображения на мобильных.</li>
+                    </ul>
+                </div>
+
+                <div class="tutorial-box">
+                    <h3>📖 Как пользоваться?</h3>
+                    
+                    <div class="tut-step">
+                        <div class="tut-img"></div>
+                        <p><strong>Шаг 1: Авторизация.</strong> Введите своё имя и нарисуйте уникальный графический ключ. Если вы здесь впервые, система предложит отправить заявку на регистрацию.</p>
+                    </div>
+
+                    <div class="tut-step">
+                        <div class="tut-img"></div>
+                        <p><strong>Шаг 2: Навигация.</strong> После входа вы попадете в календарь. Выбирайте нужный год и нажимайте на плитку месяца, чтобы перейти к деталям.</p>
+                    </div>
+
+                    <div class="tut-step">
+                        <div class="tut-img"></div>
+                        <p><strong>Шаг 3: Заметки.</strong> Внутри месяца вы можете добавлять события, прикреплять цветные метки (например, встречи или важные даты) и следить за ними в боковом меню.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
 </body>
 </html>
