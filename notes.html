@@ -91,12 +91,10 @@
 
     /* ИСПРАВЛЕННЫЙ ФУТЕР (Точь-в-точь как на главной) */
     .inner-footer {
-        position: absolute; bottom: 0px; left: 0px; right: 0px;
-        display: flex; align-items: center; justify-content: space-between;
-        background: rgba(255, 160, 122, 0.4); /* Был черный, стал полупрозрачный серый */
-        padding: 5px 20px; border-top: 1px solid var(--inner-border); z-index: 10;
+        position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between;
+        background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
     }
-    .footer-text { font-size: 9px; color: #fff; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+    .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
 
     /* МОДАЛЬНОЕ ОКНО */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
