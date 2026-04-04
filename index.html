@@ -51,15 +51,18 @@
         /* --- ПОЛЯ ВВОДА И КАНВАС --- */
         input { 
             width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 6px; 
-            border: none; background: #ebebeb; text-align: center; 
+            border: none; background: #2c3135; /* Сделал инпут чуть темнее, чтобы подходил к стилю */
+            color: #fff; /* Белый текст для инпута */
+            text-align: center; 
             font-size: 1rem; outline: none; box-sizing: border-box; 
         }
         
         canvas { 
-            background: #fff; border-radius: 8px; 
+            background: transparent; /* УБРАЛИ БЕЛЫЙ ФОН */
+            border-radius: 8px; 
             cursor: crosshair; max-width: 100%; height: auto; touch-action: none;
         }
-        canvas.disabled { opacity: 0.1; pointer-events: none; }
+        canvas.disabled { opacity: 0.3; pointer-events: none; } /* Чуть увеличил видимость неактивного */
         canvas.hidden { display: none; }
         .hidden { display: none; }
 
@@ -348,7 +351,11 @@
         function draw() {
             ctx.clearRect(0, 0, 260, 260);
             if(pattern.length > 0) {
-                ctx.beginPath(); ctx.strokeStyle = "#0984e3"; ctx.lineWidth = 8; ctx.lineCap="round"; ctx.lineJoin="round";
+                ctx.beginPath(); 
+                ctx.strokeStyle = "#0984e3"; /* Цвет линии (синий) */
+                ctx.lineWidth = 8; 
+                ctx.lineCap="round"; 
+                ctx.lineJoin="round";
                 for(let k=0; k < pattern.length; k+=2) {
                     let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
                     if (k === 0) ctx.moveTo(d.x, d.y);
@@ -358,7 +365,8 @@
             }
             dots.forEach(d => {
                 ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#dfe6e9";
+                /* Если точка задета - синяя, если нет - темно-серая под цвет фона */
+                ctx.fillStyle = d.hit ? "#0984e3" : "#3e3e3e"; 
                 ctx.fill();
             });
         }
