@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Secure Terminal</title>
     <style>
+        /* БАЗОВЫЕ ПЕРЕМЕННЫЕ И НАСТРОЙКИ СТРАНИЦЫ */
         :root { 
             --accent: #0984e3; 
             --bg: #121416; 
@@ -27,7 +28,7 @@
             position: relative; /* Важно для позиционирования уведомлений */
         }
 
-        /* КАРТОЧКА АВТОРИЗАЦИИ */
+        /* --- КАРТОЧКА АВТОРИЗАЦИИ --- */
         .auth-card { 
             background: white; padding: 30px; 
             border-radius: 8px; /* Аккуратное закругление */
@@ -47,6 +48,7 @@
             color: #444; font-weight: 800; text-transform: uppercase;
         }
 
+        /* --- ПОЛЯ ВВОДА И КАНВАС --- */
         input { 
             width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 6px; 
             border: none; background: #ebebeb; text-align: center; 
@@ -59,140 +61,110 @@
         }
         canvas.disabled { opacity: 0.1; pointer-events: none; }
         canvas.hidden { display: none; }
+        .hidden { display: none; }
 
         .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
-        /* УВЕДОМЛЕНИЯ (PC: ВЫЕЗД ИЗ-ПОД ПЛИТКИ БЕЗ ПОТЕРИ РАЗМЕРА) */
-#notif-sidebar { 
-    position: absolute; 
-    top: 50%; left: 50%; 
-    width: 300px; /* УВЕЛИЧИЛИ ШИРИНУ */
-    height: 45%;
-    background: var(--orange); 
-    color: white; 
-    z-index: 5; 
-    border-radius: 8px;
-    padding: 30px; /* Немного больше внутренних отступов для солидности */
-    box-sizing: border-box;
-    
-    /* УБРАЛИ SCALE(0.9): теперь размер не меняется при появлении */
-    transform: translate(-50%, -50%); 
-    opacity: 0;
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); /* Более плавный "дорогой" выезд */
-    display: flex; 
-    flex-direction: column;
-    box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
-}
+        /* --- БОКОВОЕ МЕНЮ / УВЕДОМЛЕНИЯ (ШТОРКА) --- */
+        #notif-sidebar { 
+            position: absolute; 
+            top: 50%; left: 50%; 
+            width: 300px; 
+            height: 45%;
+            background: var(--orange); 
+            color: white; 
+            z-index: 5; 
+            border-radius: 8px;
+            padding: 30px; 
+            box-sizing: border-box;
+            transform: translate(-50%, -50%); 
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+            pointer-events: none; /* Чтобы не перекрывало клики, когда скрыто */
+        }
 
-#notif-sidebar.active { 
-    /* УВЕЛИЧИЛИ СДВИГ: теперь выезжает на 280px вправо */
-    transform: translate(calc(-50% + 280px), -50%); 
-    opacity: 1;
-}
+        #notif-sidebar.active { 
+            transform: translate(calc(-50% + 280px), -50%); 
+            opacity: 1;
+            pointer-events: auto; /* Включаем клики, когда шторка активна */
+        }
 
-.notif-header { 
-    display: flex; 
-    /* Сдвигаем всё вправо */
-    justify-content: flex-end; 
-    /* Расстояние между заголовком и крестиком */
-    gap: 15px; 
-    /* Выравнивание по вертикали (чтобы крестик не прыгал выше текста) */
-    align-items: center; 
-    
-    margin-bottom: 20px; 
-    border-bottom: 1px solid rgba(255,255,255,0.2);
-    padding-bottom: 10px;
-}
+        .notif-header { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 15px; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
 
-.notif-header span:first-child { 
-    font-weight: 900; 
-    font-size: 0.7rem; 
-    letter-spacing: 1.5px; 
-    opacity: 0.9; 
-    /* Убираем лишние отступы, если они были */
-    margin: 0;
-}
-
-.close-x { 
-    cursor: pointer; 
-    font-size: 44px; 
-    line-height: 1; 
-    opacity: 0.7; 
-    /* Чтобы крестик всегда был крайним справа */
-    order: 2; 
-}
-
-.notif-header span:first-child {
-    /* Чтобы заголовок был перед крестиком */
-    order: 1;
-}
+        .close-x { 
+            cursor: pointer; font-size: 44px; line-height: 1; opacity: 0.7; order: 2; 
+        }
+        .notif-header span:first-child { 
+            font-weight: 900; font-size: 0.7rem; letter-spacing: 1.5px; opacity: 0.9; margin: 0; order: 1;
+        }
 
         #log-container { flex: 1; display: flex; flex-direction: column; justify-content: right; text-align: right; }
-
-        .log-card { background: rgba(); border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .log-card { border-radius: 8px; padding: 15px; margin-bottom: 15px; }
         .log-card h3 { margin: 0 0 8px 0; font-size: 1.1rem; text-transform: uppercase; }
         .log-card p { margin: 0; font-size: 0.85rem; line-height: 1.4; }
         
+        /* --- КНОПКИ --- */
         .orange-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: white; color: var(--orange); font-weight: 900; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; }
         .admin-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: var(--accent); color: white; font-weight: 900; cursor: pointer; margin-top: 10px; }
-      
+        
+        /* --- ФУТЕР --- */
         .inner-footer {
-        position: absolute; bottom: 0px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between;
-        background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
-    }
-    .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
-        /* МОБИЛЬНАЯ АДАПТАЦИЯ (СВЕРХУ) */
+            position: absolute; bottom: 0px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between;
+            background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
+        }
+        .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+        
+        /* --- АДАПТИВ ПОД МОБИЛЬНЫЕ (ШТОРКА СВЕРХУ) --- */
         @media (max-width: 600px) {
             .auth-card { 
-                z-index: 10;
-                transform: translateY(-8vh); 
-                padding: 20px;
+                z-index: 10; transform: translateY(-8vh); padding: 20px;
             }
-            
             #notif-sidebar { 
-                position: fixed; /* На мобилках фиксируем сверху */
-                z-index: 9999 !important;
-                top: 20px; 
-                left: 10px; right: 10px; 
-                bottom: auto;
+                position: fixed; z-index: 9999 !important;
+                top: 20px; left: 10px; right: 10px; bottom: auto;
                 width: auto; height: auto; min-height: 160px;
-                
-                /* Прячем за верхний край экрана */
                 transform: translate(0, -150%) scale(1); 
             }
             #notif-sidebar.active { 
-                /* Опускаем вниз на видимую часть */
                 transform: translate(0, 0) scale(1); 
             }
-            
             .notif-header { margin-bottom: 10px; }
+            .info-flex { flex-direction: column; } /* Текст и картинка друг под другом на телефоне */
         }
 
-
-        .hidden { display: none; }
         /* --- СТИЛИ ДЛЯ ИНФО-ОКНА --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px); /* Красивое размытие фона */
+            backdrop-filter: blur(5px);
         }
         
-        .modal-overlay.active {
-            opacity: 1; pointer-events: all;
-        }
+        .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .info-modal {
-            background: #ffffff; width: 90%; max-width: 95%; max-height: 85vh;
+            background: #ffffff; 
+            width: 95%; 
+            max-width: 500px; /* Чуть шире чем авторизация (360px) */
+            max-height: 85vh;
             border-radius: 8px; display: flex; flex-direction: column; overflow: hidden;
-            transform: transition: transform 0.3s ease;
+            transform: translateY(-20px); transition: transform 0.3s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            color: #222; /* Темный текст для светлого фона */
+            color: #222; 
         }
 
-        .modal-overlay.active .info-modal {
-            transform: translateY(0);
-        }
+        .modal-overlay.active .info-modal { transform: translateY(0); }
 
         .info-modal-header {
             padding: 20px; display: flex; justify-content: space-between; align-items: center;
@@ -200,36 +172,30 @@
         }
 
         .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #333; text-transform: uppercase;}
-        
         .close-info { font-size: 30px; line-height: 1; cursor: pointer; color: #888; transition: 0.2s; }
         .close-info:hover { color: #f39c12; }
 
-        .info-modal-content {
-            padding: 20px; overflow-y: auto; text-align: left;
+        .info-modal-content { padding: 20px; overflow-y: auto; text-align: left; }
+
+        /* Расположение текста и картинки (Слева направо) */
+        .info-flex {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .info-text-side { flex: 1.2; } /* Левая сторона: текст (занимает чуть больше места) */
+        .info-img-side { flex: 1; display: flex; justify-content: center; } /* Правая: картинка */
+        .info-img-side img {
+            width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* Список обновлений */
-        .changelog-box { background: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 25px; }
+        .changelog-box { background: #f0f8ff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 20px; }
         .changelog-box h3 { margin: 0 0 10px 0; font-size: 1rem; color: #0984e3; }
         .changelog-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: #444;}
         .changelog-box li { margin-bottom: 5px; }
 
-        /* Инструкция */
-        .tutorial-box h3 { font-size: 1.1rem; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
-        .tut-step { margin-bottom: 25px; }
-        .tut-step p { font-size: 0.85rem; line-height: 1.5; color: #555; margin-top: 10px;}
-        .tut-step strong { color: #222; }
-        
-        /* Заглушка под картинки */
-        .tut-img {
-            width: 100%; height: auto; background: #eef2f5; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; color: #aaa; border: 1px dashed #ccc; overflow: hidden;
-        }
-        .tut-img img {width: 100%;
-    height: auto;
-    display: block;
-    object-fit: contain; }
+        .tutorial-box h3 { font-size: 1rem; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
+        .tutorial-box p { font-size: 0.85rem; line-height: 1.5; color: #555;}
     </style>
 </head>
 <body>
@@ -259,6 +225,46 @@
         <p class="status-text" id="status">Введите имя</p>
     </div>
 
+    <div id="info-modal-overlay" class="modal-overlay hidden" onclick="closeInfoModal(event)">
+        <div class="info-modal" onclick="event.stopPropagation()">
+            
+            <div class="info-modal-header">
+                <h2>Справка и Обновления</h2>
+                <span class="close-info" onclick="closeInfoModal()">×</span>
+            </div>
+
+            <div class="info-modal-content">
+                <div class="info-flex">
+                    <div class="info-text-side">
+                        <div class="changelog-box">
+                            <h3>🚀 Последние изменения</h3>
+                            <ul>
+                                <li>Добавлено светлое окно информации.</li>
+                                <li>Исправлена ошибка моргания шторки при повторном вводе ключа.</li>
+                                <li>Новое расположение обновлений.</li>
+                            </ul>
+                        </div>
+                        <div class="tutorial-box">
+                            <h3>📖 Как пользоваться?</h3>
+                            <p>Введите своё имя и нарисуйте уникальный графический ключ. Если вы здесь впервые, система предложит отправить заявку на регистрацию.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-img-side">
+                        <img src="Set1.png" alt="Превью">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="inner-footer">
+            <span style="color: #aaa; font-size: 10px; cursor: pointer; text-decoration: underline;" onclick="openInfoModal()">Как пользоваться? / Обновления</span>
+            <div class="footer-text">Group 5 • Version v2.6.18</div>
+        </div>
+    </footer>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -279,15 +285,22 @@
         const sidebar = document.getElementById('notif-sidebar');
         let dots = [], pattern = "", drawing = false;
 
+        // Автоматическое открытие инфо-окна при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.openInfoModal();
+            }, 500); // Небольшая задержка, чтобы страница прогрузилась
+        });
+
         window.closeLog = () => {
             sidebar.classList.remove('active');
             resetCanvas();
         };
-// Открытие инфо-окна
+
+        // Открытие инфо-окна
         window.openInfoModal = () => {
             const modal = document.getElementById('info-modal-overlay');
             modal.classList.remove('hidden');
-            // Небольшая задержка, чтобы сработала плавная CSS анимация
             setTimeout(() => modal.classList.add('active'), 10);
         };
 
@@ -295,9 +308,9 @@
         window.closeInfoModal = (e) => {
             const modal = document.getElementById('info-modal-overlay');
             modal.classList.remove('active');
-            // Ждем завершения анимации исчезновения перед тем как скрыть блок полностью
             setTimeout(() => modal.classList.add('hidden'), 300);
         };
+
         function resetCanvas() {
             pattern = "";
             initDots();
@@ -305,30 +318,27 @@
         }
 
         window.checkName = (val) => {
-    // 1. Убираем лишние символы и обрезаем до 20 знаков
-    let cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 20);
-    
-    const inputField = document.getElementById('username');
-    
-    // Обновляем значение в поле, если оно изменилось (из-за фильтра или длины)
-    if (val !== cleanValue) {
-        inputField.value = cleanValue;
-    }
+            let cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 20);
+            const inputField = document.getElementById('username');
+            
+            if (val !== cleanValue) {
+                inputField.value = cleanValue;
+            }
 
-    const name = cleanValue.trim().toLowerCase();
-    const isOk = name.length > 0;
-    
-    if (name === 'admin') {
-        canvas.classList.add('hidden');
-        adminBox.classList.remove('hidden');
-        document.getElementById('status').innerText = "Режим администратора";
-    } else {
-        canvas.classList.remove('hidden');
-        adminBox.classList.add('hidden');
-        canvas.classList.toggle('disabled', !isOk);
-        document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
-    }
-};
+            const name = cleanValue.trim().toLowerCase();
+            const isOk = name.length > 0;
+            
+            if (name === 'admin') {
+                canvas.classList.add('hidden');
+                adminBox.classList.remove('hidden');
+                document.getElementById('status').innerText = "Режим администратора";
+            } else {
+                canvas.classList.remove('hidden');
+                adminBox.classList.add('hidden');
+                canvas.classList.toggle('disabled', !isOk);
+                document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
+            }
+        };
 
         function initDots() {
             dots = [];
@@ -355,6 +365,8 @@
 
         const startDraw = (e) => {
             if (canvas.classList.contains('disabled')) return;
+            // ИСПРАВЛЕНИЕ: Прячем шторку, когда пользователь начинает рисовать заново
+            sidebar.classList.remove('active'); 
             pattern = ""; initDots(); drawing = true; draw();
         };
 
@@ -415,79 +427,29 @@
                     
                     document.getElementById('send-req').onclick = async () => {
                         await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
-                        showLog("Готово", "<h3>Заявка отправлена</h3>");
+                        showLog("Готово", "Заявка отправлена");
                     };
                 }
             } catch (e) { console.error(e); }
         };
 
-function showLog(title, text) {
-    const logContainer = document.getElementById('log-container');
-    const sidebar = document.getElementById('notif-sidebar');
+        function showLog(title, text) {
+            const logContainer = document.getElementById('log-container');
+            const sidebar = document.getElementById('notif-sidebar');
 
-    if (!logContainer || !sidebar) return;
+            if (!logContainer || !sidebar) return;
 
-    // Выводим ТОЛЬКО текст сообщения (параметр text)
-    // Параметр title (в котором обычно летит имя) просто игнорируем
-    logContainer.innerHTML = `
-        <div class="log-card">
-            <p style="margin:0; font-size:0.8rem; line-height:1.4; color:#fff; font-weight:500;">
-                <h1>${text}</h1>
-            </p>
-        </div>`;
-    
-    sidebar.classList.add('active');
-}
+            logContainer.innerHTML = `
+                <div class="log-card">
+                    <h1 style="margin:0; font-size:1.1rem; line-height:1.4; color:#fff; font-weight:500;">
+                        ${text}
+                    </h1>
+                </div>`;
+            
+            sidebar.classList.add('active');
+        }
 
         initDots(); draw();
     </script>
-    <footer>
-        <div class="inner-footer">
-            <span style="color: #aaa; font-size: 10px; cursor: pointer; text-decoration: underline;" onclick="openInfoModal()">Как пользоваться? / Обновления</span>
-        <div class="footer-text">Group 5 • Version v2.6.18</div>
-         </div>
-    </footer>
-
-    <div id="info-modal-overlay" class="modal-overlay hidden" onclick="closeInfoModal(event)">
-        <div class="info-modal" onclick="event.stopPropagation()">
-            
-            <div class="info-modal-header">
-                <h2>Справка и Обновления</h2>
-                <span class="close-info" onclick="closeInfoModal()">×</span>
-            </div>
-
-            <div class="info-modal-content">
-                
-                <div class="changelog-box">
-                    <h3>🚀 Последние изменения (v2.6.18)</h3>
-                    <ul>
-                        <li>Добавлено светлое окно информации.</li>
-                        <li>Улучшена работа системы графического ключа.</li>
-                        <li>Исправлены мелкие баги отображения на мобильных.</li>
-                    </ul>
-                </div>
-
-                <div class="tutorial-box">
-                    <h3>📖 Как пользоваться?</h3>
-                    
-                    <div class="tut-step">
-                        <div class="tut-img"><img src="Set1.png" alt="Шаг 1"></div>
-                        <p><strong>Шаг 1: Авторизация.</strong> Введите своё имя и нарисуйте уникальный графический ключ. Если вы здесь впервые, система предложит отправить заявку на регистрацию.</p>
-                    </div>
-
-                    <div class="tut-step">
-                        <div class="tut-img"></div>
-                        <p><strong>Шаг 2: Навигация.</strong> После входа вы попадете в календарь. Выбирайте нужный год и нажимайте на плитку месяца, чтобы перейти к деталям.</p>
-                    </div>
-
-                    <div class="tut-step">
-                        <div class="tut-img"></div>
-                        <p><strong>Шаг 3: Заметки.</strong> Внутри месяца вы можете добавлять события, прикреплять цветные метки (например, встречи или важные даты) и следить за ними в боковом меню.</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
 </body>
 </html>
