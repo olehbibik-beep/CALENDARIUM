@@ -159,10 +159,10 @@
         .info-modal {
             background: #ffffff; 
             width: 95%; 
-            max-width: 500px; /* Чуть шире чем авторизация (360px) */
+            max-width: 600px; /* Чуть шире чем авторизация (360px) */
             max-height: 85vh;
             border-radius: 8px; display: flex; flex-direction: column; overflow: hidden;
-            transform: translateY(-20px); transition: transform 0.3s ease;
+            transform: transition: transform 0.3s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             color: #222; 
         }
@@ -174,7 +174,7 @@
             background: #f8f9fa; border-bottom: 1px solid #e0e0e0;
         }
 
-        .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 800; color: #333; text-transform: uppercase;}
+        .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 300; color: #333; text-transform: uppercase;}
         .close-info { font-size: 30px; line-height: 1; cursor: pointer; color: #888; transition: 0.2s; }
         .close-info:hover { color: #f39c12; }
 
@@ -240,16 +240,12 @@
                 <div class="info-flex">
                     <div class="info-text-side">
                         <div class="changelog-box">
-                            <h3>🚀 Последние изменения</h3>
+                            <h3>Последние изменения</h3>
                             <ul>
                                 <li>Добавлено светлое окно информации.</li>
                                 <li>Исправлена ошибка моргания шторки при повторном вводе ключа.</li>
                                 <li>Новое расположение обновлений.</li>
                             </ul>
-                        </div>
-                        <div class="tutorial-box">
-                            <h3>📖 Как пользоваться?</h3>
-                            <p>Введите своё имя и нарисуйте уникальный графический ключ. Если вы здесь впервые, система предложит отправить заявку на регистрацию.</p>
                         </div>
                     </div>
                     
