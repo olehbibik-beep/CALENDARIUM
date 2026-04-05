@@ -186,7 +186,7 @@
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-            backdrop-filter: blur(50px);
+            backdrop-filter: blur(2px);
         }
         
         .modal-overlay.active { opacity: 1; pointer-events: all; }
@@ -205,7 +205,7 @@
         .modal-overlay.active .info-modal { transform: translateY(0); }
 
         .info-modal-header {
-            padding: 0px; display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; display: flex; margin-left: auto; justify-content: space-between; align-items: center;
             background: #1a1d1f; border-bottom: none; 
         }
 
