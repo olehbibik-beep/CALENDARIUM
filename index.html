@@ -51,7 +51,7 @@
         /* --- ПОЛЯ ВВОДА И КАНВАС --- */
         input { 
             width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 6px; 
-            border: none; background: var(--accent); /* Сделал инпут чуть темнее, чтобы подходил к стилю */
+            border: none; background: transporent; /* Сделал инпут чуть темнее, чтобы подходил к стилю */
             color: #fff; /* Белый текст для инпута */
             text-align: center; 
             font-size: 1rem; outline: none; box-sizing: border-box; 
@@ -62,7 +62,7 @@
             border-radius: 8px; 
             cursor: crosshair; max-width: 100%; height: auto; touch-action: none;
         }
-        canvas.disabled { opacity: 0.3; pointer-events: none; } /* Чуть увеличил видимость неактивного */
+        canvas.disabled { opacity: 0.1; pointer-events: none; } /* Чуть увеличил видимость неактивного */
         canvas.hidden { display: none; }
         .hidden { display: none; }
 
