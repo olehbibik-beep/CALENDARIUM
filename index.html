@@ -185,7 +185,7 @@
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(50px);
         }
         
         .modal-overlay.active { opacity: 1; pointer-events: all; }
@@ -205,7 +205,7 @@
 
         .info-modal-header {
             padding: 20px; display: flex; justify-content: space-between; align-items: center;
-            background: #22272a; border-bottom: none; 
+            background: #2b3236; border-bottom: none; 
         }
 
         .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 300; color: #fff; text-transform: uppercase;}
@@ -264,7 +264,6 @@
         <div class="info-modal" onclick="event.stopPropagation()">
             
             <div class="info-modal-header">
-                <h2>Справка и Обновления</h2>
                 <span class="close-info" onclick="closeInfoModal()">×</span>
             </div>
 
