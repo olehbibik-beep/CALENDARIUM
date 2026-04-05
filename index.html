@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <meta name="apple-mobile-web-app-title" content="Calendarium">
+    <meta name="application-name" content="Calendarium">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121416">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Secure Terminal</title>
     <style>
+        /* БАЗОВЫЕ ПЕРЕМЕННЫЕ И НАСТРОЙКИ СТРАНИЦЫ */
         :root { 
             --accent: #09e0e3; 
             --bg: #3e3e3e; 
             --orange: #f39c12; 
-            --title-color: #ffffff;
+            --footer-bg: #eceff1;
+            --title-color: #ffffff; /* ДОБАВЛЕН ЦВЕТ ЗАГОЛОВКА */
         }
         
         body { 
@@ -25,144 +35,252 @@
             border-radius: 8px; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.5); text-align: center; 
             width: 90%; max-width: 360px; 
-            z-index: 10; position: relative; box-sizing: border-box;
+            z-index: 10; 
+            box-sizing: border-box;
+            position: relative;
+        }
+        
+        .auth-header {
+            display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 20px; 
         }
         
         .auth-header h1 {
-            margin: 0 0 20px 0; font-size: 1.3rem; letter-spacing: 2px;
-            color: var(--title-color); font-weight: 800; text-transform: uppercase;
+            margin: 0; font-size: 1.3rem; letter-spacing: 2px; line-height: 1; 
+            color: var(--title-color); /* ИСПОЛЬЗУЕМ ПЕРЕМЕННУЮ */
+            font-weight: 800; text-transform: uppercase;
         }
 
+        /* --- ПОЛЯ ВВОДА И КАНВАС --- */
         input { 
             width: 100%; padding: 15px; margin-bottom: 12px; border-radius: 6px; 
-            border: none; background: #333; color: #fff; 
-            text-align: center; font-size: 1rem; outline: none; box-sizing: border-box; 
+            border: none; background: #444; 
+            color: #fff; 
+            text-align: center; 
+            font-size: 1rem; outline: none; box-sizing: border-box; 
         }
         
         canvas { 
-            background: transparent; border-radius: 8px; 
+            background: transparent; 
+            border-radius: 8px; 
             cursor: crosshair; max-width: 100%; height: auto; touch-action: none;
         }
         canvas.disabled { opacity: 0.1; pointer-events: none; }
+        canvas.hidden { display: none; }
         .hidden { display: none; }
 
-        /* --- КНОПКИ С ХОВЕРОМ --- */
-        .orange-btn, .admin-btn { 
-            width: 100%; padding: 14px; border-radius: 6px; border: none; 
-            font-weight: 900; cursor: pointer; font-size: 0.9rem; 
-            text-transform: uppercase; transition: all 0.3s ease;
-        }
+        .status-text { font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; }
 
-        .orange-btn { background: white; color: var(--orange); }
-        .orange-btn:hover { background: var(--orange); color: white; transform: translateY(-2px); }
-
-        .admin-btn { background: var(--accent); color: #1a1d1f; margin-top: 10px; }
-        .admin-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(9, 224, 227, 0.3); }
-
-        /* --- ШТОРКА И КРЕСТИКИ --- */
+        /* --- БОКОВОЕ МЕНЮ / УВЕДОМЛЕНИЯ (ШТОРКА) --- */
         #notif-sidebar { 
-            position: absolute; top: 50%; left: 50%; width: 300px; height: 45%;
-            background: var(--orange); color: white; z-index: 5; border-radius: 8px;
-            padding: 30px; box-sizing: border-box; transform: translate(-50%, -50%); 
-            opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none; display: flex; flex-direction: column;
+            position: absolute; 
+            top: 50%; left: 50%; 
+            width: 300px; 
+            height: 45%;
+            background: var(--orange); 
+            color: white; 
+            z-index: 5; 
+            border-radius: 8px;
+            padding: 30px; 
+            box-sizing: border-box;
+            transform: translate(-50%, -50%); 
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.4);
+            pointer-events: none; 
         }
 
-        #notif-sidebar.active { transform: translate(calc(-50% + 280px), -50%); opacity: 1; pointer-events: auto; }
+        #notif-sidebar.active { 
+            transform: translate(calc(-50% + 280px), -50%); 
+            opacity: 1;
+            pointer-events: auto; 
+        }
 
+        .notif-header { 
+            display: flex; 
+            justify-content: space-between; /* Изменил выравнивание для красоты */
+            align-items: center; 
+            margin-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
+
+        /* --- ОБЪЕДИНЕННЫЕ СТИЛИ ДЛЯ КРЕСТИКОВ ЗАКРЫТИЯ --- */
         .close-x, .close-info { 
-            cursor: pointer; font-size: 32px; color: #ffffff; /* Белый по умолчанию */
-            transition: color 0.3s ease, transform 0.2s ease; line-height: 1;
+            cursor: pointer; 
+            font-size: 34px; 
+            line-height: 1; 
+            opacity: 0.6; 
+            transition: 0.2s ease; 
+            font-weight: 300;
         }
-        .close-x:hover, .close-info:hover { color: var(--accent); transform: scale(1.2); }
+        .close-x:hover, .close-info:hover { 
+            color: var(--accent); 
+            opacity: 1; 
+            transform: scale(1.1); 
+        }
+        .close-info { color: #888; }
+        
+        .notif-header span:first-child { 
+            font-weight: 300; color: #fff; font-size: 0.7rem; letter-spacing: 1.5px; opacity: 0.9; margin: 0;
+        }
 
-        /* --- ИНФО МОДАЛКА --- */
-        .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
-            z-index: 99999; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s ease; backdrop-filter: blur(8px);
+        #log-container { flex: 1; display: flex; flex-direction: column; justify-content: right; text-align: right; }
+        .log-card { border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .log-card h3 { margin: 0 0 8px 0; font-size: 1.1rem; text-transform: uppercase; }
+        .log-card p { margin: 0; font-size: 0.85rem; line-height: 1.4; }
+        
+        /* --- КНОПКИ --- */
+        .orange-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: white; color: var(--orange); font-weight: 900; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; }
+        .admin-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: var(--accent); color: white; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        
+        /* --- ФУТЕР (ПОДСТРОЕН ПОД ПЛИТКУ) --- */
+        .inner-footer {
+            position: absolute; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            width: 90%; 
+            max-width: 360px; /* Совпадает с карточкой */
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 0; 
+            z-index: 10;
         }
+        .footer-text { font-size: 9px; color: #777; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+        
+        /* --- АДАПТИВ ПОД МОБИЛЬНЫЕ И ПЛАНШЕТЫ (ШТОРКА СВЕРХУ) --- */
+        @media (max-width: 850px) { /* Расширено до 850px для планшетов */
+            .auth-card { 
+                z-index: 10; transform: translateY(-5vh); padding: 20px; /* Чуть приподнял карточку */
+            }
+            #notif-sidebar { 
+                position: fixed; z-index: 9999 !important;
+                top: 20px; left: 10px; right: 10px; bottom: auto;
+                width: auto; height: auto; min-height: 160px;
+                transform: translate(0, -150%) scale(1); 
+            }
+            #notif-sidebar.active { 
+                transform: translate(0, 0) scale(1); 
+            }
+            .notif-header { margin-bottom: 10px; }
+            .info-flex { flex-direction: column; } 
+        }
+
+        /* --- СТИЛИ ДЛЯ ИНФО-ОКНА (ТЕМНАЯ ТЕМА) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .info-modal {
-            background: #1a1d1f; width: 90%; max-width: 550px; border-radius: 12px;
-            overflow: hidden; color: #eee; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            background: #1a1d1f; /* Сделано темным */
+            width: 95%; 
+            max-width: 600px; 
+            max-height: 85vh;
+            border-radius: 8px; display: flex; flex-direction: column; overflow: hidden;
+            transition: transform 0.3s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            color: #e0e6ed; /* Светлый текст */
         }
 
-        .info-modal-header { padding: 20px; display: flex; justify-content: space-between; align-items: center; background: #25292c; }
-        .info-modal-content { padding: 25px; }
-        
-        .info-flex { display: flex; gap: 20px; align-items: center; }
-        .info-text-side { flex: 1; }
-        .info-img-side { flex: 1.2; }
-        .info-img-side img { width: 100%; border-radius: 8px; filter: grayscale(0.2); }
+        .modal-overlay.active .info-modal { transform: translateY(0); }
 
-        .changelog-box { background: #25292c; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); }
-        .changelog-box h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 0.9rem; }
-        .changelog-box ul { margin: 0; padding-left: 15px; font-size: 0.8rem; color: #bbb; }
-
-        /* Футер */
-        .inner-footer {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 360px; display: flex; justify-content: space-between;
+        .info-modal-header {
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            background: #22272a; border-bottom: none; /* Убрана линия, сделан фон */
         }
-        .footer-text { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 1px; }
 
-        @media (max-width: 850px) {
-            #notif-sidebar { position: fixed; top: 20px; left: 10px; right: 10px; width: auto; height: auto; transform: translateY(-150%); }
-            #notif-sidebar.active { transform: translateY(0); }
-            .info-flex { flex-direction: column-reverse; }
+        .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 300; color: #fff; text-transform: uppercase;}
+
+        .info-modal-content { padding: 20px; overflow-y: auto; text-align: left; }
+
+        /* Расположение текста и картинки */
+        .info-flex {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
         }
+        .info-text-side { flex: 1; } /* Текст занимает меньше места */
+        .info-img-side { flex: 1.5; display: flex; justify-content: center; } /* Картинка больше */
+        .info-img-side img {
+            width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .changelog-box { background: #2b3236; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); margin-bottom: 20px; }
+        .changelog-box h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--accent); }
+        .changelog-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: #ccc;}
+        .changelog-box li { margin-bottom: 5px; }
+
+        .tutorial-box h3 { font-size: 1rem; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px; color: #fff;}
+        .tutorial-box p { font-size: 0.85rem; line-height: 1.5; color: #aaa;}
     </style>
 </head>
 <body>
 
     <div id="notif-sidebar">
-        <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;">
-            <span style="font-size: 10px; letter-spacing: 2px;">SYSTEM LOG</span>
+        <div class="notif-header">
+            <span>INFO</span>
             <span class="close-x" onclick="closeLog()">×</span>
         </div>
         <div id="log-container"></div>
     </div>
     
     <div class="auth-card">
-        <div class="auth-header"><h1>CALENDARIUM</h1></div>
-        <input type="text" id="username" oninput="checkName(this.value)" placeholder="Ваше имя">
-        <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
-        <div id="admin-box" class="hidden">
-            <input type="password" id="admin-password" placeholder="Пароль">
-            <button class="admin-btn" onclick="handleLogin()">Войти</button>
+        <div class="auth-header">
+            <h1>CALENDARIUM</h1>
         </div>
-        <p id="status" style="font-size: 10px; color: var(--accent); margin-top: 15px; text-transform: uppercase; font-weight: bold;">Введите имя</p>
+
+        <input type="text" id="username" oninput="checkName(this.value)" maxlength="20" placeholder="Ваше имя">
+        
+        <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
+        
+        <div id="admin-box" class="hidden">
+            <input type="password" id="admin-password" placeholder="пароль администратора">
+            <button class="admin-btn" onclick="handleLogin()">Войти в систему</button>
+        </div>
+
+        <p class="status-text" id="status">Введите имя</p>
     </div>
 
-    <div id="info-modal-overlay" class="modal-overlay" onclick="closeInfoModal()">
+    <div id="info-modal-overlay" class="modal-overlay hidden" onclick="closeInfoModal(event)">
         <div class="info-modal" onclick="event.stopPropagation()">
+            
             <div class="info-modal-header">
-                <h2 style="margin:0; font-size: 1rem; font-weight: 400;">ОБНОВЛЕНИЕ v2.6</h2>
+                <h2>Справка и Обновления</h2>
                 <span class="close-info" onclick="closeInfoModal()">×</span>
             </div>
+
             <div class="info-modal-content">
                 <div class="info-flex">
                     <div class="info-text-side">
                         <div class="changelog-box">
-                            <h3>ЧТО НОВОГО:</h3>
+                            <h3>Последние изменения</h3>
                             <ul>
-                                <li>Акцентный цвет графики.</li>
-                                <li>Улучшенный отклик кнопок.</li>
-                                <li>Исправлена логика шторки.</li>
+                                <li>Исправлена ошибка моргания шторки.</li>
+                                <li>Улучшено отображение на планшетах.</li>
+                                <li>Новая темная тема окна обновлений.</li>
                             </ul>
                         </div>
                     </div>
-                    <div class="info-img-side"><img src="Set1.png" alt="Preview"></div>
+                    
+                    <div class="info-img-side">
+                        <img src="Set1.png" alt="Превью">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="inner-footer">
-        <span style="color: #888; font-size: 10px; cursor: pointer; border-bottom: 1px solid #444;" onclick="openInfoModal()">СПРАВКА</span>
-        <div class="footer-text">GROUP 5 • 2026</div>
+        <span style="color: #999; font-size: 10px; cursor: pointer; text-decoration: underline; transition: 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#999'" onclick="openInfoModal()">Как пользоваться?</span>
+        <div class="footer-text">Group 5 • v2.6.18</div>
     </div>
 
     <script type="module">
@@ -180,28 +298,61 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const canvas = document.getElementById('canvas');
+        const adminBox = document.getElementById('admin-box');
         const ctx = canvas.getContext('2d');
         const sidebar = document.getElementById('notif-sidebar');
         let dots = [], pattern = "", drawing = false;
 
-        // Инициализация
-        window.onload = () => setTimeout(() => document.getElementById('info-modal-overlay').classList.add('active'), 500);
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.openInfoModal();
+            }, 500); 
+        });
 
-        window.openInfoModal = () => document.getElementById('info-modal-overlay').classList.add('active');
-        window.closeInfoModal = () => document.getElementById('info-modal-overlay').classList.remove('active');
-        window.closeLog = () => { sidebar.classList.remove('active'); resetCanvas(); };
+        window.closeLog = () => {
+            sidebar.classList.remove('active');
+            resetCanvas();
+        };
 
-        function resetCanvas() { pattern = ""; initDots(); draw(); }
+        window.openInfoModal = () => {
+            const modal = document.getElementById('info-modal-overlay');
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('active'), 10);
+        };
+
+        window.closeInfoModal = (e) => {
+            const modal = document.getElementById('info-modal-overlay');
+            modal.classList.remove('active');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        function resetCanvas() {
+            pattern = "";
+            initDots();
+            draw();
+        }
 
         window.checkName = (val) => {
-            const name = val.trim().toLowerCase();
-            const isOk = name.length > 0;
-            const isAdmin = name === 'admin';
+            let cleanValue = val.replace(/[^a-zA-Zа-яА-Я0-9]/g, '').slice(0, 20);
+            const inputField = document.getElementById('username');
             
-            document.getElementById('canvas').classList.toggle('hidden', isAdmin);
-            document.getElementById('admin-box').classList.toggle('hidden', !isAdmin);
-            canvas.classList.toggle('disabled', !isOk);
-            document.getElementById('status').innerText = isAdmin ? "ADMIN MODE" : (isOk ? "РИСУЙТЕ КЛЮЧ" : "ВВЕДИТЕ ИМЯ");
+            if (val !== cleanValue) {
+                inputField.value = cleanValue;
+            }
+
+            const name = cleanValue.trim().toLowerCase();
+            const isOk = name.length > 0;
+            
+            if (name === 'admin') {
+                canvas.classList.add('hidden');
+                adminBox.classList.remove('hidden');
+                document.getElementById('status').innerText = "Режим администратора";
+            } else {
+                canvas.classList.remove('hidden');
+                adminBox.classList.add('hidden');
+                canvas.classList.toggle('disabled', !isOk);
+                document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
+            }
         };
 
         function initDots() {
@@ -211,78 +362,108 @@
 
         function draw() {
             ctx.clearRect(0, 0, 260, 260);
-            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
-            
             if(pattern.length > 0) {
-                ctx.beginPath(); ctx.strokeStyle = accentColor; ctx.lineWidth = 6; ctx.lineCap="round"; ctx.lineJoin="round";
+                ctx.beginPath(); 
+                ctx.strokeStyle = "#0984e3"; 
+                ctx.lineWidth = 8; 
+                ctx.lineCap="round"; 
+                ctx.lineJoin="round";
                 for(let k=0; k < pattern.length; k+=2) {
                     let d = dots.find(dot => dot.id === pattern.substring(k, k+2));
-                    k === 0 ? ctx.moveTo(d.x, d.y) : ctx.lineTo(d.x, d.y);
+                    if (k === 0) ctx.moveTo(d.x, d.y);
+                    else ctx.lineTo(d.x, d.y);
                 }
                 ctx.stroke();
             }
             dots.forEach(d => {
-                ctx.beginPath(); ctx.arc(d.x, d.y, 10, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? accentColor : "#333"; ctx.fill();
+                ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
+                ctx.fillStyle = d.hit ? "#0984e3" : "#3e3e3e"; 
+                ctx.fill();
             });
         }
 
-        const startDraw = () => { 
+        const startDraw = (e) => {
             if (canvas.classList.contains('disabled')) return;
-            sidebar.classList.remove('active'); // Прячем шторку при новом вводе
-            pattern = ""; initDots(); drawing = true; draw(); 
+            sidebar.classList.remove('active'); 
+            pattern = ""; initDots(); drawing = true; draw();
         };
 
         const moveDraw = (e) => {
             if(!drawing) return;
             const rect = canvas.getBoundingClientRect();
-            const x = ((e.touches ? e.touches[0].clientX : e.clientX) - rect.left) * (canvas.width / rect.width);
-            const y = ((e.touches ? e.touches[0].clientY : e.clientY) - rect.top) * (canvas.height / rect.height);
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (clientX - rect.left) * scaleX;
+            const y = (clientY - rect.top) * scaleY;
 
             dots.forEach(d => {
-                if(Math.sqrt((x - d.x)**2 + (y - d.y)**2) < 20 && !d.hit) { 
-                    d.hit = true; pattern += d.id; draw(); 
+                if(Math.sqrt((x - d.x)**2 + (y - d.y)**2) < 25 && !d.hit) { 
+                    d.hit = true; 
+                    pattern += d.id; 
+                    draw(); 
                 }
             });
         };
 
+        const endDraw = () => {
+            if(!drawing) return;
+            drawing = false;
+            if(pattern.length >= 4) window.handleLogin();
+        };
+
         canvas.addEventListener('mousedown', startDraw);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e); }, {passive: false});
         window.addEventListener('mousemove', moveDraw);
-        window.addEventListener('touchmove', moveDraw);
-        window.addEventListener('mouseup', () => { if(drawing && pattern.length >= 4) handleLogin(); drawing = false; });
+        window.addEventListener('touchmove', (e) => { if(drawing) e.preventDefault(); moveDraw(e); }, {passive: false});
+        window.addEventListener('mouseup', endDraw);
+        window.addEventListener('touchend', endDraw);
 
         window.handleLogin = async () => {
             const name = document.getElementById('username').value.trim().toLowerCase();
-            const secret = (name === 'admin') ? document.getElementById('admin-password').value : pattern;
-            if(!secret) return;
+            const adminPass = document.getElementById('admin-password').value;
+            const finalSecret = (name === 'admin') ? adminPass : pattern;
+
+            if (!finalSecret) return;
 
             try {
                 const snap = await getDoc(doc(db, "users", name));
-                if (snap.exists() && snap.data().password === secret) {
-                    location.href = 'calendar.html';
+                if (snap.exists()) {
+                    if (snap.data().password === finalSecret) {
+                        localStorage.setItem('currentUser', name);
+                        window.location.href = 'calendar.html';
+                    } else {
+                        showLog("Ошибка", "Неверный ключ или пароль.");
+                    }
                 } else if (name !== 'admin') {
-                    showRequestUI(name);
-                } else {
-                    showLog("ОШИБКА", "НЕВЕРНЫЙ ПАРОЛЬ");
+                    document.getElementById('log-container').innerHTML = `
+                        <div class="log-card"><h3>Новый профиль?</h3><p>Хочу создать свой аккаунт.</p></div>
+                        <button class="orange-btn" id="send-req"><p>ОТПРАВИТЬ</p></button>
+                    `;
+                    sidebar.classList.add('active');
+                    
+                    document.getElementById('send-req').onclick = async () => {
+                        await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
+                        showLog("Готово", "Заявка отправлена");
+                    };
                 }
             } catch (e) { console.error(e); }
         };
 
-        function showRequestUI(name) {
-            document.getElementById('log-container').innerHTML = `
-                <p style="font-size:0.8rem; margin-bottom:15px;">ПРОФИЛЬ НЕ НАЙДЕН. ОТПРАВИТЬ ЗАЯВКУ?</p>
-                <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
-            `;
-            sidebar.classList.add('active');
-            document.getElementById('send-req').onclick = async () => {
-                await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
-                showLog("УСПЕХ", "ЗАЯВКА ОТПРАВЛЕНА");
-            };
-        }
-
         function showLog(title, text) {
-            document.getElementById('log-container').innerHTML = `<h1 style="font-size:1rem; color:#fff;">${text}</h1>`;
+            const logContainer = document.getElementById('log-container');
+            const sidebar = document.getElementById('notif-sidebar');
+
+            if (!logContainer || !sidebar) return;
+
+            logContainer.innerHTML = `
+                <div class="log-card">
+                    <h1 style="margin:0; font-size:1.1rem; line-height:1.4; color:#fff; font-weight:500;">
+                        ${text}
+                    </h1>
+                </div>`;
+            
             sidebar.classList.add('active');
         }
 
