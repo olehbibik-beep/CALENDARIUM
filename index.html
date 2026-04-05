@@ -229,6 +229,12 @@
         .changelog-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: #ccc;}
         .changelog-box li { margin-bottom: 5px; }
     </style>
+    <link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
 </head>
 <body>
 
