@@ -19,7 +19,7 @@
             --bg: #001A1F; 
             --orange: #f39c12; 
             --footer-bg: #eceff1;
-            --title-color: #ffffff; /* ДОБАВЛЕН ЦВЕТ ЗАГОЛОВКА */
+            --title-color: #ffffff;
         }
         
         body { 
@@ -46,7 +46,7 @@
         
         .auth-header h1 {
             margin: 0; font-size: 1.3rem; letter-spacing: 2px; line-height: 1; 
-            color: var(--title-color); /* ИСПОЛЬЗУЕМ ПЕРЕМЕННУЮ */
+            color: var(--title-color); 
             font-weight: 800; text-transform: uppercase;
         }
 
@@ -97,7 +97,7 @@
 
         .notif-header { 
             display: flex; 
-            justify-content: space-between; /* Изменил выравнивание для красоты */
+            justify-content: space-between; 
             align-items: center; 
             margin-bottom: 20px; 
             border-bottom: 1px solid rgba(255,255,255,0.2);
@@ -109,16 +109,14 @@
             cursor: pointer; 
             font-size: 34px; 
             line-height: 1; 
-            opacity: 0.6; 
-            transition: 0.2s ease; 
+            color: #ffffff; /* Белый по умолчанию */
+            transition: all 0.3s ease; 
             font-weight: 300;
         }
         .close-x:hover, .close-info:hover { 
-            color: var(--accent); 
-            opacity: 1; 
-            transform: scale(1.1); 
+            color: var(--accent); /* Акцент при наведении */
+            transform: scale(1.2); 
         }
-        .close-info { color: #888; }
         
         .notif-header span:first-child { 
             font-weight: 300; color: #fff; font-size: 0.7rem; letter-spacing: 1.5px; opacity: 0.9; margin: 0;
@@ -130,17 +128,33 @@
         .log-card p { margin: 0; font-size: 0.85rem; line-height: 1.4; }
         
         /* --- КНОПКИ --- */
-        .orange-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: white; color: var(--orange); font-weight: 900; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; }
-        .admin-btn { width: 100%; padding: 14px; border-radius: 6px; border: none; background: var(--accent); color: white; font-weight: 900; cursor: pointer; margin-top: 10px; }
+        .orange-btn { 
+            width: 100%; padding: 14px; border-radius: 6px; border: none; 
+            background: white; color: var(--orange); font-weight: 900; 
+            cursor: pointer; font-size: 0.9rem; text-transform: uppercase; 
+            transition: all 0.3s ease;
+        }
+        .orange-btn:hover {
+            background: var(--orange); color: white; transform: translateY(-2px);
+        }
+
+        .admin-btn { 
+            width: 100%; padding: 14px; border-radius: 6px; border: none; 
+            background: var(--accent); color: #001A1F; font-weight: 900; 
+            cursor: pointer; margin-top: 10px; transition: all 0.3s ease;
+        }
+        .admin-btn:hover {
+            filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(9, 224, 227, 0.3);
+        }
         
-        /* --- ФУТЕР (ПОДСТРОЕН ПОД ПЛИТКУ) --- */
+        /* --- ФУТЕР --- */
         .inner-footer {
             position: absolute; 
             bottom: 20px; 
             left: 50%; 
             transform: translateX(-50%);
             width: 90%; 
-            max-width: 360px; /* Совпадает с карточкой */
+            max-width: 360px; 
             display: flex; 
             align-items: center; 
             justify-content: space-between;
@@ -149,10 +163,10 @@
         }
         .footer-text { font-size: 9px; color: #777; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
         
-        /* --- АДАПТИВ ПОД МОБИЛЬНЫЕ И ПЛАНШЕТЫ (ШТОРКА СВЕРХУ) --- */
-        @media (max-width: 850px) { /* Расширено до 850px для планшетов */
+        /* --- АДАПТИВ ПОД МОБИЛЬНЫЕ И ПЛАНШЕТЫ --- */
+        @media (max-width: 850px) { 
             .auth-card { 
-                z-index: 10; transform: translateY(-5vh); padding: 20px; /* Чуть приподнял карточку */
+                z-index: 10; transform: translateY(-5vh); padding: 20px; 
             }
             #notif-sidebar { 
                 position: fixed; z-index: 9999 !important;
@@ -167,7 +181,7 @@
             .info-flex { flex-direction: column; } 
         }
 
-        /* --- СТИЛИ ДЛЯ ИНФО-ОКНА (ТЕМНАЯ ТЕМА) --- */
+        /* --- СТИЛИ ДЛЯ ИНФО-ОКНА --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8);
             z-index: 99999; display: flex; align-items: center; justify-content: center;
@@ -178,35 +192,34 @@
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .info-modal {
-            background: #1a1d1f; /* Сделано темным */
+            background: #1a1d1f; 
             width: 95%; 
             max-width: 600px; 
             max-height: 85vh;
             border-radius: 8px; display: flex; flex-direction: column; overflow: hidden;
             transition: transform 0.3s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            color: #e0e6ed; /* Светлый текст */
+            color: #e0e6ed; 
         }
 
         .modal-overlay.active .info-modal { transform: translateY(0); }
 
         .info-modal-header {
             padding: 20px; display: flex; justify-content: space-between; align-items: center;
-            background: #22272a; border-bottom: none; /* Убрана линия, сделан фон */
+            background: #22272a; border-bottom: none; 
         }
 
         .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 300; color: #fff; text-transform: uppercase;}
 
         .info-modal-content { padding: 20px; overflow-y: auto; text-align: left; }
 
-        /* Расположение текста и картинки */
         .info-flex {
             display: flex;
             gap: 20px;
             align-items: flex-start;
         }
-        .info-text-side { flex: 1; } /* Текст занимает меньше места */
-        .info-img-side { flex: 1.5; display: flex; justify-content: center; } /* Картинка больше */
+        .info-text-side { flex: 1; } 
+        .info-img-side { flex: 1.5; display: flex; justify-content: center; } 
         .info-img-side img {
             width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
@@ -215,9 +228,6 @@
         .changelog-box h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--accent); }
         .changelog-box ul { margin: 0; padding-left: 20px; font-size: 0.85rem; line-height: 1.5; color: #ccc;}
         .changelog-box li { margin-bottom: 5px; }
-
-        .tutorial-box h3 { font-size: 1rem; margin-bottom: 10px; border-bottom: 2px solid #333; padding-bottom: 5px; color: #fff;}
-        .tutorial-box p { font-size: 0.85rem; line-height: 1.5; color: #aaa;}
     </style>
 </head>
 <body>
@@ -259,9 +269,9 @@
                         <div class="changelog-box">
                             <h3>Последние изменения</h3>
                             <ul>
-                                <li>Исправлена ошибка моргания шторки.</li>
-                                <li>Улучшено отображение на планшетах.</li>
-                                <li>Новая темная тема окна обновлений.</li>
+                                <li>Акцентный цвет рисования и UI.</li>
+                                <li>Ховеры для кнопок и крестиков.</li>
+                                <li>Корректная работа шторки.</li>
                             </ul>
                         </div>
                     </div>
@@ -339,15 +349,17 @@
             const name = cleanValue.trim().toLowerCase();
             const isOk = name.length > 0;
             
+            // Прячем шторку и сбрасываем канвас при вводе имени
+            sidebar.classList.remove('active');
+            resetCanvas();
+            
             if (name === 'admin') {
                 canvas.classList.add('hidden');
                 adminBox.classList.remove('hidden');
-                document.getElementById('status').innerText = "Режим администратора";
             } else {
                 canvas.classList.remove('hidden');
                 adminBox.classList.add('hidden');
                 canvas.classList.toggle('disabled', !isOk);
-                document.getElementById('status').innerText = isOk ? "Нарисуйте ключ" : "Введите имя";
             }
         };
 
@@ -358,9 +370,13 @@
 
         function draw() {
             ctx.clearRect(0, 0, 260, 260);
+            
+            // Берем акцентный цвет из CSS
+            const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
             if(pattern.length > 0) {
                 ctx.beginPath(); 
-                ctx.strokeStyle = "#0984e3"; 
+                ctx.strokeStyle = accentColor; 
                 ctx.lineWidth = 8; 
                 ctx.lineCap="round"; 
                 ctx.lineJoin="round";
@@ -373,14 +389,14 @@
             }
             dots.forEach(d => {
                 ctx.beginPath(); ctx.arc(d.x, d.y, 14, 0, Math.PI*2);
-                ctx.fillStyle = d.hit ? "#0984e3" : "#3e3e3e"; 
+                ctx.fillStyle = d.hit ? accentColor : "#3e3e3e"; 
                 ctx.fill();
             });
         }
 
         const startDraw = (e) => {
             if (canvas.classList.contains('disabled')) return;
-            sidebar.classList.remove('active'); 
+            sidebar.classList.remove('active'); // Прячем шторку перед новым рисованием
             pattern = ""; initDots(); drawing = true; draw();
         };
 
@@ -435,7 +451,7 @@
                 } else if (name !== 'admin') {
                     document.getElementById('log-container').innerHTML = `
                         <div class="log-card"><h3>Новый профиль?</h3><p>Хочу создать свой аккаунт.</p></div>
-                        <button class="orange-btn" id="send-req"><p>ОТПРАВИТЬ</p></button>
+                        <button class="orange-btn" id="send-req"><p style="margin: 0;">ОТПРАВИТЬ</p></button>
                     `;
                     sidebar.classList.add('active');
                     
