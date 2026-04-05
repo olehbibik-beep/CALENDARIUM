@@ -150,9 +150,10 @@
         /* --- ФУТЕР --- */
         .inner-footer {
             position: absolute; 
-            bottom: 0px; 
+            bottom: 20px; 
             left: 50%; 
-            width: 90%; 
+            width: 90%;
+            transform: translateX(-50%);
             max-width: 360px; 
             display: flex; 
             align-items: center; 
@@ -191,21 +192,21 @@
         .modal-overlay.active { opacity: 1; pointer-events: all; }
 
         .info-modal {
-            background: #E0E6ED; 
+            background: #1a1d1f; 
             width: 95%; 
             max-width: 600px; 
             max-height: 85vh;
             border-radius: 16px; display: flex; flex-direction: column; overflow: hidden;
             transition: transform 0.3s ease;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            color: #1a1d1f; 
+            color: #E0E6ED; 
         }
 
         .modal-overlay.active .info-modal { transform: translateY(0); }
 
         .info-modal-header {
             padding: 0px; display: flex; justify-content: space-between; align-items: center;
-            background: #e0e6ed; border-bottom: none; 
+            background: #1a1d1f; border-bottom: none; 
         }
 
         .info-modal-header h2 { margin: 0; font-size: 1.1rem; font-weight: 300; color: #fff; text-transform: uppercase;}
