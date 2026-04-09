@@ -96,47 +96,50 @@
         background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
     }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
-/* КАПСУЛА ДЛЯ МНОГОДНЕВНЫХ СОБЫТИЙ */
-.day-box.span-start, .day-box.span-mid, .day-box.span-end {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
-    z-index: 2;
-}
-
-/* Левый край капсулы */
-.day-box.span-start {
-    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 30px 0 0 30px !important;
-}
-
-/* Середина капсулы (без боковых рамок) */
-.day-box.span-mid {
-    border-radius: 0 !important;
-}
-
-/* Правый край капсулы */
-.day-box.span-end {
-    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 0 30px 30px 0 !important;
-}
-
-/* Перекидываем "мостик" через gap: 10px */
-.day-box.span-start::after, .day-box.span-mid::after {
+/* --- КАПСУЛА ДЛЯ МНОГОДНЕВНЫХ СОБЫТИЙ --- */
+.day-box.c-start::before,
+.day-box.c-mid::before,
+.day-box.c-end::before,
+.day-box.c-single::before {
     content: '';
     position: absolute;
-    top: -1px; bottom: -1px;
-    right: -12px; /* Ширина gap + 2px на перекрытие */
-    width: 12px;
-    background: inherit;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    z-index: -1;
+    top: -3px;      /* Отступ рамки вверх */
+    bottom: -3px;   /* Отступ рамки вниз */
+    pointer-events: none; /* Чтобы рамка не мешала кликать на день */
+    z-index: 10;    /* Рисуем поверх пустот */
 }
 
-/* Если день последний в строке (Воскресенье), мостик не рисуем */
-.day-box:nth-child(7n)::after {
-    display: none;
+/* НАЧАЛО (Левый край капсулы) */
+.day-box.c-start::before {
+    left: -3px;
+    right: -11px; /* Перекидываем мостик через gap (10px) к следующей плитке */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-right: none;
+    border-radius: 16px 0 0 16px;
+}
+
+/* СЕРЕДИНА (Только верхняя и нижняя линии) */
+.day-box.c-mid::before {
+    left: 0;
+    right: -11px;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* КОНЕЦ (Правый край капсулы) */
+.day-box.c-end::before {
+    left: 0;
+    right: -3px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-left: none;
+    border-radius: 0 16px 16px 0;
+}
+
+/* ЕСЛИ СОБЫТИЕ НА 1 ДЕНЬ (Целая капсула) */
+.day-box.c-single::before {
+    left: -3px; right: -3px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
 }
     /* МОДАЛЬНОЕ ОКНО */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
@@ -347,12 +350,12 @@
     }
 
     function updateUI() {
-    // Очищаем старые классы капсулы
+    // 1. Очищаем старые классы рамки при каждом обновлении
     document.querySelectorAll('.day-box').forEach(b => {
-        b.classList.remove('span-start', 'span-mid', 'span-end');
+        b.classList.remove('c-start', 'c-mid', 'c-end', 'c-single', 'has-memorial');
     });
 
-    // Функция проверки, есть ли конгресс в этот день
+    // Функция для проверки, есть ли конгресс в конкретный день
     const hasCongress = (day) => {
         return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
     };
@@ -363,42 +366,42 @@
         if (!tile || !row) continue;
         
         const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-        tile.classList.remove('has-memorial');
         row.innerHTML = '';
         
         notes.forEach(n => {
             if (n.category === 'memorial') tile.classList.add('has-memorial');
             else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
             else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
-            // Для конгресса можно тоже добавить серую точку, как на скрине
-            else if (n.category === 'congress') row.innerHTML += '<div class="mark" style="background: #aaa;"></div>';
+            // Можно добавить серую точку для конгресса вниз, если хочешь
+            else if (n.category === 'congress') row.innerHTML += '<div class="mark" style="background:#aaa;"></div>';
         });
 
-        // --- ЛОГИКА КАПСУЛЫ ---
+        // 2. ЛОГИКА РАМКИ
         if (hasCongress(d)) {
             const prev = hasCongress(d - 1);
             const next = hasCongress(d + 1);
             
-            // Защита от переноса строки (чтобы капсула не уехала за пределы экрана)
+            // Проверка на конец и начало недели
             const isSunday = new Date(year, mIdx, d).getDay() === 0;
             const isMonday = new Date(year, mIdx, d).getDay() === 1;
 
             if (!prev && next) {
-                tile.classList.add('span-start');
+                if (isSunday) tile.classList.add('c-single'); // Зажимаем капсулу, если это край строки
+                else tile.classList.add('c-start');
             } else if (prev && next) {
-                if (isMonday) tile.classList.add('span-start'); // Если понедельник - начинаем заново
-                else if (isSunday) tile.classList.add('span-end'); // Если воскресенье - закрываем капсулу
-                else tile.classList.add('span-mid');
+                if (isMonday) tile.classList.add('c-start'); 
+                else if (isSunday) tile.classList.add('c-end'); 
+                else tile.classList.add('c-mid');
             } else if (prev && !next) {
-                tile.classList.add('span-end');
+                if (isMonday) tile.classList.add('c-single');
+                else tile.classList.add('c-end');
             } else {
-                tile.classList.add('span-start', 'span-end'); // Если событие всего один день
+                tile.classList.add('c-single'); 
             }
         }
     }
     if (selectedDay) selectDay(selectedDay);
 }
-
     window.selectDay = (d) => {
         selectedDay = d;
         document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
