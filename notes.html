@@ -96,7 +96,48 @@
         background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
     }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+/* КАПСУЛА ДЛЯ МНОГОДНЕВНЫХ СОБЫТИЙ */
+.day-box.span-start, .day-box.span-mid, .day-box.span-end {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    z-index: 2;
+}
 
+/* Левый край капсулы */
+.day-box.span-start {
+    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 30px 0 0 30px !important;
+}
+
+/* Середина капсулы (без боковых рамок) */
+.day-box.span-mid {
+    border-radius: 0 !important;
+}
+
+/* Правый край капсулы */
+.day-box.span-end {
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 0 30px 30px 0 !important;
+}
+
+/* Перекидываем "мостик" через gap: 10px */
+.day-box.span-start::after, .day-box.span-mid::after {
+    content: '';
+    position: absolute;
+    top: -1px; bottom: -1px;
+    right: -12px; /* Ширина gap + 2px на перекрытие */
+    width: 12px;
+    background: inherit;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: -1;
+}
+
+/* Если день последний в строке (Воскресенье), мостик не рисуем */
+.day-box:nth-child(7n)::after {
+    display: none;
+}
     /* МОДАЛЬНОЕ ОКНО */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
     .modal-box { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 0px solid var(--inner-border); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
@@ -231,6 +272,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <button id="btn-memorial" class="modal-btn" style="background:var(--ev-memorial);" onclick="save('memorial')">ВЕЧЕРЯ</button>
                 <button id="btn-meeting" class="modal-btn" style="background:var(--ev-meeting); color: #000;" onclick="save('meeting')">ВСТРЕЧА</button>
+                <button id="btn-congress" class="modal-btn" style="background:transparent; border: 1px solid #aaa; color: #fff;" onclick="save('congress')">КОНГРЕСС</button>
                 <button class="modal-btn" style="background:#444;" onclick="save('personal')">ЛИЧНОЕ</button>
             </div>
             <button class="modal-btn" style="background:transparent; border: 1px solid #444; color:#aaa;" onclick="closeModal()">ОТМЕНА</button>
@@ -305,21 +347,57 @@
     }
 
     function updateUI() {
-        for (let d = 1; d <= 31; d++) {
-            const tile = document.getElementById(`tile-${d}`);
-            const row = document.getElementById(`marks-${d}`);
-            if (!tile || !row) continue;
-            const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-            tile.classList.remove('has-memorial');
-            row.innerHTML = '';
-            notes.forEach(n => {
-                if (n.category === 'memorial') tile.classList.add('has-memorial');
-                else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
-                else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
-            });
+    // Очищаем старые классы капсулы
+    document.querySelectorAll('.day-box').forEach(b => {
+        b.classList.remove('span-start', 'span-mid', 'span-end');
+    });
+
+    // Функция проверки, есть ли конгресс в этот день
+    const hasCongress = (day) => {
+        return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
+    };
+
+    for (let d = 1; d <= 31; d++) {
+        const tile = document.getElementById(`tile-${d}`);
+        const row = document.getElementById(`marks-${d}`);
+        if (!tile || !row) continue;
+        
+        const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
+        tile.classList.remove('has-memorial');
+        row.innerHTML = '';
+        
+        notes.forEach(n => {
+            if (n.category === 'memorial') tile.classList.add('has-memorial');
+            else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
+            else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
+            // Для конгресса можно тоже добавить серую точку, как на скрине
+            else if (n.category === 'congress') row.innerHTML += '<div class="mark" style="background: #aaa;"></div>';
+        });
+
+        // --- ЛОГИКА КАПСУЛЫ ---
+        if (hasCongress(d)) {
+            const prev = hasCongress(d - 1);
+            const next = hasCongress(d + 1);
+            
+            // Защита от переноса строки (чтобы капсула не уехала за пределы экрана)
+            const isSunday = new Date(year, mIdx, d).getDay() === 0;
+            const isMonday = new Date(year, mIdx, d).getDay() === 1;
+
+            if (!prev && next) {
+                tile.classList.add('span-start');
+            } else if (prev && next) {
+                if (isMonday) tile.classList.add('span-start'); // Если понедельник - начинаем заново
+                else if (isSunday) tile.classList.add('span-end'); // Если воскресенье - закрываем капсулу
+                else tile.classList.add('span-mid');
+            } else if (prev && !next) {
+                tile.classList.add('span-end');
+            } else {
+                tile.classList.add('span-start', 'span-end'); // Если событие всего один день
+            }
         }
-        if (selectedDay) selectDay(selectedDay);
     }
+    if (selectedDay) selectDay(selectedDay);
+}
 
     window.selectDay = (d) => {
         selectedDay = d;
