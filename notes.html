@@ -46,7 +46,8 @@
     .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: #fff; letter-spacing: 1px; }
 
     .preview-box { display: flex; flex-direction: column; margin-top: 10px; flex: 1; }
-    .preview { background: transparent; width: 100%; padding: 20px; border-radius: 4px; border-left: 4px solid var(--accent); min-height: 100px; box-shadow: 0 10px 20px rgba(0,0,0,0.0); flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; }
+    /* УБРАЛИ border-left ОТСЮДА */
+    .preview { background: transparent; width: 100%; padding: 15px 0; border-radius: 4px; min-height: 100px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; }
     
     .action-btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 20px; cursor: pointer; color: #fff; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; background: var(--accent); }
     .action-btn:active { transform: scale(0.96); }
@@ -68,7 +69,7 @@
         width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 12px; 
         display: flex; align-items: center; justify-content: center;
         font-weight: 300; font-size: 1.1rem; cursor: pointer; border: 2px solid transparent;
-        position: relative; transition: 0.2s; overflow: hidden; /* Чтобы лента не вылезала за скругления */
+        position: relative; transition: 0.2s; overflow: hidden;
     }
     
     .day-box:hover { background: #2b3236; }
@@ -80,13 +81,12 @@
     .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
     .day-box.today { font-size: 2.2rem; color: #fff;}
 
-    /* ОБЫЧНЫЕ ИНДИКАТОРЫ (Встречи, личное) */
     .indicator-row { position: absolute; bottom: 10px; display: flex; gap: 4px; justify-content: center; width: 60%; z-index: 5; }
     .mark { height: 4px; width: 25%; border-radius: 4px; }
     .m-meeting { background: var(--ev-meeting); }
     .m-personal { background: #888; }
 
-    /* --- ЛЕНТА МНОГОДНЕВНОГО СОБЫТИЯ (КОНГРЕСС) ОТ КРАЯ ДО КРАЯ --- */
+    /* --- ЛЕНТА МНОГОДНЕВНОГО СОБЫТИЯ --- */
     .day-box.c-start::after,
     .day-box.c-mid::after,
     .day-box.c-end::after,
@@ -94,13 +94,9 @@
         content: ''; position: absolute; bottom: 3px; height: 4px;
         background: #aaa; z-index: 5;
     }
-    /* Одиночный день (по центру) */
     .day-box.c-single::after { left: 30%; right: 30%; border-radius: 4px; }
-    /* Начало события (от центра до правого края) */
-    .day-box.c-start::after { left: 30%; right: 0; border-radius: 40px 0 0 4px; }
-    /* Середина (от края до края) */
+    .day-box.c-start::after { left: 30%; right: 0; border-radius: 4px 0 0 4px; }
     .day-box.c-mid::after { left: 0; right: 0; border-radius: 0; }
-    /* Конец события (от левого края до центра) */
     .day-box.c-end::after { left: 0; right: 30%; border-radius: 0 4px 4px 0; }
 
     .inner-footer { position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between; background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border); }
@@ -278,7 +274,6 @@
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
                 else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
                 else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
-                // Обычную точку конгресса убрали, так как теперь есть полоска внизу
             });
 
             if (hasCongress(d)) {
@@ -315,11 +310,14 @@
         document.getElementById('edit-btn').style.display = 'block';
         const notes = Array.isArray(dbData[d]) ? dbData[d] : []; 
         
+        // ЗДЕСЬ ОБНОВИЛИ ОТРИСОВКУ КАЖДОГО СОБЫТИЯ
         document.getElementById('preview').innerHTML = `<div style="color:var(--accent); font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">${d} ${months[mIdx]}</div>` + 
-            (notes.map(n => `<div style="margin-bottom:8px; display:flex; gap:8px;">
-                                <span style="color:${n.category === 'memorial' ? 'var(--ev-memorial)' : n.category === 'meeting' ? 'var(--ev-meeting)' : '#aaa'}">•</span>
-                                <span>${n.text}</span>
-                            </div>`).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
+            (notes.map(n => {
+                const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
+                return `<div style="margin-bottom:12px; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 4px solid ${borderCol};">
+                            ${n.text}
+                        </div>`;
+            }).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
     };
 
     window.openModal = () => {
@@ -333,7 +331,7 @@
         list.innerHTML = notes.map((n, idx) => {
             const isOwner = n.author === currentUser;
             const canDelete = isAdmin || isOwner;
-            const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : '#888');
+            const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
 
             return `
             <div class="note-item" style="border-left: 4px solid ${borderCol}">
