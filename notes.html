@@ -13,7 +13,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
     <style>
-    /* ИСПОЛЬЗУЕМ ТЕ ЖЕ ЦВЕТА И СТИЛИ, ЧТО И НА ГЛАВНОЙ */
     :root { 
         --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
         --ev-memorial: #ff7675; --ev-memorial-bg: #3b1e22; 
@@ -29,14 +28,12 @@
         height: 100vh; overflow: hidden; 
     }
 
-    /* ГЛАВНАЯ ПЛИТКА-ОБОЛОЧКА */
     .app-container {
         width: 90%; max-width: 95%; height: 85%; background: #0f1112; border-radius: 30px;
         border: 0px solid var(--inner-border); display: flex; position: relative; overflow: hidden;
         box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
-    /* ЛЕВАЯ СТОРОНА (САЙДБАР) */
     .sidebar { 
         width: 320px; background: rgba(80,80,80,0.2); 
         padding: 30px; display: flex; flex-direction: column; 
@@ -48,14 +45,12 @@
     .back-btn:hover { background: var(--accent); border-color: #555; }
     .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: #fff; letter-spacing: 1px; }
 
-    /* БЛОК ЗАМЕТОК ДЛЯ ПК */
-    .preview-box { display: flex; flex-direction: column; flex: ; margin-top: 10px; }
+    .preview-box { display: flex; flex-direction: column; margin-top: 10px; flex: 1; }
     .preview { background: transparent; width: 100%; padding: 20px; border-radius: 4px; border-left: 4px solid var(--accent); min-height: 100px; box-shadow: 0 10px 20px rgba(0,0,0,0.0); flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; }
     
     .action-btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 20px; cursor: pointer; color: #fff; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; background: var(--accent); }
     .action-btn:active { transform: scale(0.96); }
 
-    /* ПРАВАЯ СТОРОНА (СЕТКА ДНЕЙ) */
     .main-view { 
         flex: 1; display: flex; flex-direction: column; 
         padding: 30px 20px; position: relative; overflow-y: auto;
@@ -73,7 +68,7 @@
         width: 100%; aspect-ratio: 1/1; background: var(--dark); border-radius: 12px; 
         display: flex; align-items: center; justify-content: center;
         font-weight: 300; font-size: 1.1rem; cursor: pointer; border: 2px solid transparent;
-        position: relative; transition: 0.2s;
+        position: relative; transition: 0.2s; overflow: hidden; /* Чтобы лента не вылезала за скругления */
     }
     
     .day-box:hover { background: #2b3236; }
@@ -85,63 +80,32 @@
     .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
     .day-box.today { font-size: 2.2rem; color: #fff;}
 
-    .indicator-row { position: absolute; bottom: 8px; display: flex; gap: 4px; justify-content: center; width: 60%; }
+    /* ОБЫЧНЫЕ ИНДИКАТОРЫ (Встречи, личное) */
+    .indicator-row { position: absolute; bottom: 10px; display: flex; gap: 4px; justify-content: center; width: 60%; z-index: 5; }
     .mark { height: 4px; width: 25%; border-radius: 4px; }
     .m-meeting { background: var(--ev-meeting); }
     .m-personal { background: #888; }
 
-    /* ИСПРАВЛЕННЫЙ ФУТЕР (Точь-в-точь как на главной) */
-    .inner-footer {
-        position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between;
-        background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
+    /* --- ЛЕНТА МНОГОДНЕВНОГО СОБЫТИЯ (КОНГРЕСС) ОТ КРАЯ ДО КРАЯ --- */
+    .day-box.c-start::after,
+    .day-box.c-mid::after,
+    .day-box.c-end::after,
+    .day-box.c-single::after {
+        content: ''; position: absolute; bottom: 3px; height: 4px;
+        background: #aaa; z-index: 5;
     }
+    /* Одиночный день (по центру) */
+    .day-box.c-single::after { left: 30%; right: 30%; border-radius: 4px; }
+    /* Начало события (от центра до правого края) */
+    .day-box.c-start::after { left: 30%; right: 0; border-radius: 4px 0 0 4px; }
+    /* Середина (от края до края) */
+    .day-box.c-mid::after { left: 0; right: 0; border-radius: 0; }
+    /* Конец события (от левого края до центра) */
+    .day-box.c-end::after { left: 0; right: 30%; border-radius: 0 4px 4px 0; }
+
+    .inner-footer { position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between; background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border); }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
-/* --- КАПСУЛА ДЛЯ МНОГОДНЕВНЫХ СОБЫТИЙ --- */
-.day-box.c-start::before,
-.day-box.c-mid::before,
-.day-box.c-end::before,
-.day-box.c-single::before {
-    content: '';
-    position: absolute;
-    top: -3px;      /* Отступ рамки вверх */
-    bottom: -3px;   /* Отступ рамки вниз */
-    pointer-events: none; /* Чтобы рамка не мешала кликать на день */
-    z-index: 10;    /* Рисуем поверх пустот */
-}
 
-/* НАЧАЛО (Левый край капсулы) */
-.day-box.c-start::before {
-    left: -3px;
-    right: -11px; /* Перекидываем мостик через gap (10px) к следующей плитке */
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-right: none;
-    border-radius: 16px 0 0 16px;
-}
-
-/* СЕРЕДИНА (Только верхняя и нижняя линии) */
-.day-box.c-mid::before {
-    left: 0;
-    right: -11px;
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* КОНЕЦ (Правый край капсулы) */
-.day-box.c-end::before {
-    left: 0;
-    right: -3px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-left: none;
-    border-radius: 0 16px 16px 0;
-}
-
-/* ЕСЛИ СОБЫТИЕ НА 1 ДЕНЬ (Целая капсула) */
-.day-box.c-single::before {
-    left: -3px; right: -3px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 16px;
-}
-    /* МОДАЛЬНОЕ ОКНО */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
     .modal-box { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 0px solid var(--inner-border); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
     .modal-btn { width: 100%; padding: 14px; border: none; border-radius: 4px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.7rem; }
@@ -157,77 +121,25 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-/* МОБИЛЬНАЯ АДАПТАЦИЯ */
     @media (max-width: 850px) {
-        body { 
-            overflow-x: hidden; /* Защита от горизонтальной прокрутки */
-            overflow-y: auto; 
-            height: auto; 
-            padding: 0; 
-            display: flex;           /* ВКЛЮЧАЕМ ФЛЕКС */
-            flex-direction: column;  /* ВЫСТРАИВАЕМ ВСЁ В КОЛОНКУ */
-        }
-
-        .app-container { 
-            flex-direction: column; 
-            height: auto; 
-            min-height: auto; /* На странице заметок лучше убрать 100vh, чтобы не тянуло лишнего */
-            width: 100vw; 
-            border-radius: 0; 
-            display: flex; 
-            flex: none; /* Убираем жадное поглощение места */
-        }
-        
+        body { overflow-x: hidden; overflow-y: auto; height: auto; padding: 0; display: flex; flex-direction: column; }
+        .app-container { flex-direction: column; height: auto; min-height: auto; width: 100vw; border-radius: 0; display: flex; flex: none; }
         .sidebar { display: contents; }
-        
-        .user-header { 
-            order: 1; 
-            width: 100%; 
-            padding: 20px; 
-            background: #0f1112; 
-            border-bottom: 1px solid var(--inner-border); 
-            margin-bottom: 0; 
-            display: flex; 
-            flex-direction: row; 
-            align-items: center; 
-            justify-content: space-between; 
-        }
-        
+        .user-header { order: 1; width: 100%; padding: 20px; background: #0f1112; border-bottom: 1px solid var(--inner-border); margin-bottom: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-between; }
         .main-view { order: 2; padding: 15px; width: 100%; flex: none; }
-        
         .month-title-wrapper { margin-bottom: 15px; }
         #m-name { font-size: 1.8rem; }
-        
         .grid { gap: 3px; } 
         .day-box { font-size: 0.9rem; border-radius: 6px; }
-
-        /* БЛОК ЗАМЕТОК */
-        .preview-box { 
-            order: 3; 
-            display: flex; 
-            width: 100%; 
-            padding: 20px; 
-            background: rgba(255, 255, 255, 0.02); 
-            border-top: 1px solid var(--inner-border); 
-            margin-top: 10px; 
-            flex: none; 
-        }
-
-        .preview {
-            flex: none; 
-            min-height: 120px; 
-            height: auto;
-        }
-        
-        /* ФУТЕР — теперь он точно будет внизу */
+        .preview-box { order: 3; display: flex; width: 100%; padding: 20px; background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); margin-top: 10px; flex: none; }
+        .preview { flex: none; min-height: 120px; height: auto; }
         .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
     }
-</style>
+    </style>
 </head>
 <body>
 
     <div class="app-container">
-        
         <div class="sidebar">
             <div class="user-header">
                 <button class="back-btn" onclick="location.href='calendar.html'">НАЗАД</button>
@@ -255,15 +167,16 @@
                 <div id="grid" class="grid"></div>
             </div>
         </div>
-
     </div>
-        <div class="inner-footer">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="footer-dot"></div>
-                <div class="footer-text">Group 5 • v2.6.16</div>
-            </div>
-            <div class="footer-text">ЗАМЕТКИ</div>
+
+    <div class="inner-footer">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="footer-dot"></div>
+            <div class="footer-text">Group 5 • v2.6.16</div>
         </div>
+        <div class="footer-text">ЗАМЕТКИ</div>
+    </div>
+
     <div id="modal" class="modal">
         <div class="modal-box">
             <h3 id="modal-title" style="margin:0 0 20px 0; text-align:center; color: var(--accent); text-transform: uppercase;"></h3>
@@ -283,16 +196,12 @@
     </div>
 
 <script type="module">
-    // ==========================================
-    // ЗАЩИТА СТРАНИЦЫ
-    // ==========================================
     const currentUserRaw = localStorage.getItem('currentUser');
     if (!currentUserRaw) {
         window.location.replace('index.html');
     }
     const currentUser = currentUserRaw.toLowerCase();
     document.getElementById('user-display').innerText = currentUser;
-    // ==========================================
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -341,8 +250,7 @@
             
             grid.innerHTML += `
                 <div class="day-box ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}" 
-                     id="tile-${d}" 
-                     onclick="selectDay(${d})">
+                     id="tile-${d}" onclick="selectDay(${d})">
                     ${d}
                     <div class="indicator-row" id="marks-${d}"></div>
                 </div>`;
@@ -350,58 +258,54 @@
     }
 
     function updateUI() {
-    // 1. Очищаем старые классы рамки при каждом обновлении
-    document.querySelectorAll('.day-box').forEach(b => {
-        b.classList.remove('c-start', 'c-mid', 'c-end', 'c-single', 'has-memorial');
-    });
-
-    // Функция для проверки, есть ли конгресс в конкретный день
-    const hasCongress = (day) => {
-        return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
-    };
-
-    for (let d = 1; d <= 31; d++) {
-        const tile = document.getElementById(`tile-${d}`);
-        const row = document.getElementById(`marks-${d}`);
-        if (!tile || !row) continue;
-        
-        const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-        row.innerHTML = '';
-        
-        notes.forEach(n => {
-            if (n.category === 'memorial') tile.classList.add('has-memorial');
-            else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
-            else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
-            // Можно добавить серую точку для конгресса вниз, если хочешь
-            else if (n.category === 'congress') row.innerHTML += '<div class="mark" style="background:#aaa;"></div>';
+        document.querySelectorAll('.day-box').forEach(b => {
+            b.classList.remove('c-start', 'c-mid', 'c-end', 'c-single', 'has-memorial');
         });
 
-        // 2. ЛОГИКА РАМКИ
-        if (hasCongress(d)) {
-            const prev = hasCongress(d - 1);
-            const next = hasCongress(d + 1);
-            
-            // Проверка на конец и начало недели
-            const isSunday = new Date(year, mIdx, d).getDay() === 0;
-            const isMonday = new Date(year, mIdx, d).getDay() === 1;
+        const hasCongress = (day) => {
+            return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
+        };
 
-            if (!prev && next) {
-                if (isSunday) tile.classList.add('c-single'); // Зажимаем капсулу, если это край строки
-                else tile.classList.add('c-start');
-            } else if (prev && next) {
-                if (isMonday) tile.classList.add('c-start'); 
-                else if (isSunday) tile.classList.add('c-end'); 
-                else tile.classList.add('c-mid');
-            } else if (prev && !next) {
-                if (isMonday) tile.classList.add('c-single');
-                else tile.classList.add('c-end');
-            } else {
-                tile.classList.add('c-single'); 
+        for (let d = 1; d <= 31; d++) {
+            const tile = document.getElementById(`tile-${d}`);
+            const row = document.getElementById(`marks-${d}`);
+            if (!tile || !row) continue;
+            
+            const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
+            row.innerHTML = '';
+            
+            notes.forEach(n => {
+                if (n.category === 'memorial') tile.classList.add('has-memorial');
+                else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
+                else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
+                // Обычную точку конгресса убрали, так как теперь есть полоска внизу
+            });
+
+            if (hasCongress(d)) {
+                const prev = hasCongress(d - 1);
+                const next = hasCongress(d + 1);
+                
+                const isSunday = new Date(year, mIdx, d).getDay() === 0;
+                const isMonday = new Date(year, mIdx, d).getDay() === 1;
+
+                if (!prev && next) {
+                    if (isSunday) tile.classList.add('c-single'); 
+                    else tile.classList.add('c-start');
+                } else if (prev && next) {
+                    if (isMonday) tile.classList.add('c-start'); 
+                    else if (isSunday) tile.classList.add('c-end'); 
+                    else tile.classList.add('c-mid');
+                } else if (prev && !next) {
+                    if (isMonday) tile.classList.add('c-single');
+                    else tile.classList.add('c-end');
+                } else {
+                    tile.classList.add('c-single'); 
+                }
             }
         }
+        if (selectedDay) selectDay(selectedDay);
     }
-    if (selectedDay) selectDay(selectedDay);
-}
+
     window.selectDay = (d) => {
         selectedDay = d;
         document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
@@ -412,10 +316,10 @@
         const notes = Array.isArray(dbData[d]) ? dbData[d] : []; 
         
         document.getElementById('preview').innerHTML = `<div style="color:var(--accent); font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">${d} ${months[mIdx]}</div>` + 
-                               (notes.map(n => `<div style="margin-bottom:8px; display:flex; gap:8px;">
-                                                    <span style="color:${n.category === 'memorial' ? 'var(--ev-memorial)' : n.category === 'meeting' ? 'var(--ev-meeting)' : '#aaa'}">•</span>
-                                                    <span>${n.text}</span>
-                                                </div>`).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
+            (notes.map(n => `<div style="margin-bottom:8px; display:flex; gap:8px;">
+                                <span style="color:${n.category === 'memorial' ? 'var(--ev-memorial)' : n.category === 'meeting' ? 'var(--ev-meeting)' : '#aaa'}">•</span>
+                                <span>${n.text}</span>
+                            </div>`).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
     };
 
     window.openModal = () => {
@@ -446,7 +350,7 @@
 
     window.save = async (cat) => {
         const val = document.getElementById('note-input').value.trim();
-        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'ВСТРЕЧА' : 'ЛИЧНОЕ');
+        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'ВСТРЕЧА' : cat === 'congress' ? 'КОНГРЕСС' : 'ЛИЧНОЕ');
         const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
         notes.push({ text, category: cat, author: currentUser });
         await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
