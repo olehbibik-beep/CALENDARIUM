@@ -273,7 +273,7 @@
                         <div class="info-desc">СОБЫТИЯ<br>в этом месяце</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-num">7</div>
+                        <div class="info-num">3</div>
                         <div class="info-desc">UPDATE<br><span style="font-size:0.75rem; color:#ccc; display:block; margin-top:5px;">(Новый UI, удаление шторок, боковая инфо-панель)</span></div>
                     </div>
                 `;
@@ -411,9 +411,9 @@
                     // Показываем ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ справа (линия желтая)
                     setPanelState('warning', `
                         <div class="info-item" style="flex-direction: column; gap: 5px;">
-                            <div class="info-desc" style="color: var(--warning); font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">Новый профиль?</div>
-                            <div class="info-desc" style="margin-bottom: 10px;">Хочу создать свой аккаунт с этим графическим ключом.</div>
-                            <button class="orange-btn" id="send-req">ОТПРАВИТЬ ЗАЯВКУ</button>
+                            <div class="info-desc" style="color: var(--warning); font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">НОВЫЙ ПРОФИЛЬ?</div>
+                            <div class="info-desc" style="margin-bottom: 10px;">Создать свой аккаунт с этим графическим ключом.</div>
+                            <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
                         </div>
                     `);
                     togglePanel(true);
@@ -423,7 +423,7 @@
                         await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
                         setPanelState('info', `
                             <div class="info-item">
-                                <div class="info-desc" style="color: var(--accent); font-size: 1.4rem; font-weight: 500;">\ Заявка отправлена администратору.</div>
+                                <div class="info-desc" style="color: var(--accent); font-size: 1.4rem; font-weight: 500;">Заявка отправлена администратору.</div>
                             </div>
                         `);
                     };
