@@ -314,7 +314,7 @@
         document.getElementById('preview').innerHTML = `<div style="color:var(--accent); font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">${d} ${months[mIdx]}</div>` + 
             (notes.map(n => {
                 const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
-                return `<div style="margin-bottom:12px; padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 4px; border-left: 4px solid ${borderCol};">
+                return `<div style="margin-bottom:12px; padding: 10px 12px; border-radius: 4px; border-left: 4px solid ${borderCol};">
                             ${n.text}
                         </div>`;
             }).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
