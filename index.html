@@ -13,14 +13,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Secure Terminal</title>
     <style>
-        :root { 
-            --accent: #09e0e3; 
-            --bg: #27272A; 
-            --orange: #383942; 
-            --error: #ff4757;
-            --warning: #F2FF02;
-            --title-color: #ffffff;
-        }
+       :root { 
+    --accent: #09e0e3; 
+    --bg: #27272A; 
+    --orange: #383942; 
+    --error: #ff4757;
+    --warning: #F2FF02;
+    --title-color: #ffffff;
+    
+    /* Новые переменные для удобной настройки */
+    --line-height: 60%;         /* Высота интерактивной линии в % */
+    --num-color: #09e0e3;       /* Цвет цифр (счетчика) */
+    --desc-color: #e0e6ed;      /* Цвет обычного текста (описания) */
+    --text-error: #ffffff;      /* Читаемый цвет текста при ошибке (белый лучше читается на темном) */
+    --text-warning: #ffffff;    /* Читаемый цвет текста при предупреждении */
+}
         
         body { 
             margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); 
@@ -84,18 +91,21 @@
 
         /* --- ИНТЕРАКТИВНАЯ ЛИНИЯ --- */
         .status-line {
-            width: 12px;
-            background: var(--accent);
-            border-radius: 0 16px 16px 0;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-            box-shadow: -2px 0 15px rgba(9, 224, 227, 0.2);
-        }
+    width: 12px;
+    height: var(--line-height); /* Высота теперь управляется из :root */
+    align-self: center;         /* Центрируем линию по вертикали */
+    border-radius: 8px 0 0 8px; /* Скругляем иначе, чтобы смотрелось как ползунок */
+    background: var(--accent);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    box-shadow: -2px 0 15px rgba(9, 224, 227, 0.2);
+    /* Отступ справа, чтобы линия не прилипала намертво, если нужно: margin-right: -12px; */
+}
         .status-line:hover { filter: brightness(1.8); }
         .status-line .dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; opacity: 0.8; }
         
@@ -146,12 +156,39 @@
         }
         .footer-text { font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: 300; letter-spacing: 2px; }
         
-        @media (max-width: 750px) { 
-            .main-container { flex-direction: column; gap: 20px; }
-            .info-panel { transform: translateY(-20px); text-align: center; }
-            .info-panel.active { transform: translateY(0); }
-            .info-item { flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px;}
-        }
+       @media (max-width: 750px), (max-height: 750px) { 
+    .main-container { 
+        flex-direction: column; 
+        gap: 10px; /* Уменьшили дыру между блоками */
+        padding: 10px;
+    }
+    .auth-content {
+        padding: 15px; /* Уменьшили внутренние отступы карточки */
+    }
+    input {
+        padding: 10px; /* Сделали инпуты чуть тоньше */
+        margin-bottom: 10px;
+    }
+    canvas {
+        max-width: 220px; /* Уменьшили канвас для мелких экранов */
+        max-height: 220px;
+    }
+    .info-panel { 
+        transform: translateY(-10px); 
+        text-align: center; 
+    }
+    .info-panel.active { 
+        transform: translateY(0); 
+    }
+    .info-item { 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 5px; 
+        margin-bottom: 10px; /* Ужали инфо-блоки */
+    }
+    .info-num { font-size: 2.5rem; } /* Чуть уменьшили огромные цифры */
+    .inner-footer { bottom: 5px; }
+}
     </style>
     <link rel="manifest" href="manifest.json">
 <script>
@@ -258,30 +295,29 @@
         }
 
         function setPanelState(state, customHtml = '') {
-            panelState = state;
-            const line = document.getElementById('status-line');
-            const content = document.getElementById('info-content');
-            
-            line.className = 'status-line'; // сброс классов
-            if (state === 'error') line.classList.add('error');
-            if (state === 'warning') line.classList.add('warning');
+    panelState = state;
+    const line = document.getElementById('status-line');
+    const content = document.getElementById('info-content');
+    
+    line.className = 'status-line'; // сброс классов
+    if (state === 'error') line.classList.add('error');
+    if (state === 'warning') line.classList.add('warning');
 
-            if (state === 'info') {
-                content.innerHTML = `
-                    <div class="info-item">
-                        <div class="info-num" id="events-count">${currentEventsCount}</div>
-                        <div class="info-desc" color="000">СОБЫТИЯ<br>в этом месяце</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-num">3</div>
-                        <div class="info-desc">UPDATE<br><span style="font-size:0.75rem; color:#ccc; display:block; margin-top:5px;">(Новый UI, удаление шторок, боковая инфо-панель)</span></div>
-                    </div>
-                `;
-            } else {
-                content.innerHTML = customHtml;
-            }
-        }
-
+    if (state === 'info') {
+        content.innerHTML = `
+            <div class="info-item">
+                <div class="info-num" id="events-count" style="color: var(--num-color);">${currentEventsCount}</div>
+                <div class="info-desc" style="color: var(--desc-color);">СОБЫТИЯ<br>в этом месяце</div>
+            </div>
+            <div class="info-item">
+                <div class="info-num" style="color: var(--num-color);">3</div>
+                <div class="info-desc" style="color: var(--desc-color);">UPDATE<br><span style="font-size:0.75rem; color:#aaa; display:block; margin-top:5px;">(Новый UI, удаление шторок, боковая инфо-панель)</span></div>
+            </div>
+        `;
+    } else {
+        content.innerHTML = customHtml;
+    }
+}
         // Возврат панели в дефолтное состояние при взаимодействии с формой
         function resetUIState() {
             if (panelState !== 'info') {
@@ -399,23 +435,25 @@
                         window.location.href = 'calendar.html';
                     } else {
                         // Показываем ОШИБКУ справа (линия красная)
-                        setPanelState('error', `
-                            <div class="info-item" style="align-items: center;">
-                                <div class="info-desc" style="color: var(--error); font-size: 1.4rem; font-weight: 500;">Неверный ключ или пароль.</div>
-                            </div>
-                        `);
+                        // Показываем ОШИБКУ
+setPanelState('error', `
+    <div class="info-item" style="align-items: center;">
+        <div class="info-desc" style="color: var(--text-error); font-size: 1.2rem; font-weight: 500;">Неверный ключ или пароль.</div>
+    </div>
+`);
                         togglePanel(true);
                         draw(); // перерисовать линии красным
                     }
                 } else if (name !== 'admin') {
                     // Показываем ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ справа (линия желтая)
-                    setPanelState('warning', `
-                        <div class="info-item" style="flex-direction: column; gap: 5px;">
-                            <div class="info-desc" style="color: var(--warning); font-size: 1.4rem; font-weight: 800; text-transform: uppercase;">НОВЫЙ ПРОФИЛЬ?</div>
-                            <div class="info-desc" style="margin-bottom: 10px;">Создать свой аккаунт с этим графическим ключом.</div>
-                            <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
-                        </div>
-                    `);
+                    // Показываем ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ
+setPanelState('warning', `
+    <div class="info-item" style="flex-direction: column; gap: 5px;">
+        <div class="info-desc" style="color: var(--text-warning); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">НОВЫЙ ПРОФИЛЬ?</div>
+        <div class="info-desc" style="color: var(--desc-color); margin-bottom: 10px;">Создать свой аккаунт с этим графическим ключом.</div>
+        <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
+    </div>
+`);
                     togglePanel(true);
                     draw(); // перерисовать линии желтым
                     
