@@ -156,39 +156,46 @@
         }
         .footer-text { font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: 300; letter-spacing: 2px; }
         
-       @media (max-width: 750px), (max-height: 750px) { 
-    .main-container { 
-        flex-direction: column; 
-        gap: 10px; /* Уменьшили дыру между блоками */
-        padding: 10px;
-    }
-    .auth-content {
-        padding: 15px; /* Уменьшили внутренние отступы карточки */
-    }
-    input {
-        padding: 10px; /* Сделали инпуты чуть тоньше */
-        margin-bottom: 10px;
-    }
-    canvas {
-        max-width: 220px; /* Уменьшили канвас для мелких экранов */
-        max-height: 220px;
-    }
-    .info-panel { 
-        transform: translateY(-10px); 
-        text-align: center; 
-    }
-    .info-panel.active { 
-        transform: translateY(0); 
-    }
-    .info-item { 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 5px; 
-        margin-bottom: 10px; /* Ужали инфо-блоки */
-    }
-    .info-num { font-size: 2.5rem; } /* Чуть уменьшили огромные цифры */
-    .inner-footer { bottom: 5px; }
-}
+      /* --- АДАПТИВНОСТЬ --- */
+        
+        /* 1. Для телефонов и планшетов (узкие экраны) - выстраиваем в колонку */
+        @media (max-width: 768px) { 
+            .main-container { 
+                flex-direction: column; 
+                gap: 15px; 
+                padding: 10px;
+            }
+            .auth-content { padding: 20px; }
+            input { padding: 12px; margin-bottom: 10px; }
+            canvas { max-width: 220px; max-height: 220px; }
+            
+            /* На мобильных панель выезжает сверху-вниз и центрируется */
+            .info-panel { 
+                transform: translateY(-20px); 
+                text-align: center; 
+            }
+            .info-panel.active { transform: translateY(0); }
+            .info-item { 
+                flex-direction: column; 
+                align-items: center; 
+                gap: 5px; 
+                margin-bottom: 15px; 
+            }
+            .info-num { font-size: 2.8rem; }
+            .inner-footer { bottom: 5px; }
+        }
+
+        /* 2. Для ПК с небольшой высотой экрана (ноутбуки) - сохраняем горизонтальную раскладку, но уменьшаем масштаб */
+        @media (min-width: 769px) and (max-height: 750px) {
+            .main-container {
+                /* Сжимаем контейнер на 15%, чтобы все поместилось по высоте без прокрутки */
+                transform: scale(0.85); 
+            }
+            /* Убеждаемся, что панель на ПК выезжает слева-направо */
+            .info-panel { transform: translateX(-30px); }
+            .info-panel.active { transform: translateX(0); }
+            .inner-footer { bottom: 5px; }
+        }
     </style>
     <link rel="manifest" href="manifest.json">
 <script>
