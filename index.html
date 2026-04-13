@@ -222,6 +222,23 @@
             .info-panel.active { transform: translateX(0); }
             .inner-footer { bottom: 5px; }
         }
+        /* --- НОВЫЕ ЭФФЕКТЫ (НЕ ВЛИЯЮТ НА ВЕРСТКУ) --- */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15%, 45%, 75% { transform: translateX(-6px); }
+            30%, 60%, 90% { transform: translateX(6px); }
+        }
+        .shake-animation {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .loading-pulse {
+            animation: pulse 1s infinite;
+        }
     </style>
     <link rel="manifest" href="manifest.json">
 <script>
@@ -244,8 +261,10 @@
                 
                 <canvas id="canvas" width="260" height="260" class="disabled"></canvas>
                 
-                <div id="admin-box" class="hidden" style="width: 100%;">
-                    <input type="password" id="admin-password" placeholder="пароль администратора">
+                <div id="admin-box" class="hidden" style="width: 100%; position: relative;">
+                    <input type="password" id="admin-password" placeholder="пароль администратора" style="padding-right: 40px;">
+                    <div onclick="toggleAdminPass()" style="position: absolute; right: 15px; top: 13px; cursor: pointer; opacity: 0.5; font-size: 1.2rem; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">👁️</div>
+                    
                     <button class="admin-btn" onclick="handleLogin()">Войти в систему</button>
                 </div>
             </div>
@@ -415,6 +434,24 @@
                 ctx.fill();
             });
         }
+        // Функция показа/скрытия пароля админа
+        window.toggleAdminPass = () => {
+            const passInput = document.getElementById('admin-password');
+            if (passInput.type === "password") {
+                passInput.type = "text";
+            } else {
+                passInput.type = "password";
+            }
+        };
+
+        // Функция тряски карточки
+        function triggerErrorShake() {
+            const wrapper = document.querySelector('.auth-wrapper');
+            wrapper.classList.remove('shake-animation');
+            void wrapper.offsetWidth; // Перезапуск анимации
+            wrapper.classList.add('shake-animation');
+            setTimeout(() => wrapper.classList.remove('shake-animation'), 400);
+        }
 
         const startDraw = (e) => {
             if (canvas.classList.contains('disabled')) return;
@@ -453,55 +490,88 @@
         window.addEventListener('touchend', endDraw);
 
         // --- ЛОГИКА АВТОРИЗАЦИИ ---
-        window.handleLogin = async () => {
-            const name = document.getElementById('username').value.trim().toLowerCase();
+window.handleLogin = async () => {
+            const inputName = document.getElementById('username').value;
+            const name = inputName.trim().toLowerCase();
             const adminPass = document.getElementById('admin-password').value;
             const finalSecret = (name === 'admin') ? adminPass : pattern;
 
             if (!finalSecret) return;
 
+            // 1. ВКЛЮЧАЕМ АНИМАЦИЮ ЗАГРУЗКИ
+            canvas.classList.add('disabled'); // Временно блокируем холст
+            setPanelState('info', `
+                <div class="info-item" style="align-items: center; justify-content: center; width: 100%;">
+                    <div class="info-desc loading-pulse" style="color: var(--accent); font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Проверка...</div>
+                </div>
+            `);
+            togglePanel(true);
+
             try {
                 const snap = await getDoc(doc(db, "users", name));
                 if (snap.exists()) {
                     if (snap.data().password === finalSecret) {
+                        // 2. УСПЕХ: Сохраняем имя для будущих входов
+                        localStorage.setItem('savedUsername', inputName.trim());
                         localStorage.setItem('currentUser', name);
                         window.location.href = 'calendar.html';
                     } else {
-                        // Показываем ОШИБКУ справа (линия красная)
-                        // Показываем ОШИБКУ
-setPanelState('error', `
-    <div class="info-item" style="align-items: center;">
-        <div class="info-desc" style="color: var(--text-error); font-size: 1.2rem; font-weight: 500;">Неверный ключ или пароль.</div>
-    </div>
-`);
+                        // 3. ОШИБКА ПАРОЛЯ
+                        triggerErrorShake(); // Трясем карточку
+                        setPanelState('error', `
+                            <div class="info-item" style="align-items: center;">
+                                <div class="info-desc" style="color: var(--text-error); font-size: 1.2rem; font-weight: 500;">Неверный ключ или пароль.</div>
+                            </div>
+                        `);
                         togglePanel(true);
-                        draw(); // перерисовать линии красным
+                        draw(); 
+                        canvas.classList.remove('disabled'); // Снова разрешаем рисовать
                     }
                 } else if (name !== 'admin') {
-                    // Показываем ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ справа (линия желтая)
-                    // Показываем ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ
-setPanelState('warning', `
-    <div class="info-item" style="flex-direction: column; gap: 5px;">
-        <div class="info-desc" style="color: var(--text-warning); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">НОВЫЙ ПРОФИЛЬ?</div>
-        <div class="info-desc" style="color: var(--desc-color); margin-bottom: 10px;">Создать свой аккаунт с этим графическим ключом.</div>
-        <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
-    </div>
-`);
+                    // 4. ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ (Новый профиль)
+                    setPanelState('warning', `
+                        <div class="info-item" style="flex-direction: column; gap: 5px;">
+                            <div class="info-desc" style="color: var(--text-warning); font-size: 1.2rem; font-weight: 800; text-transform: uppercase;">НОВЫЙ ПРОФИЛЬ?</div>
+                            <div class="info-desc" style="color: var(--desc-color); margin-bottom: 10px;">Создать аккаунт с этим ключом.</div>
+                            <button class="orange-btn" id="send-req">ОТПРАВИТЬ</button>
+                        </div>
+                    `);
                     togglePanel(true);
-                    draw(); // перерисовать линии желтым
+                    draw(); 
+                    canvas.classList.remove('disabled'); // Снова разрешаем рисовать
                     
                     document.getElementById('send-req').onclick = async () => {
                         await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
                         setPanelState('info', `
                             <div class="info-item">
-                                <div class="info-desc" style="color: var(--accent); font-size: 1.4rem; font-weight: 500;">Заявка отправлена администратору.</div>
+                                <div class="info-desc" style="color: var(--accent); font-size: 1.4rem; font-weight: 500;">Заявка отправлена.</div>
                             </div>
                         `);
                     };
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error(e); 
+                canvas.classList.remove('disabled'); 
+            }
         };
-
+// Обработка возврата на страницу и авто-ввод сохраненного имени
+        window.addEventListener('pageshow', () => {
+            // Удаляем "активную" сессию для безопасности
+            localStorage.removeItem('currentUser');
+            
+            const inputField = document.getElementById('username');
+            const savedName = localStorage.getItem('savedUsername');
+            
+            // Если поле пустое, но есть сохраненное имя - подставляем
+            if (savedName && !inputField.value) {
+                inputField.value = savedName;
+            }
+            
+            // Запускаем проверку, чтобы разблокировать холст ключа
+            if (inputField.value) {
+                checkName(inputField.value);
+            }
+        });
         // Старт
         initDots(); draw();
         fetchEventsCount();
