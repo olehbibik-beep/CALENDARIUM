@@ -139,12 +139,66 @@
    }
 
    /* --- ФИКС ДЛЯ ГОРИЗОНТАЛЬНОГО ПОЛОЖЕНИЯ (ПЕЙЗАЖ) НА ТЕЛЕФОНАХ --- */
-   @media (max-height: 600px) and (orientation: landscape) {
-       .months-grid { 
-           /* Когда экран повернут горизонтально, ширины много, а высоты мало - ставим 4 в ряд */
-           grid-template-columns: repeat(4, 1fr); 
+  /* --- АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ (ВМЕЩАЕТСЯ В 1 ЭКРАН) --- */
+   @media (max-width: 1024px) {
+       body { 
+           height: 100dvh; /* Используем dvh, чтобы адресная строка браузера не съедала низ */
+           overflow: hidden; /* Жестко отключаем прокрутку всей страницы */
+           padding: 0; 
        }
-       .month-card { min-height: 50px; }
+       .app-container { 
+           flex-direction: column; 
+           height: 100%; 
+           width: 100vw; 
+           border-radius: 0; 
+       }
+       
+       /* Верхний блок: Юзер и Актуальные события */
+       .sidebar { 
+           width: 100%; 
+           height: 35%; /* Отдаем 35% экрана под шапку и события */
+           padding: 15px; 
+           border-right: none;
+           border-bottom: 1px solid var(--inner-border);
+           background: rgba(15, 17, 18, 0.8);
+           backdrop-filter: blur(10px); /* Эффект стекла */
+       }
+       .user-header { margin-bottom: 10px; }
+       
+       /* События скроллятся ТОЛЬКО ВНУТРИ своего блока, если их много */
+       .upcoming-box { margin-top: 0; flex: 1; overflow-y: auto; padding-right: 5px; }
+       
+       /* Нижний блок: Календарь */
+       .main-view { 
+           padding: 10px; 
+           flex: 1; /* Занимает оставшиеся 65% экрана */
+           justify-content: space-between;
+       }
+       .year-switcher { margin-bottom: 5px; }
+       #display-year { font-size: clamp(2rem, 5vh, 3rem); } /* Размер шрифта сам подстроится под экран */
+       
+       .months-grid { 
+           grid-template-columns: repeat(3, 1fr); 
+           grid-template-rows: repeat(4, 1fr); /* Сетка 3 колонки на 4 ряда */
+           gap: 8px; 
+           height: 100%; /* Растягивается на доступное место */
+       }
+       
+       .month-card { 
+           min-height: 0; /* Важно: позволяет плиткам сжиматься */
+           font-size: clamp(0.7rem, 2vh, 0.9rem);
+           border-radius: 12px;
+       }
+       
+       /* Прячем футер на телефонах, чтобы не тратить место */
+       .inner-footer { display: none; }
+   }
+
+   /* --- ГОРИЗОНТАЛЬНОЕ ПОЛОЖЕНИЕ (ПЕЙЗАЖ) --- */
+   @media (max-height: 600px) and (orientation: landscape) {
+       .app-container { flex-direction: row; }
+       .sidebar { height: 100%; width: 250px; border-bottom: none; border-right: 1px solid var(--inner-border); }
+       .months-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
        #display-year { font-size: 2rem; }
    }
 </style>
