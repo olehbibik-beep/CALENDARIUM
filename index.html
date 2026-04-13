@@ -351,11 +351,18 @@
     const line = document.getElementById('status-line');
     const content = document.getElementById('info-content');
     
-    line.className = 'status-line'; // сброс классов
+    // Сброс всех классов цвета
+    line.classList.remove('error', 'warning');
+    
     if (state === 'error') line.classList.add('error');
     if (state === 'warning') line.classList.add('warning');
 
-    if (state === 'info') {
+    // Если передали свой HTML (например, "Проверка" или "Ошибка"), показываем его
+    if (customHtml) {
+        content.innerHTML = customHtml;
+    } 
+    // Если состояние 'info' и кастомного текста нет — показываем стандартные события
+    else if (state === 'info') {
         content.innerHTML = `
             <div class="info-item">
                 <div class="info-num" id="events-count" style="color: var(--num-color);">${currentEventsCount}</div>
@@ -366,8 +373,6 @@
                 <div class="info-desc" style="color: var(--desc-color);">UPDATE<br><span style="font-size:0.75rem; color:#aaa; display:block; margin-top:5px;">(Новый UI, удаление шторок, боковая инфо-панель)</span></div>
             </div>
         `;
-    } else {
-        content.innerHTML = customHtml;
     }
 }
         // Возврат панели в дефолтное состояние при взаимодействии с формой
@@ -498,14 +503,18 @@ window.handleLogin = async () => {
 
             if (!finalSecret) return;
 
-            // 1. ВКЛЮЧАЕМ АНИМАЦИЮ ЗАГРУЗКИ
-            canvas.classList.add('disabled'); // Временно блокируем холст
-            setPanelState('info', `
-                <div class="info-item" style="align-items: center; justify-content: center; width: 100%;">
-                    <div class="info-desc loading-pulse" style="color: var(--accent); font-size: 1.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Проверка...</div>
+            // Блокируем холст и показываем ЗАГРУЗКУ (без проскока событий)
+            canvas.classList.add('disabled'); 
+            
+            // Важно: передаем состояние 'loading', чтобы CSS не красил линию в красный/желтый раньше времени
+            setPanelState('loading', `
+                <div class="info-item" style="align-items: center; justify-content: center; width: 100%; height: 100px;">
+                    <div class="info-desc loading-pulse" style="color: var(--accent); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Авторизация...</div>
                 </div>
             `);
             togglePanel(true);
+
+            // ... далее идет твой код с try { const snap = await getDoc... }
 
             try {
                 const snap = await getDoc(doc(db, "users", name));
