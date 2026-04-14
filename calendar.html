@@ -94,103 +94,88 @@
     }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
 
-   @media (max-width: 1024px) { 
-       body { 
-           overflow-x: hidden; 
-           overflow-y: auto; 
-           height: auto; 
-           padding: 0; 
-           flex-direction: column; 
-       }
-       .app-container { flex-direction: column; height: auto; min-height: 100vh; width: 100vw; border-radius: 0; display: flex; }
-       
-       .sidebar { display: contents; }
-       .user-header { 
-           order: 1; width: 100%; padding: 20px; background: #0f1112; 
-           border-bottom: 1px solid var(--inner-border); margin-bottom: 0; display: flex; 
-       }
-       
-       .main-view { order: 2; padding: 15px; width: 100%; }
-       
-       .months-grid { 
-           grid-template-columns: repeat(3, 1fr); 
-           gap: 10px; 
-       }
-       
-       .month-card { 
-           aspect-ratio: auto; 
-           min-height: 65px; 
-           font-size: 0.85rem;
-       }
+  /* =========================================
+       АЛГОРИТМ АДАПТИВНОСТИ
+       ========================================= */
 
-       .upcoming-box { 
-           order: 3; display: block; width: 100%; padding: 20px; 
-           background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); 
-           margin-top: 10px; padding-bottom: 20px; 
-       }
-       
-       .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
-       
-       #display-year { font-size: 2.5rem; } 
-       .year-side { font-size: 1.5rem; }
-   }
+    /* 1. ПОРТРЕТНАЯ ОРИЕНТАЦИЯ (Все устройства вертикально: телефоны, планшеты) */
+    @media (max-width: 1024px) and (orientation: portrait) {
+        body { height: 100dvh; padding: 0; background: #0f1112; }
+        .app-container { 
+            flex-direction: column; width: 100vw; height: 100dvh; 
+            border-radius: 0; box-shadow: none; 
+        }
+        
+        /* Разрушаем контейнер сайдбара, чтобы выстроить элементы в нужной очередности */
+        .sidebar { display: contents; }
+        
+        .user-header { 
+            order: 1; padding: 20px; margin: 0; background: #1a1d1f; 
+            border-bottom: 1px solid var(--inner-border);
+        }
+        
+        /* Календарь ставим по центру */
+        .main-view { 
+            order: 2; padding: 15px; flex: 0 0 auto;
+        }
+        .year-switcher { margin-bottom: 10px; }
+        #display-year { font-size: 3rem; }
+        
+        /* Сетка месяцев: 3 колонки, 4 ряда (идеально для вертикали) */
+        .months-grid { 
+            grid-template-columns: repeat(3, 1fr); 
+            grid-template-rows: repeat(4, 1fr); 
+            gap: 10px; 
+        }
+        .month-card { min-height: 60px; font-size: 0.85rem; }
 
-   @media (max-width: 1024px) {
-       body { 
-           height: 100dvh; 
-           overflow: hidden; 
-           padding: 0; 
-       }
-       .app-container { 
-           flex-direction: column; 
-           height: 100%; 
-           width: 100vw; 
-           border-radius: 0; 
-       }
-       
-       .sidebar { 
-           width: 100%; 
-           height: 35%; 
-           padding: 15px; 
-           border-right: none;
-           border-bottom: 1px solid var(--inner-border);
-           background: rgba(15, 17, 18, 0.8);
-           backdrop-filter: blur(10px); 
-       }
-       .user-header { margin-bottom: 10px; }
-       
-       .upcoming-box { margin-top: 0; flex: 1; overflow-y: auto; padding-right: 5px; }
-       
-       .main-view { 
-           padding: 10px; 
-           flex: 1; 
-           justify-content: space-between;
-       }
-       .year-switcher { margin-bottom: 5px; }
-       #display-year { font-size: clamp(2rem, 5vh, 3rem); } 
-       
-       .months-grid { 
-           grid-template-columns: repeat(3, 1fr); 
-           grid-template-rows: repeat(4, 1fr); 
-           gap: 8px; 
-           height: 100%; 
-       }
-       
-       .month-card { 
-           min-height: 0; 
-           font-size: clamp(0.7rem, 2vh, 0.9rem);
-           border-radius: 12px;
-       }
-       
-       .inner-footer { display: none; }
-   }
+        /* Блок событий уходит вниз и скроллится только внутри себя */
+        .upcoming-box { 
+            order: 3; padding: 20px; flex: 1; overflow-y: auto; margin: 0;
+            background: rgba(255,255,255, 0.02);
+            border-top: 1px solid var(--inner-border);
+        }
 
-   @media (max-height: 600px) and (orientation: landscape) {
-       .app-container { flex-direction: row; }
-       .sidebar { height: 100%; width: 250px; border-bottom: none; border-right: 1px solid var(--inner-border); }
-       .months-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
-       #display-year { font-size: 2rem; }
-   }
+        .inner-footer { display: none; } /* Скрываем футер для экономии места */
+    }
+
+    /* 2. ЛАНДШАФТНАЯ ОРИЕНТАЦИЯ (Планшеты и Телефоны горизонтально) */
+    @media (max-width: 1100px) and (orientation: landscape), (max-height: 600px) and (orientation: landscape) {
+        body { height: 100dvh; padding: 0; }
+        .app-container { 
+            flex-direction: row; /* Возвращаем ПК-вид */
+            width: 100vw; height: 100dvh; border-radius: 0; 
+        }
+        
+        /* Сужаем сайдбар, чтобы календарю было больше места */
+        .sidebar { 
+            width: 240px; padding: 15px; border-bottom: none; 
+            border-right: 1px solid var(--inner-border);
+        }
+        .user-header { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+        .nav-btns { width: 100%; justify-content: space-between; }
+        .upcoming-box { margin-top: 5px; }
+
+        .main-view { padding: 10px; }
+        .year-switcher { margin-bottom: 5px; }
+        #display-year { font-size: 2.2rem; }
+        .year-side { font-size: 1.2rem; }
+
+        /* Календарь: 4 колонки, 3 ряда. Жестко ограничиваем отступы, чтобы всё влезло! */
+        .months-grid { 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(3, 1fr); 
+            gap: 5px; padding-bottom: 0;
+        }
+        .month-card { 
+            min-height: 0; /* Разрешаем сжиматься */
+            font-size: 0.75rem; 
+            border-radius: 12px;
+        }
+        .month-indicator { bottom: 6px; }
+
+        .inner-footer { display: none; }
+    }
     </style>
 </head>
 <body>
