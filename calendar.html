@@ -64,10 +64,9 @@
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
         color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
         text-transform: uppercase; font-size: 0.9rem; min-height: 50px; 
-        border: 1px solid transparent; /* Добавил прозрачную рамку, чтобы плитка не дергалась при наведении */
+        border: 1px solid transparent;
     }
 
-    /* НОВЫЙ БЛОК ДЛЯ ПОДСВЕТКИ ПРИ НАВЕДЕНИИ */
     .month-card:hover {
         background: #2b3236; 
         box-shadow: 0 8px 15px rgba(0,0,0,0.4);
@@ -95,11 +94,10 @@
     }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
 
-/* --- АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ --- */
-   @media (max-width: 1024px) { /* Расширили до 1024px, чтобы захватить планшеты */
+   @media (max-width: 1024px) { 
        body { 
            overflow-x: hidden; 
-           overflow-y: auto; /* Гарантируем, что скролл будет доступен, если не влезает */
+           overflow-y: auto; 
            height: auto; 
            padding: 0; 
            flex-direction: column; 
@@ -115,36 +113,32 @@
        .main-view { order: 2; padding: 15px; width: 100%; }
        
        .months-grid { 
-           grid-template-columns: repeat(3, 1fr); /* Выводим ровно по 3 плиточки */
+           grid-template-columns: repeat(3, 1fr); 
            gap: 10px; 
        }
        
        .month-card { 
-           aspect-ratio: auto; /* Убираем жесткий квадрат, чтобы не съедало высоту */
-           min-height: 65px; /* Задаем аккуратную компактную высоту */
+           aspect-ratio: auto; 
+           min-height: 65px; 
            font-size: 0.85rem;
        }
 
-       /* События аккуратно встанут под календарем */
        .upcoming-box { 
            order: 3; display: block; width: 100%; padding: 20px; 
            background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); 
            margin-top: 10px; padding-bottom: 20px; 
        }
        
-       /* Футер ляжет в самый низ страницы */
        .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
        
-       #display-year { font-size: 2.5rem; } /* Чуть уменьшили год для мобильных */
+       #display-year { font-size: 2.5rem; } 
        .year-side { font-size: 1.5rem; }
    }
 
-   /* --- ФИКС ДЛЯ ГОРИЗОНТАЛЬНОГО ПОЛОЖЕНИЯ (ПЕЙЗАЖ) НА ТЕЛЕФОНАХ --- */
-  /* --- АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ (ВМЕЩАЕТСЯ В 1 ЭКРАН) --- */
    @media (max-width: 1024px) {
        body { 
-           height: 100dvh; /* Используем dvh, чтобы адресная строка браузера не съедала низ */
-           overflow: hidden; /* Жестко отключаем прокрутку всей страницы */
+           height: 100dvh; 
+           overflow: hidden; 
            padding: 0; 
        }
        .app-container { 
@@ -154,55 +148,50 @@
            border-radius: 0; 
        }
        
-       /* Верхний блок: Юзер и Актуальные события */
        .sidebar { 
            width: 100%; 
-           height: 35%; /* Отдаем 35% экрана под шапку и события */
+           height: 35%; 
            padding: 15px; 
            border-right: none;
            border-bottom: 1px solid var(--inner-border);
            background: rgba(15, 17, 18, 0.8);
-           backdrop-filter: blur(10px); /* Эффект стекла */
+           backdrop-filter: blur(10px); 
        }
        .user-header { margin-bottom: 10px; }
        
-       /* События скроллятся ТОЛЬКО ВНУТРИ своего блока, если их много */
        .upcoming-box { margin-top: 0; flex: 1; overflow-y: auto; padding-right: 5px; }
        
-       /* Нижний блок: Календарь */
        .main-view { 
            padding: 10px; 
-           flex: 1; /* Занимает оставшиеся 65% экрана */
+           flex: 1; 
            justify-content: space-between;
        }
        .year-switcher { margin-bottom: 5px; }
-       #display-year { font-size: clamp(2rem, 5vh, 3rem); } /* Размер шрифта сам подстроится под экран */
+       #display-year { font-size: clamp(2rem, 5vh, 3rem); } 
        
        .months-grid { 
            grid-template-columns: repeat(3, 1fr); 
-           grid-template-rows: repeat(4, 1fr); /* Сетка 3 колонки на 4 ряда */
+           grid-template-rows: repeat(4, 1fr); 
            gap: 8px; 
-           height: 100%; /* Растягивается на доступное место */
+           height: 100%; 
        }
        
        .month-card { 
-           min-height: 0; /* Важно: позволяет плиткам сжиматься */
+           min-height: 0; 
            font-size: clamp(0.7rem, 2vh, 0.9rem);
            border-radius: 12px;
        }
        
-       /* Прячем футер на телефонах, чтобы не тратить место */
        .inner-footer { display: none; }
    }
 
-   /* --- ГОРИЗОНТАЛЬНОЕ ПОЛОЖЕНИЕ (ПЕЙЗАЖ) --- */
    @media (max-height: 600px) and (orientation: landscape) {
        .app-container { flex-direction: row; }
        .sidebar { height: 100%; width: 250px; border-bottom: none; border-right: 1px solid var(--inner-border); }
        .months-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
        #display-year { font-size: 2rem; }
    }
-</style>
+    </style>
 </head>
 <body>
 
@@ -233,15 +222,14 @@
         </div>
         
     </div>
-<div class="inner-footer">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <div class="footer-dot"></div>
-                    <div class="footer-text">Group 5 • v2.6.16</div>
-                </div>
-                <div class="footer-text">© 2026 CALENDARIUM</div>
-            </div>
+    <div class="inner-footer">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="footer-dot"></div>
+            <div class="footer-text">Group 5 • v2.6.16</div>
+        </div>
+        <div class="footer-text">© 2026 CALENDARIUM</div>
+    </div>
     <script type="module">
-        /* Твой скрипт Firebase и логика остаются такими же */
         const user = localStorage.getItem('currentUser');
         if (!user) { window.location.replace('index.html'); }
 
@@ -291,95 +279,122 @@
             window.location.href = 'notes.html';
         };
 
+        // --- ЛОГИКА ПЛАВНОГО ПЕРЕХОДА И СМЕНЫ ГОДА ---
         window.changeYear = (dir) => { 
-            currentYear += dir; updateDisp(); initGrid(); loadData(); 
-        };
-async function loadData() {
-    const container = document.getElementById('next-event-container');
-    if (!container) return;
-
-    // Начальное состояние
-    container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px;">ПОИСК...</div>';
-
-    const now = new Date();
-    // Устанавливаем время в 00:00:00, чтобы сравнение шло только по дням
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    
-    let upcomingEvents = [];
-
-    // Чистим индикаторы (точки) перед новой загрузкой
-    for(let i=0; i<12; i++) {
-        const ind = document.getElementById(`ind-${i}`);
-        if(ind) ind.innerHTML = '';
-    }
-
-    // Загружаем все 12 месяцев текущего выбранного года
-    const monthPromises = Array.from({length: 12}, (_, i) => 
-        getDoc(doc(db, "calendar", `${currentYear}_${i}`))
-    );
-    
-    const snapshots = await Promise.all(monthPromises);
-
-    snapshots.forEach((snap, i) => {
-        if (snap.exists()) {
-            const data = snap.data();
-            const ind = document.getElementById(`ind-${i}`);
-            let hasRed = false;
-            let hasBlue = false;
-
-            Object.entries(data).forEach(([day, notes]) => {
-                if (!Array.isArray(notes)) return;
-
-                notes.forEach(n => {
-                    // 1. Логика точек под плитками месяцев
-                    if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
-                    else hasBlue = true;
-
-                    // 2. Логика списка в сайдбаре
-                    const eventDate = new Date(currentYear, i, parseInt(day)).getTime();
-
-                    // Условие: показывать события, которые ЕЩЕ НЕ ПРОШЛИ (сегодня или будущее)
-                    if (eventDate >= todayStart) {
-                        upcomingEvents.push({
-                            text: n.text,
-                            day: day,
-                            mName: monthsNames[i],
-                            stamp: eventDate,
-                            cat: n.category
-                        });
-                    }
-                });
+            if (!document.startViewTransition) {
+                applyYearChange(dir);
+                return;
+            }
+            document.startViewTransition(() => {
+                applyYearChange(dir);
             });
+        };
 
-            // Рисуем точки под месяцем
-            if (ind) {
-                if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
-                if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
+        function applyYearChange(dir) {
+            currentYear += dir; 
+            updateDisp(); 
+            initGrid(); 
+            loadData();
+        }
+
+        // --- ЛОГИКА СВАЙПОВ ---
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const mainView = document.querySelector('.main-view');
+
+        mainView.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        mainView.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50; // чувствительность свайпа
+            if (touchEndX < touchStartX - threshold) {
+                changeYear(1);
+            }
+            if (touchEndX > touchStartX + threshold) {
+                changeYear(-1);
             }
         }
-    });
 
-    // Сортируем события по дате (ближайшие сверху)
-    upcomingEvents.sort((a, b) => a.stamp - b.stamp);
+        async function loadData() {
+            const container = document.getElementById('next-event-container');
+            if (!container) return;
 
-    // Вывод в HTML
-    if (upcomingEvents.length > 0) {
-        let html = '<div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">АКТУАЛЬНОЕ</div>';
-        // Берем только первые 5 для компактности
-        upcomingEvents.slice(0, 5).forEach(ev => {
-            const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
-            html += `
-                <div class="event-card-mini" style="border-left-color: ${color}">
-                    <div class="ev-title">${ev.text}</div>
-                    <div class="ev-date">${ev.day} ${ev.mName}</div>
-                </div>`;
-        });
-        container.innerHTML = html;
-    } else {
-        container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center; margin-top:20px;">СОБЫТИЙ НЕТ</div>';
-    }
-}
+            container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px;">ПОИСК...</div>';
 
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            
+            let upcomingEvents = [];
+
+            for(let i=0; i<12; i++) {
+                const ind = document.getElementById(`ind-${i}`);
+                if(ind) ind.innerHTML = '';
+            }
+
+            const monthPromises = Array.from({length: 12}, (_, i) => 
+                getDoc(doc(db, "calendar", `${currentYear}_${i}`))
+            );
+            
+            const snapshots = await Promise.all(monthPromises);
+
+            snapshots.forEach((snap, i) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const ind = document.getElementById(`ind-${i}`);
+                    let hasRed = false;
+                    let hasBlue = false;
+
+                    Object.entries(data).forEach(([day, notes]) => {
+                        if (!Array.isArray(notes)) return;
+
+                        notes.forEach(n => {
+                            if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
+                            else hasBlue = true;
+
+                            const eventDate = new Date(currentYear, i, parseInt(day)).getTime();
+
+                            if (eventDate >= todayStart) {
+                                upcomingEvents.push({
+                                    text: n.text,
+                                    day: day,
+                                    mName: monthsNames[i],
+                                    stamp: eventDate,
+                                    cat: n.category
+                                });
+                            }
+                        });
+                    });
+
+                    if (ind) {
+                        if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
+                        if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
+                    }
+                }
+            });
+
+            upcomingEvents.sort((a, b) => a.stamp - b.stamp);
+
+            if (upcomingEvents.length > 0) {
+                let html = '<div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">АКТУАЛЬНОЕ</div>';
+                upcomingEvents.slice(0, 5).forEach(ev => {
+                    const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
+                    html += `
+                        <div class="event-card-mini" style="border-left-color: ${color}">
+                            <div class="ev-title">${ev.text}</div>
+                            <div class="ev-date">${ev.day} ${ev.mName}</div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center; margin-top:20px;">СОБЫТИЙ НЕТ</div>';
+            }
+        }
 
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
