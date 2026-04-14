@@ -95,7 +95,7 @@
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
 
   /* =========================================
-       АЛГОРИТМ АДАПТИВНОСТИ
+       АЛГОРИТМ АДАПТИВНОСТИ (ОБНОВЛЕННЫЙ)
        ========================================= */
 
     /* 1. ПОРТРЕТНАЯ ОРИЕНТАЦИЯ (Все устройства вертикально: телефоны, планшеты) */
@@ -106,74 +106,87 @@
             border-radius: 0; box-shadow: none; 
         }
         
-        /* Разрушаем контейнер сайдбара, чтобы выстроить элементы в нужной очередности */
         .sidebar { display: contents; }
-        
         .user-header { 
             order: 1; padding: 20px; margin: 0; background: #1a1d1f; 
             border-bottom: 1px solid var(--inner-border);
         }
         
-        /* Календарь ставим по центру */
-        .main-view { 
-            order: 2; padding: 15px; flex: 0 0 auto;
-        }
+        .main-view { order: 2; padding: 15px; flex: 0 0 auto; }
         .year-switcher { margin-bottom: 10px; }
         #display-year { font-size: 3rem; }
         
-        /* Сетка месяцев: 3 колонки, 4 ряда (идеально для вертикали) */
         .months-grid { 
             grid-template-columns: repeat(3, 1fr); 
-            grid-template-rows: repeat(4, 1fr); 
-            gap: 10px; 
+            grid-template-rows: repeat(4, 1fr); gap: 10px; 
         }
         .month-card { min-height: 60px; font-size: 0.85rem; }
 
-        /* Блок событий уходит вниз и скроллится только внутри себя */
         .upcoming-box { 
             order: 3; padding: 20px; flex: 1; overflow-y: auto; margin: 0;
             background: rgba(255,255,255, 0.02);
             border-top: 1px solid var(--inner-border);
         }
-
-        .inner-footer { display: none; } /* Скрываем футер для экономии места */
+        .inner-footer { display: none; }
     }
 
-    /* 2. ЛАНДШАФТНАЯ ОРИЕНТАЦИЯ (Планшеты и Телефоны горизонтально) */
-    @media (max-width: 1100px) and (orientation: landscape), (max-height: 600px) and (orientation: landscape) {
-        body { height: 100dvh; padding: 0; }
+    /* 2. ЛАНДШАФТНАЯ ОРИЕНТАЦИЯ - ПЛАНШЕТЫ (Широкие экраны, выглядит как ПК) */
+    @media (max-width: 1180px) and (min-width: 768px) and (orientation: landscape) {
         .app-container { 
-            flex-direction: row; /* Возвращаем ПК-вид */
-            width: 100vw; height: 100dvh; border-radius: 0; 
+            /* Главная фишка: расширяем плитку почти на весь экран */
+            width: 98vw; 
+            height: 95dvh; 
+            border-radius: 20px; /* Сохраняем красоту плитки */
+            
+            /* Если вдруг захочешь использовать именно физический масштаб (zoom), 
+               раскомментируй строку ниже, но обычно width: 98vw хватает: */
+            /* transform: scale(0.9); */
         }
         
-        /* Сужаем сайдбар, чтобы календарю было больше места */
+        /* Сайдбар остается слева, но делаем его чуть компактнее */
         .sidebar { 
-            width: 240px; padding: 15px; border-bottom: none; 
+            width: 260px; padding: 20px; 
+        }
+        
+        /* Сетка месяцев остается как на ПК (4x3), просто адаптируется под размер */
+        .months-grid { 
+            grid-template-columns: repeat(4, 1fr); 
+            grid-template-rows: repeat(3, 1fr); 
+            gap: 10px; 
+        }
+        
+        .month-card { min-height: 55px; font-size: 0.8rem; }
+        #display-year { font-size: 3.5rem; }
+        .inner-footer { display: none; }
+    }
+
+    /* 3. ЛАНДШАФТНАЯ ОРИЕНТАЦИЯ - ТЕЛЕФОНЫ (Очень узкая высота экрана) */
+    @media (max-height: 500px) and (orientation: landscape) {
+        body { height: 100dvh; padding: 0; }
+        .app-container { 
+            flex-direction: row; width: 100vw; height: 100dvh; border-radius: 0; 
+        }
+        
+        .sidebar { 
+            width: 220px; padding: 10px; border-bottom: none; 
             border-right: 1px solid var(--inner-border);
         }
-        .user-header { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 15px; }
+        .user-header { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
         .nav-btns { width: 100%; justify-content: space-between; }
         .upcoming-box { margin-top: 5px; }
 
         .main-view { padding: 10px; }
         .year-switcher { margin-bottom: 5px; }
-        #display-year { font-size: 2.2rem; }
-        .year-side { font-size: 1.2rem; }
+        #display-year { font-size: 2rem; }
+        .year-side { font-size: 1rem; }
 
-        /* Календарь: 4 колонки, 3 ряда. Жестко ограничиваем отступы, чтобы всё влезло! */
         .months-grid { 
             grid-template-columns: repeat(4, 1fr); 
             grid-template-rows: repeat(3, 1fr); 
             gap: 5px; padding-bottom: 0;
         }
-        .month-card { 
-            min-height: 0; /* Разрешаем сжиматься */
-            font-size: 0.75rem; 
-            border-radius: 12px;
-        }
-        .month-indicator { bottom: 6px; }
-
+        .month-card { min-height: 0; font-size: 0.7rem; border-radius: 8px; }
+        .month-indicator { bottom: 4px; }
         .inner-footer { display: none; }
     }
     </style>
