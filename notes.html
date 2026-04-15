@@ -13,7 +13,7 @@
     <meta name="view-transition" content="same-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
-    <style>
+   <style>
     :root { 
         --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
         --ev-memorial: #ff7675; --ev-memorial-bg: #3b1e22; 
@@ -29,8 +29,12 @@
         height: 100vh; overflow: hidden; 
     }
 
+    /* === ДЕСКТОПНАЯ ВЕРСИЯ === */
     .app-container {
-        width: 90%; max-width: 95%; height: 85%; background: #0f1112; border-radius: 30px;
+        width: 90%; 
+        max-width: 1200px; /* Ограничитель для больших мониторов */
+        height: 85vh; /* Сохраняем красивый отступ сверху и снизу */
+        background: #0f1112; border-radius: 30px;
         border: 0px solid var(--inner-border); display: flex; position: relative; overflow: hidden;
         box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
@@ -47,7 +51,6 @@
     .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: #fff; letter-spacing: 1px; }
 
     .preview-box { display: flex; flex-direction: column; margin-top: 10px; flex: 1; }
-    /* УБРАЛИ border-left ОТСЮДА */
     .preview { background: transparent; width: 100%; padding: 15px 0; border-radius: 4px; min-height: 100px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; }
     
     .action-btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 20px; cursor: pointer; color: #fff; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; background: var(--accent); }
@@ -79,7 +82,7 @@
     .day-box.selected { border-color: var(--accent) !important; background: transparent; z-index: 1; }
     .day-box.selected::before { content: ''; position: absolute; inset: 0; background: transparent; border-radius: 10px; z-index: -1; }
     
-    .day-box.has-memorial { background: var(--ev-memorial-bg); !important; color: var(--ev-memorial) !important; }
+    .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
     .day-box.today { font-size: 2.2rem; color: #fff;}
 
     .indicator-row { position: absolute; bottom: 10px; display: flex; gap: 4px; justify-content: center; width: 60%; z-index: 5; }
@@ -87,7 +90,6 @@
     .m-meeting { background: var(--ev-meeting); }
     .m-personal { background: #888; }
 
-    /* --- ЛЕНТА МНОГОДНЕВНОГО СОБЫТИЯ --- */
     .day-box.c-start::after,
     .day-box.c-mid::after,
     .day-box.c-end::after,
@@ -103,6 +105,7 @@
     .inner-footer { position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between; background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border); }
     .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
 
+    /* МОДАЛЬНОЕ ОКНО */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
     .modal-box { background: var(--card-bg); padding: 25px; border-radius: 8px; width: 90%; max-width: 400px; border: 0px solid var(--inner-border); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
     .modal-btn { width: 100%; padding: 14px; border: none; border-radius: 4px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.7rem; }
@@ -118,17 +121,44 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-    @media (max-width: 850px) {
-        body { overflow-x: hidden; overflow-y: auto; height: auto; padding: 0; display: flex; flex-direction: column; }
-        .app-container { flex-direction: column; height: auto; min-height: auto; width: 100vw; border-radius: 0; display: flex; flex: none; }
+    /* === ПЛАНШЕТЫ И ТЕЛЕФОНЫ (1024px и меньше) === */
+    @media (max-width: 1024px) {
+        body { 
+            overflow-x: hidden; 
+            overflow-y: auto; 
+            height: auto; 
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            background: #0f1112; /* Фон сливается с приложением */
+        }
+        .app-container { 
+            flex-direction: column; 
+            height: auto; 
+            min-height: 100dvh; 
+            width: 100vw; 
+            max-width: 100vw; /* Снимаем ограничение в 1200px */
+            border-radius: 0; /* Убираем скругления */
+            box-shadow: none;
+            display: flex; 
+            flex: none; 
+        }
         .sidebar { display: contents; }
-        .user-header { order: 1; width: 100%; padding: 20px; background: #0f1112; border-bottom: 1px solid var(--inner-border); margin-bottom: 0; display: flex; flex-direction: row; align-items: center; justify-content: space-between; }
+        .user-header { 
+            order: 1; width: 100%; padding: 20px; background: #0f1112; 
+            border-bottom: 1px solid var(--inner-border); margin-bottom: 0; 
+            display: flex; flex-direction: row; align-items: center; justify-content: space-between; 
+        }
         .main-view { order: 2; padding: 15px; width: 100%; flex: none; }
         .month-title-wrapper { margin-bottom: 15px; }
         #m-name { font-size: 1.8rem; }
         .grid { gap: 3px; } 
         .day-box { font-size: 0.9rem; border-radius: 6px; }
-        .preview-box { order: 3; display: flex; width: 100%; padding: 20px; background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); margin-top: 10px; flex: none; }
+        .preview-box { 
+            order: 3; display: flex; width: 100%; padding: 20px; 
+            background: rgba(255, 255, 255, 0.02); border-top: 1px solid var(--inner-border); 
+            margin-top: 10px; flex: none; 
+        }
         .preview { flex: none; min-height: 120px; height: auto; }
         .inner-footer { order: 4; position: static; padding: 20px; width: 100%; }
     }
