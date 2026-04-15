@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Главная | CALENDARIUM</title>
-    <style>
+   <style>
     :root { 
         --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
         --ev-memorial: #ff7675; --ev-meeting: #09e0e3; --text-main: #e0e6ed;
@@ -17,135 +17,162 @@
     body { 
         margin: 0; background: var(--bg); color: var(--text-main); 
         display: flex; align-items: center; justify-content: center; 
-        height: 100vh; width: 100vw; overflow: hidden; 
+        height: 100vh; overflow: hidden; 
     }
 
-    /* === ГЛАВНАЯ ПЛИТКА (На планшетах и ПК занимает почти весь экран) === */
+    /* ГЛАВНАЯ ПЛИТКА-ОБОЛОЧКА - Теперь гибко в процентах от экрана */
     .app-container {
-        width: 96vw; 
-        max-width: 1400px; 
-        height: 94vh; 
+        width: 96vw; /* 96% от ширины экрана */
+        height: 94vh; /* 94% от высоты экрана */
+        max-width: 1400px;
         background: #0f1112;
-        border-radius: 20px; 
-        display: flex; 
-        overflow: hidden;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        border-radius: 30px; border: 0px solid var(--inner-border); 
+        display: flex; position: relative; overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
-    /* === ЛЕВАЯ КОЛОНКА (САЙДБАР) === */
+    /* ЛЕВАЯ СТОРОНА (САЙДБАР) - Размеры в процентах вместо 320px */
     .sidebar { 
-        width: 320px; /* Фиксированная ширина, чтобы текст не зажимало */
-        background: rgba(255,255,255,0.02); 
-        padding: 30px 25px; 
-        display: flex; 
-        flex-direction: column; 
-        border-right: 1px solid var(--inner-border); 
-        flex-shrink: 0;
+        width: 28%; /* Занимает 28% ширины контейнера */
+        min-width: 260px; /* Защита от сильного сжатия */
+        max-width: 320px; /* Защита от сильного растяжения на ТВ/мониторах */
+        background: rgba(80,80,80,0.2); 
+        padding: 30px; display: flex; flex-direction: column; 
+        border-right: 0px solid var(--inner-border); flex-shrink: 0;
     }
 
-    .user-header { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
-    .user-name { font-weight: 800; text-transform: uppercase; font-size: 0.8rem; color: #fff; letter-spacing: 1px;}
-    .nav-btns { display: flex; gap: 8px; width: 100%; }
-    .btn-small { 
-        flex: 1; /* Кнопки занимают всю ширину поровну */
-        background: #1a1d1f; color: #fff; border: 1px solid #333; 
-        padding: 10px 0; border-radius: 6px; font-size: 0.7rem; 
-        font-weight: 700; cursor: pointer; transition: 0.2s; 
-    }
-    .btn-small:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+    .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+    .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: #fff; letter-spacing: 1px; }
+    .nav-btns { display: flex; gap: 8px; }
+    .btn-small { background: rgba(0,0,0,0.5); color: #fff; border: 0px solid #333; padding: 8px 16px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+    .btn-small:hover { background: var(--accent); }
 
-    .upcoming-box { flex: 1; overflow-y: auto; padding-right: 10px; }
-    /* Тонкий скроллбар */
-    .upcoming-box::-webkit-scrollbar { width: 4px; }
-    .upcoming-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-
-    .event-card-mini { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); }
-    .ev-title { font-size: 0.8rem; color: #fff; margin-bottom: 6px; font-weight: 300; line-height: 1.4; }
-    .ev-date { font-size: 0.85rem; font-weight: 700; color: #fff; }
-
-    /* === ПРАВАЯ ЧАСТЬ (КАЛЕНДАРЬ) === */
+    /* ПРАВАЯ СТОРОНА */
     .main-view { 
-        flex: 1; 
-        display: flex; 
-        flex-direction: column; 
-        padding: 30px 40px; 
+        width: 72%; /* Остаток ширины в процентах */
+        height: 100%; flex: 1; display: flex; flex-direction: column; 
+        padding: 2% 3%; /* Отступы тоже в процентах */
+        position: relative;
     }
 
-    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 25px; flex-shrink: 0; }
-    #display-year { font-size: 4rem; font-weight: 300; letter-spacing: -2px; color: #fff; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: 2rem; transition: 0.3s; }
-    .year-side:hover { color: var(--accent); transform: scale(1.1); }
+    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 2%; }
+    /* Шрифт масштабируется автоматически (от 3rem до 4.5rem в зависимости от ширины экрана) */
+    #display-year { font-size: clamp(3rem, 6vw, 4.5rem); font-weight: 300; letter-spacing: -3px; color: #fff; }
+    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 2vw, 1.8rem); transition: 0.2s; }
+    .year-side:hover { color: var(--accent); }
 
-    /* Сетка растягивается на все оставшееся место */
+    /* СЕТКА МЕСЯЦЕВ - Убрано ограничение в 800px, теперь тянется на все 100% */
     .months-grid { 
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr); 
-        grid-template-rows: repeat(3, 1fr); 
+        display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
         gap: 15px; 
-        flex: 1; /* Заставляет сетку занять всю высоту до низа */
+        width: 100%; 
+        height: 100%; /* Растягиваем на доступную высоту */
+        margin: 0 auto;
+        flex: 1; min-height: 0; padding-bottom: 10px;
     }
     
     .month-card { 
-        background: var(--dark); 
-        border-radius: 16px; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center; 
-        color: #fff; 
-        font-weight: 400; 
-        cursor: pointer; 
-        position: relative; 
-        transition: 0.3s;
+        background: var(--dark); border-radius: 18px; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
         text-transform: uppercase; 
-        font-size: 0.9rem; 
-        letter-spacing: 1px;
-        height: 100%; /* Карточка тянется на всю высоту ячейки сетки */
+        font-size: clamp(0.7rem, 1.2vw, 1rem); /* Размер текста зависит от процентов экрана */
+        height: 100%; /* Карточки занимают всю высоту ячейки */
+        min-height: 50px; 
+        border: 1px solid transparent;
     }
-    .month-card:hover { background: #2b3236; transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
 
-    .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 6px; width: 40px; height: 4px; }
-    .dot { flex: 1; border-radius: 4px; }
+    .month-card:hover {
+        background: #2b3236; 
+        box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+    }
+
+    .month-card.current-active { background: transparent !important; z-index: 1; }
+        
+    .month-card.current-active::before {
+        content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); 
+        border-radius: 18px; z-index: -1; border: 0px solid rgba(255,255,255,0.1);
+    }
+
+    .month-indicator { position: absolute; bottom: 12px; display: flex; gap: 4px; width: 20%; }
+    .dot { height: 4px; flex: 1; border-radius: 10px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
 
-    /* Футер убираем, чтобы не мешал сетке тянуться */
-    .inner-footer { display: none; }
+    .upcoming-box { margin-top: 20px; overflow-y: auto; flex: 1; }
+    .event-card-mini { background: transparent; padding: 12px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+    .ev-title { font-size: 0.75rem; font-weight: 300; color: #fff; margin-bottom: 4px; }
 
-    /* =========================================
-       МОБИЛЬНАЯ АДАПТАЦИЯ (ТЕЛЕФОНЫ)
-       ========================================= */
-    
-    /* 1. Телефоны вертикально (Портрет) */
-    @media (max-width: 768px) and (orientation: portrait) {
-        body { height: 100dvh; }
-        .app-container { flex-direction: column; height: 100%; width: 100vw; border-radius: 0; }
+    .inner-footer {
+        position: absolute; bottom: 10px; left: 70px; right: 70px; display: flex; align-items: center; justify-content: space-between;
+        background: transparent; padding: 5px 20px; border-top: 0px solid var(--inner-border);
+    }
+    .footer-text { font-size: 9px; color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+
+    /* ========================================================================= */
+    /* ОБЪЕДИНЕННЫЙ МЕДИА-ЗАПРОС ДЛЯ ПОРТРЕТНОЙ ОРИЕНТАЦИИ (Планшеты и телефоны) */
+    /* ========================================================================= */
+    @media (max-width: 1024px) {
+        body { 
+            height: 100dvh; 
+            overflow: hidden; 
+            padding: 0; 
+        }
+        .app-container { 
+            flex-direction: column; 
+            height: 100%; 
+            width: 100vw; 
+            border-radius: 0; 
+        }
         
-        .sidebar { width: 100%; height: 35%; padding: 20px; border-right: none; border-bottom: 1px solid var(--inner-border); }
-        .user-header { flex-direction: row; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .sidebar { 
+            width: 100%; 
+            max-width: 100%; /* Снимаем ограничение на ширину для телефонов */
+            height: 35%; 
+            padding: 15px; 
+            border-right: none;
+            border-bottom: 1px solid var(--inner-border);
+            background: rgba(15, 17, 18, 0.8);
+            backdrop-filter: blur(10px); 
+        }
+        .user-header { margin-bottom: 10px; }
         
-        .main-view { padding: 15px; }
-        .year-switcher { margin-bottom: 15px; gap: 20px; }
-        #display-year { font-size: 3rem; }
-        .year-side { font-size: 1.5rem; }
+        .upcoming-box { margin-top: 0; flex: 1; overflow-y: auto; padding-right: 5px; }
         
-        .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 10px; }
-        .month-card { font-size: 0.75rem; border-radius: 12px; }
+        .main-view { 
+            width: 100%;
+            padding: 10px; 
+            flex: 1; 
+            justify-content: space-between;
+        }
+        .year-switcher { margin-bottom: 5px; }
+        #display-year { font-size: clamp(2.5rem, 6vh, 3.5rem); } 
+        
+        .months-grid { 
+            grid-template-columns: repeat(3, 1fr); 
+            grid-template-rows: repeat(4, 1fr); 
+            gap: 8px; 
+            height: 100%; 
+        }
+        
+        .month-card { 
+            min-height: 0; 
+            font-size: clamp(0.7rem, 2vh, 0.9rem);
+            border-radius: 12px;
+        }
+        
+        .inner-footer { display: none; }
     }
 
-    /* 2. Телефоны горизонтально (Узкая высота) */
-    @media (max-height: 500px) and (orientation: landscape) {
-        .app-container { width: 100vw; height: 100dvh; border-radius: 0; }
-        .sidebar { width: 240px; padding: 15px; }
-        .main-view { padding: 10px 15px; }
-        .year-switcher { margin-bottom: 10px; gap: 20px; }
-        #display-year { font-size: 2.2rem; }
-        .year-side { font-size: 1.2rem; }
-        .months-grid { gap: 8px; }
-        .month-card { font-size: 0.7rem; border-radius: 8px; }
-        .month-indicator { bottom: 6px; }
+    /* ДЛЯ МАЛЕНЬКИХ ТЕЛЕФОНОВ ГОРИЗОНТАЛЬНО */
+    @media (max-height: 600px) and (orientation: landscape) {
+        .app-container { flex-direction: row; }
+        .sidebar { height: 100%; width: 35%; max-width: 250px; border-bottom: none; border-right: 1px solid var(--inner-border); }
+        .main-view { width: 65%; }
+        .months-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
+        #display-year { font-size: 2rem; }
     }
-</style>
+    </style>
 </head>
 <body>
 
