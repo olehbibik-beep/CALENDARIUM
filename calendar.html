@@ -43,22 +43,23 @@
         flex-shrink: 0;
     }
 
-    /* === ЕДИНАЯ ШАПКА ПОЛЬЗОВАТЕЛЯ === */
+   /* === ЕДИНАЯ ШАПКА ПОЛЬЗОВАТЕЛЯ === */
     .user-header { 
         display: flex; align-items: center; justify-content: space-between; 
         margin-bottom: 2vh; width: 100%; position: relative;
     }
     
-    /* СТРОГОЕ деление на 3 части. Ширина зафиксирована на 33.3% */
-    .header-left, .header-center, .header-right { 
-        display: flex; align-items: center; 
-        width: 33.33%; /* Жестко держим границы блоков */
-        gap: clamp(5px, 1vw, 10px); 
+    /* Боковые блоки просто прижимаются к краям */
+    .header-left, .header-right { 
+        display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); z-index: 10;
     }
     
-    .header-left { justify-content: flex-start; }
-    .header-center { justify-content: center; overflow: hidden; } /* hidden не даст имени вылезти за пределы */
-    .header-right { justify-content: flex-end; }
+    /* Броня для центра: абсолютное позиционирование. Он НИКОГДА не сместится и не сожмется */
+    .header-center { 
+        position: absolute; left: 50%; transform: translateX(-50%);
+        display: flex; align-items: center; justify-content: center; 
+        gap: 8px; z-index: 5; max-width: 50%;
+    }
 
     /* Стили кнопок */
     .icon-btn { 
@@ -71,21 +72,15 @@
         height: clamp(22px, 3.5vh, 32px); 
         object-fit: contain; opacity: 0.5; transition: 0.3s; 
     }
-    .icon-btn:hover img { 
-        opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 8px var(--accent)); 
-    }
+    .icon-btn:hover img { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 8px var(--accent)); }
 
-    /* ИКОНКА ПОЛЬЗОВАТЕЛЯ: теперь размер точно такой же, как у кнопок */
-    .user-icon { 
-        width: clamp(22px, 3.5vh, 32px); 
-        height: clamp(22px, 3.5vh, 32px); 
-        object-fit: contain; opacity: 0.8; flex-shrink: 0; 
-    }
+    /* ИКОНКА ПОЛЬЗОВАТЕЛЯ */
+    .user-icon { width: clamp(20px, 3.5vh, 28px); height: clamp(20px, 3.5vh, 28px); object-fit: contain; opacity: 0.8; flex-shrink: 0; }
     
     .user-name { 
         font-weight: 700; text-transform: uppercase; 
-        font-size: clamp(0.7rem, 1vw, 0.9rem); color: #fff; letter-spacing: 1px; 
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Обрезаем длинное имя точечками */
+        font-size: clamp(0.75rem, 1.2vw, 1rem); color: #fff; letter-spacing: 1px; 
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
     .upcoming-box { margin-top: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
