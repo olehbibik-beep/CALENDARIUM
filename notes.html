@@ -49,11 +49,39 @@
         border-right: 1px solid var(--inner-border); flex-shrink: 0;
     }
 
-    .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3vh; flex-wrap: wrap; gap: 10px; }
-    .back-btn { background: rgba(0,0,0,0.5); color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
-    .back-btn:hover { background: var(--accent); color: #000; }
-    .user-name { font-weight: 700; text-transform: uppercase; font-size: clamp(0.7rem, 1vw, 0.9rem); color: #fff; letter-spacing: 1px; }
+    /* === ЕДИНАЯ ШАПКА ПОЛЬЗОВАТЕЛЯ === */
+    .user-header { 
+        display: flex; align-items: center; justify-content: space-between; 
+        margin-bottom: 2vh; width: 100%;
+    }
+    /* Строгая сетка 30% - 40% - 30%, чтобы центр всегда был в центре */
+    .header-left, .header-right { display: flex; align-items: center; width: 30%; gap: clamp(10px, 2vw, 20px); }
+    .header-right { justify-content: flex-end; }
+    .header-center { display: flex; align-items: center; justify-content: center; width: 40%; gap: 8px; }
 
+    /* Стили для кнопок-картинок */
+    .icon-btn { 
+        background: none; border: none; padding: 5px; cursor: pointer; 
+        display: flex; align-items: center; justify-content: center; outline: none;
+    }
+    .icon-btn img { 
+        width: clamp(22px, 3.5vh, 35px); /* Адаптивный размер: не меньше 22px, не больше 35px */
+        height: clamp(22px, 3.5vh, 35px); 
+        object-fit: contain; opacity: 0.5; transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+    }
+    .icon-btn:hover img { 
+        opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 8px var(--accent)); 
+    }
+
+    /* Иконка пользователя и текст */
+    .user-icon { 
+        width: clamp(14px, 2vh, 22px); height: clamp(14px, 2vh, 22px); 
+        object-fit: contain; opacity: 0.8; 
+    }
+    .user-name { 
+        font-weight: 700; text-transform: uppercase; 
+        font-size: clamp(0.7rem, 1vw, 0.9rem); color: #fff; letter-spacing: 1px; 
+    }
     .preview-box { display: flex; flex-direction: column; margin-top: 1vh; flex: 1; overflow: hidden; }
     .preview { background: transparent; width: 100%; padding: 1vh 0; border-radius: 4px; flex: 1; overflow-y: auto; font-size: clamp(0.8rem, 1vw, 0.95rem); line-height: 1.4; }
     
