@@ -208,7 +208,7 @@
         <div class="sidebar">
             <div class="user-header">
                 <div class="header-left">
-                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
+                    <button class="icon-btn" onclick="location.href='calendar.html'">
                         <img src="OPTION.png" alt="Back" style="transform: rotate(-90deg);">
                     </button>
                 </div>
@@ -219,7 +219,10 @@
                 </div>
 
                 <div class="header-right">
-                    <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
+                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;">
+                        <img src="OPTION.png" alt="Options">
+                    </button>
+                    <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'">
                         <img src="QUIT.png" alt="Quit">
                     </button>
                 </div>
