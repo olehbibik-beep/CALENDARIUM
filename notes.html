@@ -206,25 +206,22 @@
 
     <div class="app-container">
         <div class="sidebar">
-            <div class="user-header">
+           <div class="user-header">
                 <div class="header-left">
-                    <button class="icon-btn" onclick="location.href='calendar.html'">
+                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
                         <img src="OPTION.png" alt="Back" style="transform: rotate(-90deg);">
                     </button>
                 </div>
                 
                 <div class="header-center">
-                    <img src="MAN.png" class="user-icon" alt="User">
-                    <div id="user-display" class="user-name">...</div>
+                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
+                        <img src="OPTION.png" alt="Options">
+                    </button>
                 </div>
 
                 <div class="header-right">
-                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;">
-                        <img src="OPTION.png" alt="Options">
-                    </button>
-                    <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'">
-                        <img src="QUIT.png" alt="Quit">
-                    </button>
+                    <img src="MAN.png" class="user-icon" alt="User">
+                    <div id="user-display" class="user-name">...</div>
                 </div>
             </div>
             
