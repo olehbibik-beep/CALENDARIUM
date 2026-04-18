@@ -98,7 +98,7 @@
 .months-grid.linear-mode {
     display: flex !important;
     flex-direction: row !important;
-    gap: 2px; /* Расстояние между полосками */
+    gap: 8px; /* Расстояние между полосками */
     align-items: stretch;
     overflow-x: auto; /* Появится скролл, если не влезет */
 }
@@ -120,6 +120,8 @@
 }
 
 /* Стилизация скроллбара, чтобы он был аккуратным */
+       .months-grid.linear-mode::-webkit-scrollbar { height: 4px; }
+.months-grid.linear-mode::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 8px; }
     .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
     #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
     .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
