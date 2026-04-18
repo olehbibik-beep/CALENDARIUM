@@ -298,7 +298,21 @@
         if(user.toLowerCase() === 'admin') {
             document.getElementById('admin-btn').style.display = 'flex';
         }
+// Функция переключения
+window.toggleCalendarView = () => {
+    const grid = document.getElementById('months');
+    grid.classList.toggle('linear-mode');
+    
+    // Сохраняем состояние в память
+    const isLinear = grid.classList.contains('linear-mode');
+    localStorage.setItem('calendarViewMode', isLinear ? 'linear' : 'grid');
+};
 
+// Проверка при загрузке страницы (добавьте это в конец вашего скрипта)
+const savedView = localStorage.getItem('calendarViewMode');
+if (savedView === 'linear') {
+    document.getElementById('months').classList.add('linear-mode');
+}
         function initGrid() {
             const grid = document.getElementById('months');
             const now = new Date();
