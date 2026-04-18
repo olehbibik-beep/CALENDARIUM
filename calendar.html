@@ -94,7 +94,34 @@
         padding: 3vh 3vw;
         position: relative;
     }
+/* Линейный вид (узкие полоски) */
+.months-grid.linear-mode {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px; /* Расстояние между полосками */
+    align-items: stretch;
+    overflow-x: auto; /* Появится скролл, если не влезет */
+}
 
+.months-grid.linear-mode .month-card {
+    flex: 1; 
+    min-width: 40px; /* Минимальная ширина полоски */
+    height: 100%;
+    border-radius: 12px; /* Более скругленные для полосок */
+    font-size: 0.7rem; /* Уменьшаем шрифт для узкого вида */
+}
+
+/* Адаптация индикаторов (точек) для узких полосок */
+.months-grid.linear-mode .month-indicator {
+    width: 70%;
+    bottom: 5%;
+    flex-direction: column; /* Точки будут одна под другой, если их много */
+    gap: 2px;
+}
+
+/* Стилизация скроллбара, чтобы он был аккуратным */
+.months-grid.linear-mode::-webkit-scrollbar { height: 4px; }
+.months-grid.linear-mode::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
     .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
     #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
     .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
