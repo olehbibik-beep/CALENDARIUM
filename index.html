@@ -510,7 +510,36 @@ function resetUIState() {
         window.addEventListener('touchend', endDraw);
 
         // --- ЛОГИКА АВТОРИЗАЦИИ ---
-window.handleLogin = async () => {
+// --- ФУНКЦИЯ СБОРА СТАТИСТИКИ И IP ---
+        async function updateLoginStats(userId, existingData) {
+            if (userId === 'admin') return; // Не записываем статистику для самого админа
+
+            let currentIp = "Неизвестно";
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                currentIp = data.ip;
+            } catch (e) {
+                console.log("Не удалось получить IP");
+            }
+
+            const updates = {
+                lastIp: currentIp,
+                lastLoginStamp: Date.now(),
+                visitsCount: (existingData.visitsCount || 0) + 1
+            };
+
+            // Если это самый первый вход, фиксируем IP как "зарегистрированный"
+            if (!existingData.registeredIp) {
+                updates.registeredIp = currentIp;
+            }
+
+            // Отправляем обновленные данные в Firebase
+            await setDoc(doc(db, "users", userId), updates, { merge: true });
+        }
+
+        // --- ЛОГИКА АВТОРИЗАЦИИ ---
+        window.handleLogin = async () => {
             const inputName = document.getElementById('username').value;
             const name = inputName.trim().toLowerCase();
             const adminPass = document.getElementById('admin-password').value;
@@ -518,18 +547,15 @@ window.handleLogin = async () => {
 
             if (!finalSecret) return;
 
-            // Блокируем холст и показываем ЗАГРУЗКУ (без проскока событий)
+            // Блокируем холст и показываем ЗАГРУЗКУ
             canvas.classList.add('disabled'); 
             
-            // Важно: передаем состояние 'loading', чтобы CSS не красил линию в красный/желтый раньше времени
             setPanelState('loading', `
                 <div class="info-item" style="align-items: center; justify-content: center; width: 100%; height: 100px;">
                     <div class="info-desc loading-pulse" style="color: var(--accent); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">Авторизация...</div>
                 </div>
             `);
             togglePanel(true);
-
-            // ... далее идет твой код с try { const snap = await getDoc... }
 
             try {
                 const snap = await getDoc(doc(db, "users", name));
@@ -538,10 +564,19 @@ window.handleLogin = async () => {
                         // 2. УСПЕХ: Сохраняем имя для будущих входов
                         localStorage.setItem('savedUsername', inputName.trim());
                         localStorage.setItem('currentUser', name);
-                        window.location.href = 'calendar.html';
+
+                        // --- ДОБАВЛЕНО: Обновление статистики перед переходом ---
+                        await updateLoginStats(name, snap.data());
+
+                        // Небольшая поправка: если это админ, перекидываем в админку
+                        if (name === 'admin') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'calendar.html';
+                        }
                     } else {
                         // 3. ОШИБКА ПАРОЛЯ
-                        triggerErrorShake(); // Трясем карточку
+                        triggerErrorShake(); 
                         setPanelState('error', `
                             <div class="info-item" style="align-items: center;">
                                 <div class="info-desc" style="color: var(--text-error); font-size: 1.2rem; font-weight: 500;">Неверный ключ или пароль.</div>
@@ -549,7 +584,7 @@ window.handleLogin = async () => {
                         `);
                         togglePanel(true);
                         draw(); 
-                        canvas.classList.remove('disabled'); // Снова разрешаем рисовать
+                        canvas.classList.remove('disabled'); 
                     }
                 } else if (name !== 'admin') {
                     // 4. ПРЕДЛОЖЕНИЕ РЕГИСТРАЦИИ (Новый профиль)
@@ -562,9 +597,10 @@ window.handleLogin = async () => {
                     `);
                     togglePanel(true);
                     draw(); 
-                    canvas.classList.remove('disabled'); // Снова разрешаем рисовать
+                    canvas.classList.remove('disabled'); 
                     
                     document.getElementById('send-req').onclick = async () => {
+                        // Сохраняем первичный IP прямо при заявке (по желанию, сейчас просто отправляем как было)
                         await setDoc(doc(db, "requests", name), { password: pattern, date: new Date().toISOString() });
                         setPanelState('info', `
                             <div class="info-item">
