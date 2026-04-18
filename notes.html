@@ -73,14 +73,14 @@
         display: flex; align-items: center; justify-content: center; outline: none;
         flex-shrink: 0; z-index: 50; 
     }
-    .icon-btn img { 
-        width: clamp(25px, 3.5vh, 30px); 
-        height: clamp(25px, 3.5vh, 30px); 
-        object-fit: contain; opacity: 0.5; transition: 0.3s; 
-    }
- .icon-btn img {
+    .icon-btn img {
     opacity: 0.7; /* начальное состояние */
     transition: opacity 0.3s ease, filter 0.3s ease;
+}
+ .icon-btn:hover img { 
+    opacity: 1; 
+    filter: drop-shadow(0 0 12px var(--text-main)); /* Добавлена скобка в конце */
+}
 }
 
     /* ИКОНКА ПОЛЬЗОВАТЕЛЯ */
