@@ -226,10 +226,14 @@
 
         <div class="main-view">
             <div class="year-switcher">
-                <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
-                <div id="display-year"></div>
-                <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
-            </div>
+    <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
+    <div id="display-year"></div>
+    <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
+    
+    <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
+        <img src="VIEW.png" alt="View" id="view-icon" style="width: 20px; height: 20px;">
+    </button>
+</div>
 
             <div class="months-grid" id="months"></div>
 
