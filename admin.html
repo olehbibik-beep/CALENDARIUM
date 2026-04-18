@@ -249,6 +249,7 @@
         });
 
         // Функция отрисовки пользователей (с учетом поиска)
+       // Функция отрисовки пользователей со статистикой
         function renderUsers() {
             const list = document.getElementById('user-list');
             const searchQuery = document.getElementById('user-search').value.toLowerCase();
@@ -262,14 +263,36 @@
             }
 
             filteredUsers.forEach(user => {
+                const data = user.data;
+                const ip = data.lastIp || 'Нет данных';
+                const registeredIp = data.registeredIp || ip; 
+                const visits = data.visitsCount || 0;
+                
+                // Форматируем дату, если она есть
+                let lastDate = 'Никогда';
+                if (data.lastLoginStamp) {
+                    const d = new Date(data.lastLoginStamp);
+                    lastDate = d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                }
+
+                // Проверяем, не сменился ли IP
+                const ipColorClass = (ip !== registeredIp && ip !== 'Нет данных') ? 'ip-warning' : 'stat-val';
+
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.innerHTML = `
-                    <div class="user-info">
-                        <div class="user-avatar">${user.id[0].toUpperCase()}</div>
-                        <span class="user-name">${user.id}</span>
+                    <div class="user-card-header">
+                        <div class="user-info">
+                            <div class="user-avatar">${user.id[0].toUpperCase()}</div>
+                            <span class="user-name">${user.id}</span>
+                        </div>
+                        <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${user.id}?', () => window.deleteDocById('users', '${user.id}'))">DEL</button>
                     </div>
-                    <button class="card-btn btn-delete" onclick="openConfirm('Удалить ${user.id}?', () => window.deleteDocById('users', '${user.id}'))">DEL</button>
+                    <div class="user-stats">
+                        <div class="stat-line"><span>Входы:</span> <span class="stat-val">${visits}</span></div>
+                        <div class="stat-line"><span>IP:</span> <span class="${ipColorClass}">${ip}</span></div>
+                        <div class="stat-line"><span>Был:</span> <span style="color:#fff">${lastDate}</span></div>
+                    </div>
                 `;
                 list.appendChild(card);
             });
