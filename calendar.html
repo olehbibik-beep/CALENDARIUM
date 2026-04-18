@@ -98,7 +98,7 @@
 .months-grid.linear-mode {
     display: flex !important;
     flex-direction: row !important;
-    gap: 8px; /* Расстояние между полосками */
+    gap: 2px; /* Расстояние между полосками */
     align-items: stretch;
     overflow-x: auto; /* Появится скролл, если не влезет */
 }
@@ -107,7 +107,7 @@
     flex: 1; 
     min-width: 40px; /* Минимальная ширина полоски */
     height: 100%;
-    border-radius: 12px; /* Более скругленные для полосок */
+    border-radius: 8px; /* Более скругленные для полосок */
     font-size: 0.7rem; /* Уменьшаем шрифт для узкого вида */
 }
 
@@ -146,11 +146,11 @@
     .month-card.current-active { background: transparent !important; z-index: 1; }
     .month-card.current-active::before {
         content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); 
-        border-radius: 18px; z-index: -1; 
+        border-radius: 8px; z-index: -1; 
     }
 
     .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
-    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 10px; }
+    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
 
