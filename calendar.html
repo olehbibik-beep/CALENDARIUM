@@ -371,16 +371,20 @@ if (savedView === 'linear') {
             handleSwipe();
         }, {passive: true});
 
-        function handleSwipe() {
-            const threshold = 50; // чувствительность свайпа
-            if (touchEndX < touchStartX - threshold) {
-                changeYear(1);
-            }
-            if (touchEndX > touchStartX + threshold) {
-                changeYear(-1);
-            }
-        }
+     function handleSwipe() {
+    // Если сетка в линейном режиме — выходим и не меняем год
+    if (document.getElementById('months').classList.contains('linear-mode')) {
+        return; 
+    }
 
+    const threshold = 50; 
+    if (touchEndX < touchStartX - threshold) {
+        changeYear(1);
+    }
+    if (touchEndX > touchStartX + threshold) {
+        changeYear(-1);
+    }
+}
         async function loadData() {
             const container = document.getElementById('next-event-container');
             if (!container) return;
