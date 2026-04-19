@@ -79,12 +79,7 @@
 
     .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; }
 
-    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
-    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
-    .year-side:hover { color: var(--accent); }
-
-    /* === СЕТКА МЕСЯЦЕВ === */
+    /* === СЕТКА МЕСЯЦЕВ (ОБЫЧНЫЙ ВИД) === */
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
         gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
@@ -95,36 +90,49 @@
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
         color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
         text-transform: uppercase; font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
-        height: 100%; width: 100%; border: 1px solid transparent; overflow: hidden;
+        height: 100%; width: 100%; border: 1px solid transparent;
+        overflow: hidden; /* Чтобы картинка не вылезала */
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
-    
-    .month-card span { z-index: 5; position: relative; }
 
-    .month-indicator { position: absolute; bottom: 8%; display: flex; gap: 4px; width: 40%; justify-content: center; z-index: 6; }
-    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
-    .dot.red { background: var(--ev-memorial); }
-    .dot.blue { background: var(--ev-meeting); }
-
-    /* === ЛИНЕЙНЫЙ РЕЖИМ (С КАРТИНКАМИ) === */
+    /* === ЛИНЕЙНЫЙ ВИД (ПОЛОСКИ С КАРТИНКАМИ) === */
     .months-grid.linear-mode {
         display: flex !important; flex-direction: row !important; gap: 6px; 
         align-items: stretch; overflow: hidden !important; touch-action: none;
     }
 
     .months-grid.linear-mode .month-card {
-        flex: 1; min-width: 0; height: 100%; border-radius: 10px;
-        background-image: var(--bg-img); background-size: cover; background-position: center;
+        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
+        background-image: var(--bg-img);
+        background-size: cover;
+        background-position: center;
+        font-size: 0.6rem;
     }
 
-    /* Затемнение картинок в линейном режиме */
-    .months-grid.linear-mode .month-card::after {
-        content: ''; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 2;
+    /* Наложение затемнения поверх картинки, чтобы текст читался */
+    .months-grid.linear-mode .month-card::before {
+        content: ''; position: absolute; inset: 0; 
+        background: rgba(0, 0, 0, 0.4); z-index: 1;
+    }
+
+    .months-grid.linear-mode .month-card span,
+    .months-grid.linear-mode .month-card .month-indicator {
+        z-index: 2; /* Поднимаем текст и точки над затемнением */
     }
 
     .months-grid.linear-mode .month-indicator {
-        flex-direction: column; width: 12px; bottom: 5%; gap: 3px;
+        width: 30%; bottom: 5%; flex-direction: column; gap: 2px;
     }
+
+    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
+    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
+    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
+    .year-side:hover { color: var(--accent); }
+
+    .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
+    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
+    .dot.red { background: var(--ev-memorial); }
+    .dot.blue { background: var(--ev-meeting); }
 
     .inner-footer {
         position: absolute; bottom: 1vh; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
@@ -134,9 +142,13 @@
     .footer-dot { width: 4px; height: 4px; background: #555; border-radius: 50%; }
 
     @media (orientation: portrait) {
-        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; }
-        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; border-right: none; border-bottom: 1px solid var(--inner-border); }
+        body { background: #0f1112; }
+        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
+        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; flex-direction: column; align-items: stretch; justify-content: flex-start; }
+        .upcoming-box .event-card-mini:nth-of-type(n+4) { display: none; }
+        .main-view { padding: 1vh 4vw 2vh; flex: 1; justify-content: space-between; min-height: 0; }
         .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
+        .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); }
         .inner-footer { display: none; }
     }
     </style>
@@ -187,6 +199,9 @@
     </div>
 
     <script type="module">
+        const user = localStorage.getItem('currentUser');
+        if (!user) { window.location.replace('index.html'); }
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -200,32 +215,17 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const monthImages = ["led.png", "feb.jpg", "mar.jpg", "apr.jpg", "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", "sep.jpg", "oct.jpg", "nov.jpg", "dec.jpg"];
+        
+        // Список картинок для месяцев (файлы должны быть в папке с сайтом)
+        const monthImages = [
+            "jan.jpg", "feb.jpg", "mar.jpg", "apr.jpg", 
+            "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", 
+            "sep.jpg", "oct.jpg", "nov.jpg", "dec.jpg"
+        ];
 
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
-        const user = localStorage.getItem('currentUser');
-        if (!user) { window.location.replace('index.html'); }
         document.getElementById('user-display').innerText = user;
-        if(user && user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'flex';
-
-        function initGrid() {
-            const grid = document.getElementById('months');
-            const now = new Date();
-            let gridHTML = '';
-            monthsNames.forEach((m, i) => {
-                const isToday = (i === now.getMonth() && currentYear === now.getFullYear());
-                const bgStyle = `--bg-img: url('${monthImages[i]}')`;
-                gridHTML += `
-                    <div class="month-card ${isToday ? 'current-active' : ''}" style="${bgStyle}" onclick="goToMonth(${i})">
-                        <span>${m.substring(0, 3)}</span>
-                        <div class="month-indicator" id="ind-${i}"></div>
-                    </div>`;
-            });
-            grid.innerHTML = gridHTML;
-            
-            const savedView = localStorage.getItem('calendarViewMode');
-            if (savedView === 'linear') grid.classList.add('linear-mode');
-        }
+        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'flex';
 
         window.toggleCalendarView = () => {
             const grid = document.getElementById('months');
@@ -233,41 +233,82 @@
             localStorage.setItem('calendarViewMode', grid.classList.contains('linear-mode') ? 'linear' : 'grid');
         };
 
+        function initGrid() {
+            const grid = document.getElementById('months');
+            const now = new Date();
+            const todayMonth = now.getMonth(); 
+            const todayYear = now.getFullYear();
+
+            let gridHTML = '';
+            monthsNames.forEach((m, i) => {
+                const isToday = (i === todayMonth && currentYear === todayYear);
+                const statusClass = isToday ? 'current-active' : '';
+                // Передаем картинку через инлайновый стиль
+                gridHTML += `
+                    <div class="month-card ${statusClass}" 
+                         style="--bg-img: url('${monthImages[i]}')" 
+                         onclick="goToMonth(${i})">
+                        <span>${m.substring(0, 3)}</span>
+                        <div class="month-indicator" id="ind-${i}"></div>
+                    </div>`;
+            });
+            grid.innerHTML = gridHTML;
+
+            // Восстанавливаем сохраненный вид
+            const savedView = localStorage.getItem('calendarViewMode');
+            if (savedView === 'linear') grid.classList.add('linear-mode');
+        }
+
         window.goToMonth = (i) => {
             localStorage.setItem('selectedMonth', i);
             localStorage.setItem('selectedYear', currentYear);
             window.location.href = 'notes.html';
         };
 
-        window.changeYear = (dir) => {
-            currentYear += dir;
-            updateDisp();
-            initGrid();
-            loadData();
+        window.changeYear = (dir) => { 
+            if (!document.startViewTransition) { applyYearChange(dir); return; }
+            document.startViewTransition(() => applyYearChange(dir));
         };
+
+        function applyYearChange(dir) {
+            currentYear += dir; updateDisp(); initGrid(); loadData();
+        }
 
         async function loadData() {
             const container = document.getElementById('next-event-container');
+            if (!container) return;
             container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px;">ПОИСК...</div>';
             
+            const now = new Date();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             let upcomingEvents = [];
-            const snapshots = await Promise.all(Array.from({length: 12}, (_, i) => getDoc(doc(db, "calendar", `${currentYear}_${i}`))));
+
+            for(let i=0; i<12; i++) {
+                const ind = document.getElementById(`ind-${i}`);
+                if(ind) ind.innerHTML = '';
+            }
+
+            const monthPromises = Array.from({length: 12}, (_, i) => getDoc(doc(db, "calendar", `${currentYear}_${i}`)));
+            const snapshots = await Promise.all(monthPromises);
 
             snapshots.forEach((snap, i) => {
-                const ind = document.getElementById(`ind-${i}`);
-                if (ind) ind.innerHTML = '';
                 if (snap.exists()) {
                     const data = snap.data();
+                    const ind = document.getElementById(`ind-${i}`);
                     let hasRed = false, hasBlue = false;
+
                     Object.entries(data).forEach(([day, notes]) => {
+                        if (!Array.isArray(notes)) return;
                         notes.forEach(n => {
                             if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
                             else hasBlue = true;
-                            if (new Date(currentYear, i, parseInt(day)) >= new Date().setHours(0,0,0,0)) {
-                                upcomingEvents.push({ text: n.text, day, mName: monthsNames[i], stamp: new Date(currentYear, i, parseInt(day)), cat: n.category });
+                            const eventDate = new Date(currentYear, i, parseInt(day)).getTime();
+                            if (eventDate >= todayStart) {
+                                upcomingEvents.push({ text: n.text, day: day, mName: monthsNames[i], stamp: eventDate, cat: n.category });
                             }
                         });
                     });
+
                     if (ind) {
                         if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
                         if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
