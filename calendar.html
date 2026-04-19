@@ -94,55 +94,45 @@
         padding: 3vh 3vw;
         position: relative;
     }
-/* Линейный вид (узкие полоски) */
-.months-grid.linear-mode {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 6px; /* Расстояние между полосками */
-    align-items: stretch;
-    overflow: hidden !important; /* ПОЛНОСТЬЮ выключаем скролл */
-    touch-action: none; /* Запрещаем браузеру обрабатывать жесты в этой области */
+/* Базовые стили карточки (как было изначально, плиточки без картинок) */
+.month-card { 
+    background: var(--dark); border-radius: 18px; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+    color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
+    text-transform: uppercase; 
+    font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
+    height: 100%; width: 100%;
+    border: 1px solid transparent;
+    overflow: hidden; /* Важно, чтобы картинка не вылезала за края */
+    z-index: 1;
 }
 
+/* === СТИЛИ ТОЛЬКО ДЛЯ ЛИНЕЙНОГО РЕЖИМА (С КАРТИНКАМИ) === */
 .months-grid.linear-mode .month-card {
-    flex: 1; 
-    min-width: 0; /* Минимальная ширина полоски */
-    height: 100%;
-    border-radius: 12px; /* Более скругленные для полосок */
-    font-size: 0.6rem; /* Уменьшаем шрифт для узкого вида */
-}
-
-/* Адаптация индикаторов (точек) для узких полосок */
-.months-grid.linear-mode .month-indicator {
-    width: 30%;
-    bottom: 5%;
-    flex-direction: column; /* Точки будут одна под другой, если их много */
-    gap: 2px;
-}
-
-/* Стилизация скроллбара, чтобы он был аккуратным */
-       .months-grid.linear-mode::-webkit-scrollbar { height: 4px; }
-.months-grid.linear-mode::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 8px; }
-    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
-    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
-    .year-side:hover { color: var(--accent); }
-
-    .months-grid { 
-        display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
-        gap: clamp(8px, 1.5vh, 20px); 
-        width: 100%; height: 100%; 
-        flex: 1; min-height: 0; 
-    }
-    
-   .month-card { 
-    /* ... твои существующие свойства ... */
+    background-image: var(--bg-img); /* Картинка берется из переменной */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    border-radius: 12px;
+    font-size: 0.6rem; 
+}
+
+/* Затемнение поверх картинки (только в линейном режиме) */
+.months-grid.linear-mode .month-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4); /* Сила затемнения */
+    z-index: -1; /* Прячем под текст */
+}
+
+/* Возвращаем текст и точки поверх картинки */
+.months-grid.linear-mode .month-card span {
     position: relative;
-    overflow: hidden;
-    z-index: 1;
+    z-index: 2;
+}
+.months-grid.linear-mode .month-card .month-indicator {
+    z-index: 2; /* Тут мы не трогаем position: absolute, поэтому точки никуда не убегут! */
 }
 /* Затемнение, чтобы текст читался */
 .month-card::after {
@@ -345,8 +335,8 @@ function initGrid() {
         const isToday = (i === todayMonth && currentYear === todayYear);
         const statusClass = isToday ? 'current-active' : '';
         
-        // Получаем картинку из массива. Если картинки нет, будет пустой фон.
-        const bgImg = monthImages[i] ? `style="background-image: url('${monthImages[i]}');"` : '';
+        // Магия тут: передаем картинку как CSS-переменную (--bg-img)
+        const bgImg = monthImages[i] ? `style="--bg-img: url('${monthImages[i]}');"` : '';
 
         gridHTML += `
             <div class="month-card ${statusClass}" ${bgImg} onclick="goToMonth(${i})">
