@@ -79,7 +79,6 @@
 
     .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; }
 
-    /* === СЕТКА МЕСЯЦЕВ (ОБЫЧНЫЙ ВИД) === */
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
         gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
@@ -91,11 +90,20 @@
         color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
         text-transform: uppercase; font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
         height: 100%; width: 100%; border: 1px solid transparent;
-        overflow: hidden; /* Чтобы картинка не вылезала */
+        overflow: hidden;
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
 
-    /* === ЛИНЕЙНЫЙ ВИД (ПОЛОСКИ С КАРТИНКАМИ) === */
+    /* === ОБНОВЛЕННАЯ ПОДСВЕТКА АКТИВНОГО МЕСЯЦА === */
+    .month-card.current-active { 
+        border: 2px solid var(--accent) !important; 
+        box-shadow: 0 0 15px rgba(9, 224, 227, 0.5); 
+        z-index: 10; 
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    /* Убираем старый ::before для активного месяца, чтобы он не конфликтовал с картинками */
+    .month-card.current-active::before { display: none !important; }
+
     .months-grid.linear-mode {
         display: flex !important; flex-direction: row !important; gap: 6px; 
         align-items: stretch; overflow: hidden !important; touch-action: none;
@@ -109,7 +117,6 @@
         font-size: 0.6rem;
     }
 
-    /* Наложение затемнения поверх картинки, чтобы текст читался */
     .months-grid.linear-mode .month-card::before {
         content: ''; position: absolute; inset: 0; 
         background: rgba(0, 0, 0, 0.4); z-index: 1;
@@ -117,7 +124,7 @@
 
     .months-grid.linear-mode .month-card span,
     .months-grid.linear-mode .month-card .month-indicator {
-        z-index: 2; /* Поднимаем текст и точки над затемнением */
+        z-index: 2;
     }
 
     .months-grid.linear-mode .month-indicator {
@@ -216,7 +223,6 @@
         const db = getFirestore(initializeApp(firebaseConfig));
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         
-        // Список картинок для месяцев (файлы должны быть в папке с сайтом)
         const monthImages = [
             "led.png", "feb.jpg", "mar.jpg", "apr.jpg", 
             "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", 
@@ -243,7 +249,6 @@
             monthsNames.forEach((m, i) => {
                 const isToday = (i === todayMonth && currentYear === todayYear);
                 const statusClass = isToday ? 'current-active' : '';
-                // Передаем картинку через инлайновый стиль
                 gridHTML += `
                     <div class="month-card ${statusClass}" 
                          style="--bg-img: url('${monthImages[i]}')" 
@@ -254,7 +259,6 @@
             });
             grid.innerHTML = gridHTML;
 
-            // Восстанавливаем сохраненный вид
             const savedView = localStorage.getItem('calendarViewMode');
             if (savedView === 'linear') grid.classList.add('linear-mode');
         }
