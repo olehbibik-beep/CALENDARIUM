@@ -18,12 +18,10 @@
         margin: 0; padding: 0; 
         background: var(--bg); color: var(--text-main); 
         display: flex; align-items: center; justify-content: center; 
-        height: 100dvh; /* dvh учитывает интерфейс мобильных браузеров */
-        width: 100vw; 
+        height: 100dvh; width: 100vw; 
         overflow: hidden; 
     }
 
-    /* === БАЗОВЫЕ СТИЛИ И ГОРИЗОНТАЛЬНАЯ ОРИЕНТАЦИЯ (ПК и Ландшафт) === */
     .app-container {
         width: 95vw; height: 90dvh; 
         max-width: 1400px; max-height: 900px;
@@ -43,25 +41,19 @@
         flex-shrink: 0;
     }
 
-   /* === ЕДИНАЯ ШАПКА ПОЛЬЗОВАТЕЛЯ === */
     .user-header { 
         display: flex; align-items: center; justify-content: space-between; 
         margin-bottom: 2vh; width: 100%; position: relative;
     }
     
-    /* Боковые блоки просто прижимаются к краям */
-    .header-left, .header-right { 
-        display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); z-index: 10;
-    }
+    .header-left, .header-right { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); z-index: 10; }
     
-    /* Броня для центра: абсолютное позиционирование. Он НИКОГДА не сместится и не сожмется */
     .header-center { 
         position: absolute; left: 50%; transform: translateX(-50%);
         display: flex; align-items: center; justify-content: center; 
         gap: 8px; z-index: 5; max-width: 50%;
     }
 
-    /* Стили кнопок */
     .icon-btn { 
         background: none; border: none; padding: 5px; cursor: pointer; 
         display: flex; align-items: center; justify-content: center; outline: none;
@@ -74,9 +66,6 @@
     }
     .icon-btn:hover img { opacity: 1; filter: brightness(0) invert(1); }
 
-    /* ИКОНКА ПОЛЬЗОВАТЕЛЯ */
-    .user-icon { width: clamp(25px, 3.5vh, 30px); height: clamp(25px, 3.5vh, 30px); object-fit: contain; opacity: 0.8; flex-shrink: 0; }
-    
     .user-name { 
         font-weight: 700; text-transform: uppercase;
         font-size: clamp(0.75rem, 1.2vw, 1rem); color: #fff; letter-spacing: 1px; 
@@ -88,63 +77,55 @@
     .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; }
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
 
-    .main-view { 
-        flex: 1; 
-        display: flex; flex-direction: column; 
-        padding: 3vh 3vw;
-        position: relative;
+    .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; }
+
+    .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
+    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
+    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
+    .year-side:hover { color: var(--accent); }
+
+    /* === СЕТКА МЕСЯЦЕВ === */
+    .months-grid { 
+        display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
+        gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
     }
-/* === ПЛИТОЧКИ МЕСЯЦЕВ (БАЗОВЫЙ ВИД БЕЗ КАРТИНОК) === */
+    
     .month-card { 
         background: var(--dark); border-radius: 18px; 
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
         color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
-        text-transform: uppercase; 
-        font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
-        height: 100%; width: 100%;
-        border: 1px solid transparent;
-        overflow: hidden; 
-        z-index: 1;
+        text-transform: uppercase; font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
+        height: 100%; width: 100%; border: 1px solid transparent; overflow: hidden;
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
-    .month-card.current-active { background: transparent !important; z-index: 1; }
-    .month-card.current-active::before {
-        content: ''; position: absolute; inset: 0; background: rgba(255,255,255,0.1); 
-        border-radius: 8px; z-index: -1; 
-    }
+    
+    .month-card span { z-index: 5; position: relative; }
 
-    /* ИНДИКАТОРЫ (ТОЧКИ) - ЖЕСТКО ВНИЗУ */
-    .month-indicator { 
-        position: absolute !important; bottom: 10%; 
-        display: flex; gap: 4px; width: 20%; justify-content: center; 
-        z-index: 5; /* Поднимаем точки выше всех слоев */
-    }
+    .month-indicator { position: absolute; bottom: 8%; display: flex; gap: 4px; width: 40%; justify-content: center; z-index: 6; }
     .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
 
-    /* === СТИЛИ ТОЛЬКО ДЛЯ ЛИНЕЙНОГО РЕЖИМА (С КАРТИНКАМИ) === */
+    /* === ЛИНЕЙНЫЙ РЕЖИМ (С КАРТИНКАМИ) === */
+    .months-grid.linear-mode {
+        display: flex !important; flex-direction: row !important; gap: 6px; 
+        align-items: stretch; overflow: hidden !important; touch-action: none;
+    }
+
     .months-grid.linear-mode .month-card {
-        background-image: var(--bg-img);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        border-radius: 12px;
-        font-size: 0.6rem; 
+        flex: 1; min-width: 0; height: 100%; border-radius: 10px;
+        background-image: var(--bg-img); background-size: cover; background-position: center;
     }
 
-    /* Затемнение поверх картинки (только в линейном режиме) */
+    /* Затемнение картинок в линейном режиме */
     .months-grid.linear-mode .month-card::after {
-        content: ''; position: absolute; inset: 0;
-        background: rgba(0, 0, 0, 0.5); /* Чем больше цифра, тем темнее картинка */
-        z-index: 2; /* Кладем затемнение поверх картинки */
+        content: ''; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 2;
     }
 
-    /* Текст над затемнением */
-    .months-grid.linear-mode .month-card span {
-        position: relative;
-        z-index: 3; /* Кладем текст поверх затемнения */
+    .months-grid.linear-mode .month-indicator {
+        flex-direction: column; width: 12px; bottom: 5%; gap: 3px;
     }
+
     .inner-footer {
         position: absolute; bottom: 1vh; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
         background: transparent; padding: 0 3vw; pointer-events: none;
@@ -152,63 +133,10 @@
     .footer-text { font-size: clamp(8px, 0.8vw, 10px); color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
     .footer-dot { width: 4px; height: 4px; background: #555; border-radius: 50%; }
 
-    /* === ВЕРТИКАЛЬНАЯ ОРИЕНТАЦИЯ (Телефоны/Планшеты в портретном режиме) === */
-   /* === ВЕРТИКАЛЬНАЯ ОРИЕНТАЦИЯ (Телефоны/Планшеты в портретном режиме) === */
     @media (orientation: portrait) {
-        body { background: #0f1112; }
-        .app-container {
-            width: 100vw; height: 100dvh; max-height: none; max-width: none;
-            border-radius: 0; flex-direction: column; box-shadow: none;
-        }
-        
-        .sidebar { 
-            width: 100%; max-width: 100%; 
-            height: auto; max-height: 35dvh; /* Строго ограничиваем высоту верхней части */
-            padding: 2vh 4vw 1vh; 
-            border-right: none; border-bottom: 1px solid var(--inner-border);
-            background: #0f1112; 
-            flex-direction: column; /* Возвращаем колонку */
-            align-items: stretch; justify-content: flex-start;
-        }
-        
-        .user-header { margin-bottom: 1vh; width: 100%; }
-        
-        /* Возвращаем блок с событиями и делаем его компактным */
-        .upcoming-box { 
-            display: block; 
-            overflow-y: auto; 
-            margin-top: 0; 
-            padding-right: 5px;
-        }
-        
-        /* Магия CSS: скрываем все карточки событий, начиная с 4-й (оставляем ровно 3) */
-        .upcoming-box .event-card-mini:nth-of-type(n+4) {
-            display: none;
-        }
-
-        /* Делаем сами карточки событий тоньше, чтобы сэкономить место */
-        .event-card-mini { padding: 6px 10px; margin-bottom: 6px; }
-        
-        .main-view { 
-            padding: 1vh 4vw 2vh; 
-            flex: 1; /* Занимает всё оставшееся пространство экрана */
-            justify-content: space-between; 
-            min-height: 0; /* Важно, чтобы сетку не распирало за пределы экрана */
-        }
-        
-        .year-switcher { margin-bottom: 1.5vh; }
-        #display-year { font-size: clamp(2rem, 5vh, 3.5rem); }
-        
-        .months-grid { 
-            grid-template-columns: repeat(3, 1fr); 
-            grid-template-rows: repeat(4, 1fr); 
-            gap: 8px; 
-        }
-        
-        /* Сжимаем плиточки месяцев, чтобы они точно влезли */
-        .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); min-height: 0; }
-        .month-indicator { bottom: 8%; width: 30%; }
-        
+        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; }
+        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; border-right: none; border-bottom: 1px solid var(--inner-border); }
+        .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
         .inner-footer { display: none; }
     }
     </style>
@@ -217,24 +145,21 @@
 
     <div class="app-container">
         <div class="sidebar">
-        <div class="user-header">
+            <div class="user-header">
                 <div class="header-left">
                     <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
                         <img src="QUIT.png" alt="Quit">
                     </button>
                 </div>
-                
                 <div class="header-center">
                     <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
                         <img src="OPTION.png" alt="Options">
                     </button>
                 </div>
-
                 <div class="header-right">
                     <div id="user-display" class="user-name">...</div>
                 </div>
             </div>
-            
             <div class="upcoming-box" id="next-event-container">
                 <div style="font-size:0.6rem; color:#7f8fa6; opacity:0.3; text-align:center;">ЗАГРУЗКА...</div>
             </div>
@@ -242,20 +167,17 @@
 
         <div class="main-view">
             <div class="year-switcher">
-    <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
-    <div id="display-year"></div>
-    <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
-    
-    <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
-        <img src="ORG.png" alt="View">
-    </button>
-</div>
-
+                <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
+                <div id="display-year"></div>
+                <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
+                <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
+                    <img src="ORG.png" alt="View">
+                </button>
+            </div>
             <div class="months-grid" id="months"></div>
-
         </div>
-        
     </div>
+
     <div class="inner-footer">
         <div style="display: flex; align-items: center; gap: 10px;">
             <div class="footer-dot"></div>
@@ -263,10 +185,8 @@
         </div>
         <div class="footer-text">© 2026 CALENDARIUM</div>
     </div>
-    <script type="module">
-        const user = localStorage.getItem('currentUser');
-        if (!user) { window.location.replace('index.html'); }
 
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -280,56 +200,38 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        
+        const monthImages = ["led.png", "feb.jpg", "mar.jpg", "apr.jpg", "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", "sep.jpg", "oct.jpg", "nov.jpg", "dec.jpg"];
+
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
-        
+        const user = localStorage.getItem('currentUser');
+        if (!user) { window.location.replace('index.html'); }
         document.getElementById('user-display').innerText = user;
-        if(user.toLowerCase() === 'admin') {
-            document.getElementById('admin-btn').style.display = 'flex';
+        if(user && user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'flex';
+
+        function initGrid() {
+            const grid = document.getElementById('months');
+            const now = new Date();
+            let gridHTML = '';
+            monthsNames.forEach((m, i) => {
+                const isToday = (i === now.getMonth() && currentYear === now.getFullYear());
+                const bgStyle = `--bg-img: url('${monthImages[i]}')`;
+                gridHTML += `
+                    <div class="month-card ${isToday ? 'current-active' : ''}" style="${bgStyle}" onclick="goToMonth(${i})">
+                        <span>${m.substring(0, 3)}</span>
+                        <div class="month-indicator" id="ind-${i}"></div>
+                    </div>`;
+            });
+            grid.innerHTML = gridHTML;
+            
+            const savedView = localStorage.getItem('calendarViewMode');
+            if (savedView === 'linear') grid.classList.add('linear-mode');
         }
 
-        const monthImages = [
-    "led.png", "feb.jpg", "mar.jpg", "apr.jpg", 
-    "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", 
-    "sep.jpg", "oct.jpg", "nov.jpg", "dec.jpg"
-];
-// Функция переключения
-window.toggleCalendarView = () => {
-    const grid = document.getElementById('months');
-    grid.classList.toggle('linear-mode');
-    
-    // Сохраняем состояние в память
-    const isLinear = grid.classList.contains('linear-mode');
-    localStorage.setItem('calendarViewMode', isLinear ? 'linear' : 'grid');
-};
-
-// Проверка при загрузке страницы (добавьте это в конец вашего скрипта)
-const savedView = localStorage.getItem('calendarViewMode');
-if (savedView === 'linear') {
-    document.getElementById('months').classList.add('linear-mode');
-}
-function initGrid() {
-    const grid = document.getElementById('months');
-    const now = new Date();
-    const todayMonth = now.getMonth(); 
-    const todayYear = now.getFullYear();
-
-    let gridHTML = '';
-    monthsNames.forEach((m, i) => {
-        const isToday = (i === todayMonth && currentYear === todayYear);
-        const statusClass = isToday ? 'current-active' : '';
-        
-        // Магия тут: передаем картинку как CSS-переменную (--bg-img)
-        const bgImg = monthImages[i] ? `style="--bg-img: url('${monthImages[i]}');"` : '';
-
-        gridHTML += `
-            <div class="month-card ${statusClass}" ${bgImg} onclick="goToMonth(${i})">
-                <span>${m.substring(0, 3)}</span>
-                <div class="month-indicator" id="ind-${i}"></div>
-            </div>`;
-    });
-    grid.innerHTML = gridHTML;
-}
+        window.toggleCalendarView = () => {
+            const grid = document.getElementById('months');
+            grid.classList.toggle('linear-mode');
+            localStorage.setItem('calendarViewMode', grid.classList.contains('linear-mode') ? 'linear' : 'grid');
+        };
 
         window.goToMonth = (i) => {
             localStorage.setItem('selectedMonth', i);
@@ -337,102 +239,35 @@ function initGrid() {
             window.location.href = 'notes.html';
         };
 
-        // --- ЛОГИКА ПЛАВНОГО ПЕРЕХОДА И СМЕНЫ ГОДА ---
-        window.changeYear = (dir) => { 
-            if (!document.startViewTransition) {
-                applyYearChange(dir);
-                return;
-            }
-            document.startViewTransition(() => {
-                applyYearChange(dir);
-            });
+        window.changeYear = (dir) => {
+            currentYear += dir;
+            updateDisp();
+            initGrid();
+            loadData();
         };
 
-        function applyYearChange(dir) {
-            currentYear += dir; 
-            updateDisp(); 
-            initGrid(); 
-            loadData();
-        }
-
-        // --- ЛОГИКА СВАЙПОВ ---
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const mainView = document.querySelector('.main-view');
-
-        mainView.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, {passive: true});
-
-        mainView.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, {passive: true});
-
-     function handleSwipe() {
-    // Если сетка в линейном режиме — выходим и не меняем год
-    if (document.getElementById('months').classList.contains('linear-mode')) {
-        return; 
-    }
-
-    const threshold = 50; 
-    if (touchEndX < touchStartX - threshold) {
-        changeYear(1);
-    }
-    if (touchEndX > touchStartX + threshold) {
-        changeYear(-1);
-    }
-}
         async function loadData() {
             const container = document.getElementById('next-event-container');
-            if (!container) return;
-
             container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px;">ПОИСК...</div>';
-
-            const now = new Date();
-            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
             
             let upcomingEvents = [];
-
-            for(let i=0; i<12; i++) {
-                const ind = document.getElementById(`ind-${i}`);
-                if(ind) ind.innerHTML = '';
-            }
-
-            const monthPromises = Array.from({length: 12}, (_, i) => 
-                getDoc(doc(db, "calendar", `${currentYear}_${i}`))
-            );
-            
-            const snapshots = await Promise.all(monthPromises);
+            const snapshots = await Promise.all(Array.from({length: 12}, (_, i) => getDoc(doc(db, "calendar", `${currentYear}_${i}`))));
 
             snapshots.forEach((snap, i) => {
+                const ind = document.getElementById(`ind-${i}`);
+                if (ind) ind.innerHTML = '';
                 if (snap.exists()) {
                     const data = snap.data();
-                    const ind = document.getElementById(`ind-${i}`);
-                    let hasRed = false;
-                    let hasBlue = false;
-
+                    let hasRed = false, hasBlue = false;
                     Object.entries(data).forEach(([day, notes]) => {
-                        if (!Array.isArray(notes)) return;
-
                         notes.forEach(n => {
                             if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
                             else hasBlue = true;
-
-                            const eventDate = new Date(currentYear, i, parseInt(day)).getTime();
-
-                            if (eventDate >= todayStart) {
-                                upcomingEvents.push({
-                                    text: n.text,
-                                    day: day,
-                                    mName: monthsNames[i],
-                                    stamp: eventDate,
-                                    cat: n.category
-                                });
+                            if (new Date(currentYear, i, parseInt(day)) >= new Date().setHours(0,0,0,0)) {
+                                upcomingEvents.push({ text: n.text, day, mName: monthsNames[i], stamp: new Date(currentYear, i, parseInt(day)), cat: n.category });
                             }
                         });
                     });
-
                     if (ind) {
                         if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
                         if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
@@ -441,16 +276,11 @@ function initGrid() {
             });
 
             upcomingEvents.sort((a, b) => a.stamp - b.stamp);
-
             if (upcomingEvents.length > 0) {
                 let html = '<div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">АКТУАЛЬНОЕ</div>';
                 upcomingEvents.slice(0, 5).forEach(ev => {
                     const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
-                    html += `
-                        <div class="event-card-mini" style="border-left-color: ${color}">
-                            <div class="ev-title">${ev.text}</div>
-                            <div class="ev-date">${ev.day} ${ev.mName}</div>
-                        </div>`;
+                    html += `<div class="event-card-mini" style="border-left-color: ${color}"><div class="ev-title">${ev.text}</div><div class="ev-date">${ev.day} ${ev.mName}</div></div>`;
                 });
                 container.innerHTML = html;
             } else {
