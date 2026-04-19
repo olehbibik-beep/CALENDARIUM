@@ -94,61 +94,18 @@
         padding: 3vh 3vw;
         position: relative;
     }
-/* Базовые стили карточки (как было изначально, плиточки без картинок) */
-.month-card { 
-    background: var(--dark); border-radius: 18px; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; 
-    color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
-    text-transform: uppercase; 
-    font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
-    height: 100%; width: 100%;
-    border: 1px solid transparent;
-    overflow: hidden; /* Важно, чтобы картинка не вылезала за края */
-    z-index: 1;
-}
-
-/* === СТИЛИ ТОЛЬКО ДЛЯ ЛИНЕЙНОГО РЕЖИМА (С КАРТИНКАМИ) === */
-.months-grid.linear-mode .month-card {
-    background-image: var(--bg-img); /* Картинка берется из переменной */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 12px;
-    font-size: 0.6rem; 
-}
-
-/* Затемнение поверх картинки (только в линейном режиме) */
-.months-grid.linear-mode .month-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4); /* Сила затемнения */
-    z-index: -1; /* Прячем под текст */
-}
-
-/* Возвращаем текст и точки поверх картинки */
-.months-grid.linear-mode .month-card span {
-    position: relative;
-    z-index: 2;
-}
-.months-grid.linear-mode .month-card .month-indicator {
-    z-index: 2; /* Тут мы не трогаем position: absolute, поэтому точки никуда не убегут! */
-}
-/* Затемнение, чтобы текст читался */
-.month-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3); /* 0.3 — это степень затемнения */
-    z-index: -1;
-}
-
-/* Поднимаем текст и точки над затемнением */
-.month-card span, 
-.month-card .month-indicator {
-    position: relative;
-    z-index: 2;
-}
+/* === ПЛИТОЧКИ МЕСЯЦЕВ (БАЗОВЫЙ ВИД БЕЗ КАРТИНОК) === */
+    .month-card { 
+        background: var(--dark); border-radius: 18px; 
+        display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
+        text-transform: uppercase; 
+        font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
+        height: 100%; width: 100%;
+        border: 1px solid transparent;
+        overflow: hidden; 
+        z-index: 1;
+    }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
     .month-card.current-active { background: transparent !important; z-index: 1; }
     .month-card.current-active::before {
@@ -156,11 +113,38 @@
         border-radius: 8px; z-index: -1; 
     }
 
-    .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
+    /* ИНДИКАТОРЫ (ТОЧКИ) - ЖЕСТКО ВНИЗУ */
+    .month-indicator { 
+        position: absolute !important; bottom: 10%; 
+        display: flex; gap: 4px; width: 20%; justify-content: center; 
+        z-index: 5; /* Поднимаем точки выше всех слоев */
+    }
     .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
 
+    /* === СТИЛИ ТОЛЬКО ДЛЯ ЛИНЕЙНОГО РЕЖИМА (С КАРТИНКАМИ) === */
+    .months-grid.linear-mode .month-card {
+        background-image: var(--bg-img);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 12px;
+        font-size: 0.6rem; 
+    }
+
+    /* Затемнение поверх картинки (только в линейном режиме) */
+    .months-grid.linear-mode .month-card::after {
+        content: ''; position: absolute; inset: 0;
+        background: rgba(0, 0, 0, 0.5); /* Чем больше цифра, тем темнее картинка */
+        z-index: 2; /* Кладем затемнение поверх картинки */
+    }
+
+    /* Текст над затемнением */
+    .months-grid.linear-mode .month-card span {
+        position: relative;
+        z-index: 3; /* Кладем текст поверх затемнения */
+    }
     .inner-footer {
         position: absolute; bottom: 1vh; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between;
         background: transparent; padding: 0 3vw; pointer-events: none;
