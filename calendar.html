@@ -135,16 +135,30 @@
         flex: 1; min-height: 0; 
     }
     
-    .month-card { 
-        background: var(--dark); border-radius: 18px; 
-        display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        color: #fff; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
-        text-transform: uppercase; 
-        font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
-        height: 100%; width: 100%;
-        border: 1px solid transparent;
-    }
+   .month-card { 
+    /* ... твои существующие свойства ... */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+/* Затемнение, чтобы текст читался */
+.month-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3); /* 0.3 — это степень затемнения */
+    z-index: -1;
+}
 
+/* Поднимаем текст и точки над затемнением */
+.month-card span, 
+.month-card .month-indicator {
+    position: relative;
+    z-index: 2;
+}
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
     .month-card.current-active { background: transparent !important; z-index: 1; }
     .month-card.current-active::before {
@@ -299,6 +313,12 @@
         if(user.toLowerCase() === 'admin') {
             document.getElementById('admin-btn').style.display = 'flex';
         }
+
+        const monthImages = [
+    "jan.jpg", "feb.jpg", "mar.jpg", "apr.jpg", 
+    "may.jpg", "jun.jpg", "jul.jpg", "aug.jpg", 
+    "sep.jpg", "oct.jpg", "nov.jpg", "dec.jpg"
+];
 // Функция переключения
 window.toggleCalendarView = () => {
     const grid = document.getElementById('months');
@@ -314,24 +334,28 @@ const savedView = localStorage.getItem('calendarViewMode');
 if (savedView === 'linear') {
     document.getElementById('months').classList.add('linear-mode');
 }
-        function initGrid() {
-            const grid = document.getElementById('months');
-            const now = new Date();
-            const todayMonth = now.getMonth(); 
-            const todayYear = now.getFullYear();
+function initGrid() {
+    const grid = document.getElementById('months');
+    const now = new Date();
+    const todayMonth = now.getMonth(); 
+    const todayYear = now.getFullYear();
 
-            let gridHTML = '';
-            monthsNames.forEach((m, i) => {
-                const isToday = (i === todayMonth && currentYear === todayYear);
-                const statusClass = isToday ? 'current-active' : '';
-                gridHTML += `
-                    <div class="month-card ${statusClass}" onclick="goToMonth(${i})">
-                        <span>${m.substring(0, 3)}</span>
-                        <div class="month-indicator" id="ind-${i}"></div>
-                    </div>`;
-            });
-            grid.innerHTML = gridHTML;
-        }
+    let gridHTML = '';
+    monthsNames.forEach((m, i) => {
+        const isToday = (i === todayMonth && currentYear === todayYear);
+        const statusClass = isToday ? 'current-active' : '';
+        
+        // Получаем картинку из массива. Если картинки нет, будет пустой фон.
+        const bgImg = monthImages[i] ? `style="background-image: url('${monthImages[i]}');"` : '';
+
+        gridHTML += `
+            <div class="month-card ${statusClass}" ${bgImg} onclick="goToMonth(${i})">
+                <span>${m.substring(0, 3)}</span>
+                <div class="month-indicator" id="ind-${i}"></div>
+            </div>`;
+    });
+    grid.innerHTML = gridHTML;
+}
 
         window.goToMonth = (i) => {
             localStorage.setItem('selectedMonth', i);
