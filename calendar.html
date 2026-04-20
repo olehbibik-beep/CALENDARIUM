@@ -98,7 +98,7 @@
     .month-card.current-active { 
         border: 0px solid var(--accent) !important; 
         z-index: 10; 
-        background: rgba(0, 0, 0, 0.1);
+        background: rgba(0, 0, 0, 0.9);
     }
     /* Убираем старый ::before для активного месяца, чтобы он не конфликтовал с картинками */
     .month-card.current-active::before { display: none !important; }
@@ -110,7 +110,7 @@
     }
     /* Если хочешь, чтобы при наведении уходила темнота (затемнение) */
     .months-grid.linear-mode .month-card:hover::before {
-        background: rgba(0, 0, 0, 0.1); /* Делаем затемнение почти прозрачным */
+        background: rgba(0, 0, 0, 0.9); /* Делаем затемнение почти прозрачным */
     }
 
     .months-grid.linear-mode {
