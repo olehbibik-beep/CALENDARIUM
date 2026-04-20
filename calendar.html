@@ -106,7 +106,7 @@
        /* Эффект при наведении в режиме полосок (линейном) */
     .months-grid.linear-mode .month-card:hover {
         z-index: 5; /* Чтобы была поверх соседних при увеличении */
-        filter: brightness(0.4); /* Становится светлее */
+        filter: brightness(0.9); /* Становится светлее */
     }
     /* Если хочешь, чтобы при наведении уходила темнота (затемнение) */
     .months-grid.linear-mode .month-card:hover::before {
@@ -124,7 +124,7 @@
     background-image: var(--bg-img);
     
     /* ИЗМЕНЕНИЯ ТУТ: */
-    background-size: cover;
+    background-size: 100%;
     background-repeat: no-repeat; /* Чтобы картинка была одна */
     background-position: center;  /* Центрируем */
     
