@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Главная | CALENDARIUM</title>
-   <style>
+    <style>
     :root { 
         --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
         --ev-memorial: #ff7675; --ev-meeting: #09e0e3; --text-main: #e0e6ed;
@@ -77,7 +77,7 @@
     .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; }
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
 
-    .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; }
+    .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; overflow: hidden; }
 
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
@@ -94,23 +94,19 @@
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
 
-    /* === ОБНОВЛЕННАЯ ПОДСВЕТКА АКТИВНОГО МЕСЯЦА === */
     .month-card.current-active { 
         border: 0px solid var(--accent) !important; 
         z-index: 10; 
         background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4)
     }
-    /* Убираем старый ::before для активного месяца, чтобы он не конфликтовал с картинками */
     .month-card.current-active::before { display: none !important; }
 
-       /* Эффект при наведении в режиме полосок (линейном) */
     .months-grid.linear-mode .month-card:hover {
-        z-index: 5; /* Чтобы была поверх соседних при увеличении */
-        filter: brightness(0.9); /* Становится светлее */
+        z-index: 5; 
+        filter: brightness(0.9); 
     }
-    /* Если хочешь, чтобы при наведении уходила темнота (затемнение) */
     .months-grid.linear-mode .month-card:hover::before {
-        background: rgba(255, 255, 255, 0.1); /* Делаем затемнение почти прозрачным */
+        background: rgba(255, 255, 255, 0.1); 
     }
 
     .months-grid.linear-mode {
@@ -119,17 +115,14 @@
     }
 
     .months-grid.linear-mode .month-card {
-    flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-    background: rgba(46, 82, 86, 0.6);    
-    background-image: var(--bg-img);
-    
-    /* ИЗМЕНЕНИЯ ТУТ: */
-    background-size: 90%;
-    background-repeat: no-repeat; /* Чтобы картинка была одна */
-    background-position: center 40px;  /* Центрируем */
-    
-    font-size: 0.6rem;
-}
+        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
+        background: rgba(46, 82, 86, 0.6);    
+        background-image: var(--bg-img);
+        background-size: 90%;
+        background-repeat: no-repeat; 
+        background-position: center 40px;  
+        font-size: 0.6rem;
+    }
 
     .months-grid.linear-mode .month-card::before {
         content: ''; position: absolute; inset: 0; 
@@ -162,6 +155,71 @@
     .footer-text { font-size: clamp(8px, 0.8vw, 10px); color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
     .footer-dot { width: 4px; height: 4px; background: #555; border-radius: 50%; }
 
+    /* ========================================================= */
+    /* НОВЫЕ СТИЛИ ДЛЯ ПАНЕЛИ ОБЪЯВЛЕНИЙ И КНОПКИ-СТРЕЛКИ        */
+    /* ========================================================= */
+    
+    .board-toggle-btn {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.05);
+        border: none;
+        padding: 20px 5px;
+        border-radius: 15px 0 0 15px;
+        cursor: pointer;
+        z-index: 100;
+        transition: 0.3s;
+    }
+    .board-toggle-btn:hover { background: var(--accent); }
+    /* Простая стрелочка через юникод, чтобы не зависеть от картинок */
+    .board-toggle-btn::before {
+        content: '◀';
+        color: rgba(255,255,255,0.5);
+        font-size: 14px;
+    }
+    .board-toggle-btn:hover::before { color: #000; }
+
+    .announcements-overlay {
+        position: absolute;
+        inset: 0; 
+        background: rgba(15, 17, 18, 0.95);
+        backdrop-filter: blur(10px);
+        z-index: 200;
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+        transform: translateX(100%); 
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .announcements-overlay.active { transform: translateX(0); }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 15px;
+    }
+    .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--accent); }
+    
+    .close-panel-btn {
+        background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s;
+    }
+    .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
+
+    .board-items { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 15px; padding-right: 10px; }
+    .board-card {
+        background: rgba(255,255,255,0.03);
+        padding: 20px;
+        border-radius: 15px;
+        border-left: 3px solid var(--accent);
+    }
+    .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
+    .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+
     @media (orientation: portrait) {
         body { background: #0f1112; }
         .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
@@ -171,6 +229,7 @@
         .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
         .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); }
         .inner-footer { display: none; }
+        .announcements-overlay { padding: 20px; }
     }
     </style>
 </head>
@@ -200,7 +259,7 @@
 
         <div class="main-view">
             <div class="year-switcher">
-                <button class="icon-btn" onclick="location.href='board.html'" title="Объявления" style="margin-right: 15px;">
+                <button class="icon-btn" id="board-edit-btn" onclick="location.href='board.html'" title="Редактор Объявлений" style="margin-right: 15px; display: none;">
                     <img src="BOARD.png" alt="Board">
                 </button>
 
@@ -212,7 +271,21 @@
                     <img src="ORG.png" alt="View">
                 </button>
             </div>
+            
             <div class="months-grid" id="months"></div>
+
+            <div id="announcements-panel" class="announcements-overlay">
+                <div class="panel-header">
+                    <h2>ОБЪЯВЛЕНИЯ</h2>
+                    <button class="close-panel-btn" onclick="toggleBoard()" title="Закрыть">✕</button>
+                </div>
+                <div id="board-content" class="board-items">
+                    <div style="text-align:center; opacity:0.3; margin-top:50px;">ЗАГРУЗКА...</div>
+                </div>
+            </div>
+
+            <button class="board-toggle-btn" onclick="toggleBoard()" title="Открыть объявления"></button>
+
         </div>
     </div>
 
@@ -250,7 +323,12 @@
 
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
         document.getElementById('user-display').innerText = user;
-        if(user.toLowerCase() === 'admin') document.getElementById('admin-btn').style.display = 'flex';
+        
+        // Показываем кнопки настроек и редактора объявлений ТОЛЬКО если это admin
+        if(user.toLowerCase() === 'admin') {
+            document.getElementById('admin-btn').style.display = 'flex';
+            document.getElementById('board-edit-btn').style.display = 'flex';
+        }
 
         window.toggleCalendarView = () => {
             const grid = document.getElementById('months');
@@ -297,6 +375,53 @@
             currentYear += dir; updateDisp(); initGrid(); loadData();
         }
 
+        // ==========================================
+        // ЛОГИКА ПАНЕЛИ ОБЪЯВЛЕНИЙ
+        // ==========================================
+        window.toggleBoard = async () => {
+            const panel = document.getElementById('announcements-panel');
+            panel.classList.toggle('active');
+            
+            // Если открыли панель - подгружаем актуальные данные из Firebase
+            if(panel.classList.contains('active')) {
+                await loadBoardData();
+            }
+        };
+
+        async function loadBoardData() {
+            const content = document.getElementById('board-content');
+            content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px;">ОБНОВЛЕНИЕ...</div>';
+            
+            try {
+                // ВНИМАНИЕ: Скрипт ищет документ "general" в коллекции "board"
+                const snap = await getDoc(doc(db, "board", "general")); 
+                
+                if (snap.exists() && Object.keys(snap.data()).length > 0) {
+                    const data = snap.data();
+                    let html = '';
+                    
+                    // Перебираем все сохраненные объявления
+                    Object.values(data).forEach(item => {
+                        html += `
+                            <div class="board-card">
+                                <h3>${item.title || 'Внимание'}</h3>
+                                <p>${item.text || item.desc || item}</p>
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
+                }
+            } catch (e) {
+                console.error("Ошибка при загрузке доски:", e);
+                content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px;">ОШИБКА ЗАГРУЗКИ</div>';
+            }
+        }
+
+        // ==========================================
+        // ЗАГРУЗКА КАЛЕНДАРЯ
+        // ==========================================
         async function loadData() {
             const container = document.getElementById('next-event-container');
             if (!container) return;
