@@ -96,9 +96,9 @@
 
     /* === ОБНОВЛЕННАЯ ПОДСВЕТКА АКТИВНОГО МЕСЯЦА === */
     .month-card.current-active { 
-        border: 0px solid var(--accent) !important; 
+        border: 1px solid var(--accent) !important; 
         z-index: 10; 
-        background: rgba(255, 255, 255, 0.1) !important;
+        background: transparent;
     }
     /* Убираем старый ::before для активного месяца, чтобы он не конфликтовал с картинками */
     .month-card.current-active::before { display: none !important; }
