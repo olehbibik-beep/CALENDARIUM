@@ -73,7 +73,22 @@
     }
 
     .upcoming-box { margin-top: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
-    .event-card-mini { background: transparent; padding: 10px; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--accent); }
+    /* Обновленный стиль карточки события */
+    .event-card-mini { 
+        background: rgba(255, 255, 255, 0); /* Изначально прозрачный фон */
+        padding: 10px; 
+        border-radius: 8px; /* Сделаем чуть более скругленными для красоты */
+        margin-bottom: 10px; 
+        border-left: 4px solid var(--accent); 
+        transition: background 0.3s ease; /* Плавное появление подсветки */
+        cursor: default; /* Указываем, что это просто информационный элемент */
+    }
+
+    /* Эффект при наведении или нажатии пальцем */
+    .event-card-mini:hover { 
+        background: rgba(255, 255, 255, 0.08); /* Светлое выделение */
+    }
+
     .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; }
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
 
