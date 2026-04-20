@@ -55,26 +55,43 @@
     .add-post-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: auto; text-transform: uppercase; transition: 0.2s; display: none; }
     .add-post-btn:active { transform: scale(0.96); }
 
-    /* === ДОСКА ОБЪЯВЛЕНИЙ === */
+    /* === ДОСКА ОБЪЯВЛЕНИЙ (СЕТКА/ПЛИТКИ) === */
     .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; overflow: hidden; }
-    .feed-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-right: 10px; }
     
-    /* Скроллбар для ленты */
+    .feed-container { 
+        flex: 1; overflow-y: auto; padding-right: 10px;
+        display: grid; 
+        grid-template-columns: repeat(2, 1fr); /* Делаем 2 плитки в ряд */
+        grid-auto-rows: max-content;
+        gap: 20px; 
+        align-content: start;
+    }
+    
     .feed-container::-webkit-scrollbar { width: 6px; }
     .feed-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
     .post-card { background: var(--dark); border-radius: 16px; padding: 20px; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 10px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-    .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8fa6; font-weight: 700; text-transform: uppercase; }
-    .post-text { font-size: clamp(0.85rem, 1.5vw, 1rem); line-height: 1.6; color: #fff; white-space: pre-wrap; word-break: break-word; }
-    .post-image { max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; margin-top: 10px; background: rgba(0,0,0,0.2); }
+    .post-header { display: flex; justify-content: space-between; align-items: flex-start; font-size: 0.7rem; color: #7f8fa6; font-weight: 700; text-transform: uppercase; }
     
-    .delete-btn { background: rgba(255, 118, 117, 0.1); color: #ff7675; border: 1px solid #ff7675; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; font-weight: bold; transition: 0.2s; }
-    .delete-btn:hover { background: #ff7675; color: #fff; }
+    .post-actions { display: flex; gap: 8px; }
+    .action-mini { font-size: 1.2rem; cursor: pointer; font-weight: bold; transition: 0.2s; padding: 0 5px; }
+    .action-mini.edit { color: #888; }
+    .action-mini.edit:hover { color: var(--accent); }
+    .action-mini.delete { color: var(--ev-memorial); }
+    .action-mini.delete:hover { filter: brightness(1.5); }
+
+    .post-text { font-size: clamp(0.85rem, 1.5vw, 0.95rem); line-height: 1.6; color: #fff; white-space: pre-wrap; word-break: break-word; }
+    
+    .post-image { 
+        width: 100%; max-height: 250px; object-fit: cover; border-radius: 8px; margin-top: auto; 
+        background: rgba(0,0,0,0.2); cursor: zoom-in; transition: 0.2s;
+    }
+    .post-image:hover { opacity: 0.8; }
 
     .inner-footer { position: absolute; bottom: 1vh; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; background: transparent; padding: 0 3vw; pointer-events: none; }
     .footer-text { font-size: clamp(8px, 0.8vw, 10px); color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
 
-    /* === МОДАЛЬНОЕ ОКНО === */
+    /* === МОДАЛЬНОЕ ОКНО СОЗДАНИЯ/РЕДАКТИРОВАНИЯ === */
     .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
     .modal-box { background: var(--card-bg); padding: 4vh 5vw; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
     .modal-title { color: var(--accent); text-align: center; margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -86,14 +103,26 @@
     .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; background: var(--accent); color: #000; }
     .modal-btn.cancel { background: transparent; border: 1px solid #555; color: #aaa; margin-top: -5px; }
 
+    /* === ПРОСМОТРЩИК КАРТИНОК НА ВЕСЬ ЭКРАН === */
+    .image-viewer {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
+        align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
+    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
+    .close-viewer:hover { color: var(--ev-memorial); }
+
+    /* === АДАПТИВ ДЛЯ ТЕЛЕФОНОВ === */
     @media (orientation: portrait) {
         body { background: #0f1112; }
         .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
         .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 30dvh; padding: 2vh 4vw; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; }
         .board-info { margin-top: 10px; }
-        .board-desc { display: none; } /* Скрываем описание на мобилках для экономии места */
+        .board-desc { display: none; }
         .add-post-btn { margin-top: 10px; padding: 10px; font-size: 0.8rem; }
         .main-view { padding: 2vh 4vw; flex: 1; min-height: 0; }
+        .feed-container { grid-template-columns: 1fr; /* На телефоне плитки выстраиваются в 1 столбик */ gap: 15px; }
+        .post-image { max-height: 200px; }
         .inner-footer { display: none; }
     }
     </style>
@@ -124,14 +153,13 @@
             <div class="board-info">
                 <div class="board-title">Объявления</div>
                 <div class="board-desc">Доска собрания. Здесь публикуются важные новости, графики и расписания.</div>
-                
                 <button id="add-post-btn" class="add-post-btn" onclick="openModal()">+ Написать</button>
             </div>
         </div>
 
         <div class="main-view">
             <div class="feed-container" id="feed">
-                <div style="text-align:center; color:#555; margin-top: 20px; font-size: 0.8rem;">Загрузка объявлений...</div>
+                <div style="text-align:center; color:#555; margin-top: 20px; font-size: 0.8rem; grid-column: 1 / -1;">Загрузка объявлений...</div>
             </div>
         </div>
     </div>
@@ -146,13 +174,18 @@
 
     <div id="modal" class="modal">
         <div class="modal-box">
-            <h3 class="modal-title">Новое объявление</h3>
-            <textarea id="post-text" class="modal-input" placeholder="Введите текст объявления..."></textarea>
-            <input type="text" id="post-img" class="modal-input" placeholder="Ссылка на картинку (URL) - не обязательно">
+            <h3 class="modal-title" id="modal-title">НОВОЕ ОБЪЯВЛЕНИЕ</h3>
+            <textarea id="post-text" class="modal-input" placeholder="Введите текст..."></textarea>
+            <input type="text" id="post-img" class="modal-input" placeholder="Ссылка на фото (URL) - необязательно">
             
-            <button class="modal-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
+            <button class="modal-btn" onclick="publishPost()">СОХРАНИТЬ</button>
             <button class="modal-btn cancel" onclick="closeModal()">ОТМЕНА</button>
         </div>
+    </div>
+
+    <div id="image-viewer" class="image-viewer" onclick="closeViewer()">
+        <div class="close-viewer">✕</div>
+        <img id="viewer-img" src="" alt="View">
     </div>
 
     <script type="module">
@@ -163,7 +196,6 @@
         document.getElementById('user-display').innerText = user;
         const isAdmin = (user === 'admin');
 
-        // Показываем элементы управления только админу
         if(isAdmin) {
             document.getElementById('admin-btn').style.display = 'flex';
             document.getElementById('add-post-btn').style.display = 'block';
@@ -181,12 +213,12 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
-        
-        // Будем хранить все посты в одном документе (board/main)
         const boardDocRef = doc(db, "board", "main");
+        
         let postsData = [];
+        let editingPostId = null; // Переменная для хранения ID поста, который редактируют
 
-        // Слушаем базу данных в реальном времени
+        // Слушаем изменения
         onSnapshot(boardDocRef, (snapshot) => {
             if (snapshot.exists()) {
                 postsData = snapshot.data().posts || [];
@@ -197,70 +229,108 @@
             }
         });
 
-        function renderFeed() {
+        // Отрисовка сетки
+        window.renderFeed = () => {
             const feed = document.getElementById('feed');
             if (postsData.length === 0) {
-                feed.innerHTML = '<div style="text-align:center; color:#555; margin-top: 50px; font-size: 0.9rem;">Нет активных объявлений</div>';
+                feed.innerHTML = '<div style="text-align:center; color:#555; margin-top: 50px; font-size: 0.9rem; grid-column: 1 / -1;">Нет активных объявлений</div>';
                 return;
             }
 
-            // Сортируем посты так, чтобы новые были сверху
             const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
             
             feed.innerHTML = sortedPosts.map(post => {
-                // Если есть картинка, создаем тег img
-                const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Прикрепление">` : '';
-                // Кнопка удаления видна только админу (или автору поста)
-                const deleteHtml = isAdmin ? `<button class="delete-btn" onclick="deletePost(${post.id})">УДАЛИТЬ</button>` : '';
+                // Если картинка есть, вешаем на нее onclick для просмотра
+                const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Прикрепление" onclick="openViewer('${post.imageUrl}')">` : '';
+                
+                // Кнопки управления без confirm, просто крестик и карандаш
+                const controlsHtml = isAdmin ? `
+                    <div class="post-actions">
+                        <div class="action-mini edit" onclick="editPost(${post.id})">✎</div>
+                        <div class="action-mini delete" onclick="deletePost(${post.id})">✕</div>
+                    </div>
+                ` : '';
                 
                 return `
                     <div class="post-card">
                         <div class="post-header">
-                            <span>${post.date} • ${post.author}</span>
-                            ${deleteHtml}
+                            <span style="padding-top:4px;">${post.date}</span>
+                            ${controlsHtml}
                         </div>
                         <div class="post-text">${post.text}</div>
                         ${imageHtml}
                     </div>
                 `;
             }).join('');
-        }
+        };
 
+        // ПРОСМОТР ФОТО
+        window.openViewer = (url) => {
+            document.getElementById('viewer-img').src = url;
+            document.getElementById('image-viewer').style.display = 'flex';
+        };
+        window.closeViewer = () => {
+            document.getElementById('image-viewer').style.display = 'none';
+        };
+
+        // ДОБАВЛЕНИЕ (Очищает форму)
         window.openModal = () => {
+            editingPostId = null; // Сбрасываем ID
+            document.getElementById('modal-title').innerText = "НОВОЕ ОБЪЯВЛЕНИЕ";
             document.getElementById('post-text').value = '';
             document.getElementById('post-img').value = '';
             document.getElementById('modal').style.display = 'flex';
         };
 
-        window.closeModal = () => {
-            document.getElementById('modal').style.display = 'none';
+        // РЕДАКТИРОВАНИЕ (Заполняет форму)
+        window.editPost = (id) => {
+            const postToEdit = postsData.find(p => p.id === id);
+            if (!postToEdit) return;
+            
+            editingPostId = id; // Запоминаем что именно редактируем
+            document.getElementById('modal-title').innerText = "РЕДАКТИРОВАТЬ";
+            document.getElementById('post-text').value = postToEdit.text;
+            document.getElementById('post-img').value = postToEdit.imageUrl || '';
+            document.getElementById('modal').style.display = 'flex';
         };
 
+        window.closeModal = () => document.getElementById('modal').style.display = 'none';
+
+        // СОХРАНЕНИЕ / ОБНОВЛЕНИЕ
         window.publishPost = async () => {
             const text = document.getElementById('post-text').value.trim();
             const imgUrl = document.getElementById('post-img').value.trim();
             
-            if (!text && !imgUrl) {
-                alert('Объявление не может быть пустым!');
-                return;
+            if (!text && !imgUrl) return alert('Объявление не может быть пустым!');
+
+            let updatedPosts;
+
+            if (editingPostId) {
+                // Если редактируем, обновляем нужный объект в массиве
+                updatedPosts = postsData.map(p => {
+                    if (p.id === editingPostId) {
+                        return { ...p, text: text, imageUrl: imgUrl };
+                    }
+                    return p;
+                });
+            } else {
+                // Если создаем новое, добавляем в массив
+                const newPost = {
+                    id: Date.now(),
+                    author: userRaw,
+                    date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' }),
+                    text: text,
+                    imageUrl: imgUrl
+                };
+                updatedPosts = [...postsData, newPost];
             }
-
-            const newPost = {
-                id: Date.now(),
-                author: userRaw,
-                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' }),
-                text: text,
-                imageUrl: imgUrl
-            };
-
-            const updatedPosts = [...postsData, newPost];
             
             await setDoc(boardDocRef, { posts: updatedPosts }, { merge: true });
             closeModal();
         };
 
+        // БЫСТРОЕ УДАЛЕНИЕ (Без confirm)
         window.deletePost = async (idToDel) => {
-            if(!confirm('Удалить объявление?')) return;
             const updatedPosts = postsData.filter(p => p.id !== idToDel);
             await setDoc(boardDocRef, { posts: updatedPosts }, { merge: true });
         };
