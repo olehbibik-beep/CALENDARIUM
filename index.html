@@ -628,25 +628,16 @@ function resetUIState() {
             }
             
             // Запускаем проверку, чтобы разблокировать холст ключа
-            if (inputField.value) {
+            if (inputField && inputField.value) {
                 checkName(inputField.value);
             }
         });
+
         // Старт
-        initDots(); draw();
+        initDots(); 
+        draw();
         fetchEventsCount();
         setPanelState('info');
-        // Событие 'pageshow' срабатывает даже при возврате кнопкой "Назад"
-window.addEventListener('pageshow', () => {
-    // 1. Сбрасываем текущую сессию для безопасности
-    localStorage.removeItem('currentUser');
-    
-    // 2. Проверяем, вписал ли браузер имя из кэша
-    const inputField = document.getElementById('username');
-    if (inputField) {
-        checkName(inputField.value);
-    }
-});
     </script>
 </body>
 </html>
