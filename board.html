@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="view-transition" content="same-origin">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Объявления | CALENDARIUM</title>
+    <style>
+    :root { 
+        --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
+        --ev-memorial: #ff7675; --ev-meeting: #09e0e3; --text-main: #e0e6ed;
+        --inner-border: rgba(255, 255, 255, 0.05);
+    }
+    
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body { 
+        margin: 0; padding: 0; 
+        background: var(--bg); color: var(--text-main); 
+        display: flex; align-items: center; justify-content: center; 
+        height: 100dvh; width: 100vw; 
+        overflow: hidden; 
+    }
+
+    .app-container {
+        width: 95vw; height: 90dvh; 
+        max-width: 1400px; max-height: 900px;
+        background: #0f1112; border-radius: 30px; 
+        display: flex; flex-direction: row; overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .sidebar { 
+        width: 25%; min-width: 220px; max-width: 320px; 
+        background: rgba(80,80,80,0.2); padding: 3vh 2vw; 
+        display: flex; flex-direction: column; border-right: 1px solid var(--inner-border); flex-shrink: 0;
+    }
+
+    /* === ЕДИНАЯ ШАПКА ПОЛЬЗОВАТЕЛЯ === */
+    .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2vh; width: 100%; position: relative; }
+    .header-left, .header-right { display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); z-index: 10; }
+    .header-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; gap: 8px; z-index: 5; max-width: 50%; }
+    
+    .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; flex-shrink: 0; z-index: 50; }
+    .icon-btn img { width: clamp(25px, 3.5vh, 30px); height: clamp(25px, 3.5vh, 30px); object-fit: contain; opacity: 0.5; transition: 0.3s; }
+    .icon-btn:hover img { opacity: 1; filter: drop-shadow(0 0 8px var(--accent)); }
+    
+    .user-icon { width: clamp(25px, 3.5vh, 30px); height: clamp(25px, 3.5vh, 30px); object-fit: contain; opacity: 0.8; flex-shrink: 0; }
+    .user-name { font-weight: 700; text-transform: uppercase; font-size: clamp(0.75rem, 1.2vw, 1rem); color: #fff; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0; }
+
+    /* === ИНФО В САЙДБАРЕ === */
+    .board-info { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+    .board-title { font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 800; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+    .board-desc { font-size: 0.75rem; color: #7f8fa6; line-height: 1.5; }
+    .add-post-btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: auto; text-transform: uppercase; transition: 0.2s; display: none; }
+    .add-post-btn:active { transform: scale(0.96); }
+
+    /* === ДОСКА ОБЪЯВЛЕНИЙ === */
+    .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; overflow: hidden; }
+    .feed-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-right: 10px; }
+    
+    /* Скроллбар для ленты */
+    .feed-container::-webkit-scrollbar { width: 6px; }
+    .feed-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+    .post-card { background: var(--dark); border-radius: 16px; padding: 20px; border-left: 4px solid var(--accent); display: flex; flex-direction: column; gap: 10px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    .post-header { display: flex; justify-content: space-between; font-size: 0.7rem; color: #7f8fa6; font-weight: 700; text-transform: uppercase; }
+    .post-text { font-size: clamp(0.85rem, 1.5vw, 1rem); line-height: 1.6; color: #fff; white-space: pre-wrap; word-break: break-word; }
+    .post-image { max-width: 100%; max-height: 400px; object-fit: contain; border-radius: 8px; margin-top: 10px; background: rgba(0,0,0,0.2); }
+    
+    .delete-btn { background: rgba(255, 118, 117, 0.1); color: #ff7675; border: 1px solid #ff7675; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.6rem; font-weight: bold; transition: 0.2s; }
+    .delete-btn:hover { background: #ff7675; color: #fff; }
+
+    .inner-footer { position: absolute; bottom: 1vh; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; background: transparent; padding: 0 3vw; pointer-events: none; }
+    .footer-text { font-size: clamp(8px, 0.8vw, 10px); color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
+
+    /* === МОДАЛЬНОЕ ОКНО === */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+    .modal-box { background: var(--card-bg); padding: 4vh 5vw; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
+    .modal-title { color: var(--accent); text-align: center; margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .modal-input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--inner-border); background: var(--dark); color: white; outline: none; font-size: 0.9rem; }
+    .modal-input:focus { border-color: var(--accent); }
+    textarea.modal-input { height: 120px; resize: none; }
+    
+    .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; color: white; transition: 0.2s; text-transform: uppercase; font-size: 0.8rem; background: var(--accent); color: #000; }
+    .modal-btn.cancel { background: transparent; border: 1px solid #555; color: #aaa; margin-top: -5px; }
+
+    @media (orientation: portrait) {
+        body { background: #0f1112; }
+        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
+        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 30dvh; padding: 2vh 4vw; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; }
+        .board-info { margin-top: 10px; }
+        .board-desc { display: none; } /* Скрываем описание на мобилках для экономии места */
+        .add-post-btn { margin-top: 10px; padding: 10px; font-size: 0.8rem; }
+        .main-view { padding: 2vh 4vw; flex: 1; min-height: 0; }
+        .inner-footer { display: none; }
+    }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="user-header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
+                        <img src="OPTION.png" alt="Back" style="transform: rotate(-90deg);">
+                    </button>
+                </div>
+                
+                <div class="header-center">
+                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
+                        <img src="OPTION.png" alt="Options">
+                    </button>
+                </div>
+
+                <div class="header-right">
+                    <img src="MAN.png" class="user-icon" alt="User">
+                    <div id="user-display" class="user-name">...</div>
+                </div>
+            </div>
+            
+            <div class="board-info">
+                <div class="board-title">Объявления</div>
+                <div class="board-desc">Доска собрания. Здесь публикуются важные новости, графики и расписания.</div>
+                
+                <button id="add-post-btn" class="add-post-btn" onclick="openModal()">+ Написать</button>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div class="feed-container" id="feed">
+                <div style="text-align:center; color:#555; margin-top: 20px; font-size: 0.8rem;">Загрузка объявлений...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="inner-footer">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="footer-dot"></div>
+            <div class="footer-text">Group 5 • v2.6.16</div>
+        </div>
+        <div class="footer-text">ДОСКА ОБЪЯВЛЕНИЙ</div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-box">
+            <h3 class="modal-title">Новое объявление</h3>
+            <textarea id="post-text" class="modal-input" placeholder="Введите текст объявления..."></textarea>
+            <input type="text" id="post-img" class="modal-input" placeholder="Ссылка на картинку (URL) - не обязательно">
+            
+            <button class="modal-btn" onclick="publishPost()">ОПУБЛИКОВАТЬ</button>
+            <button class="modal-btn cancel" onclick="closeModal()">ОТМЕНА</button>
+        </div>
+    </div>
+
+    <script type="module">
+        const userRaw = localStorage.getItem('currentUser');
+        if (!userRaw) { window.location.replace('index.html'); }
+        const user = userRaw.toLowerCase();
+        
+        document.getElementById('user-display').innerText = user;
+        const isAdmin = (user === 'admin');
+
+        // Показываем элементы управления только админу
+        if(isAdmin) {
+            document.getElementById('admin-btn').style.display = 'flex';
+            document.getElementById('add-post-btn').style.display = 'block';
+        }
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+            authDomain: "calendarium-1f7d7.firebaseapp.com",
+            projectId: "calendarium-1f7d7",
+            storageBucket: "calendarium-1f7d7.firebasestorage.app",
+            appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+        };
+
+        const db = getFirestore(initializeApp(firebaseConfig));
+        
+        // Будем хранить все посты в одном документе (board/main)
+        const boardDocRef = doc(db, "board", "main");
+        let postsData = [];
+
+        // Слушаем базу данных в реальном времени
+        onSnapshot(boardDocRef, (snapshot) => {
+            if (snapshot.exists()) {
+                postsData = snapshot.data().posts || [];
+                renderFeed();
+            } else {
+                postsData = [];
+                renderFeed();
+            }
+        });
+
+        function renderFeed() {
+            const feed = document.getElementById('feed');
+            if (postsData.length === 0) {
+                feed.innerHTML = '<div style="text-align:center; color:#555; margin-top: 50px; font-size: 0.9rem;">Нет активных объявлений</div>';
+                return;
+            }
+
+            // Сортируем посты так, чтобы новые были сверху
+            const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
+            
+            feed.innerHTML = sortedPosts.map(post => {
+                // Если есть картинка, создаем тег img
+                const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Прикрепление">` : '';
+                // Кнопка удаления видна только админу (или автору поста)
+                const deleteHtml = isAdmin ? `<button class="delete-btn" onclick="deletePost(${post.id})">УДАЛИТЬ</button>` : '';
+                
+                return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span>${post.date} • ${post.author}</span>
+                            ${deleteHtml}
+                        </div>
+                        <div class="post-text">${post.text}</div>
+                        ${imageHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.openModal = () => {
+            document.getElementById('post-text').value = '';
+            document.getElementById('post-img').value = '';
+            document.getElementById('modal').style.display = 'flex';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal').style.display = 'none';
+        };
+
+        window.publishPost = async () => {
+            const text = document.getElementById('post-text').value.trim();
+            const imgUrl = document.getElementById('post-img').value.trim();
+            
+            if (!text && !imgUrl) {
+                alert('Объявление не может быть пустым!');
+                return;
+            }
+
+            const newPost = {
+                id: Date.now(),
+                author: userRaw,
+                date: new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute:'2-digit' }),
+                text: text,
+                imageUrl: imgUrl
+            };
+
+            const updatedPosts = [...postsData, newPost];
+            
+            await setDoc(boardDocRef, { posts: updatedPosts }, { merge: true });
+            closeModal();
+        };
+
+        window.deletePost = async (idToDel) => {
+            if(!confirm('Удалить объявление?')) return;
+            const updatedPosts = postsData.filter(p => p.id !== idToDel);
+            await setDoc(boardDocRef, { posts: updatedPosts }, { merge: true });
+        };
+    </script>
+</body>
+</html>
