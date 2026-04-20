@@ -210,12 +210,55 @@
     }
     .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
 
-    .board-items { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 15px; padding-right: 10px; }
+   /* Основной контейнер сетки */
+    .board-items { 
+        display: grid;
+        /* Создаем 4 колонки равной ширины */
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 20px; 
+        padding-right: 10px;
+        overflow-y: auto; 
+        flex: 1; 
+        align-content: start; /* Чтобы карточки не растягивались по высоте, если их мало */
+    }
+
+    /* Стили карточки для плиточного вида */
     .board-card {
         background: rgba(255,255,255,0.03);
         padding: 20px;
         border-radius: 15px;
-        border-left: 3px solid var(--accent);
+        /* Меняем боковую полоску на верхнюю — в сетке так смотрится лучше */
+        border-top: 3px solid var(--accent); 
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .board-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255,255,255,0.06);
+    }
+
+    /* Адаптивность под разные экраны */
+    
+    /* Ноутбуки и небольшие мониторы: 3 в ряд */
+    @media (max-width: 1200px) {
+        .board-items { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* Планшеты: 2 в ряд */
+    @media (max-width: 900px) {
+        .board-items { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Телефоны (Portrait): 1 в ряд */
+    @media (orientation: portrait) {
+        .board-items { 
+            grid-template-columns: 1fr; 
+            gap: 15px;
+        }
+        .announcements-overlay { padding: 20px; }
     }
     .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
     .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
