@@ -61,7 +61,7 @@
     .feed-container { 
         flex: 1; overflow-y: auto; padding-right: 10px;
         display: grid; 
-        grid-template-columns: repeat(2, 1fr); /* Делаем 2 плитки в ряд */
+        grid-template-columns: repeat(2, 1fr); 
         grid-auto-rows: max-content;
         gap: 20px; 
         align-content: start;
@@ -121,7 +121,7 @@
         .board-desc { display: none; }
         .add-post-btn { margin-top: 10px; padding: 10px; font-size: 0.8rem; }
         .main-view { padding: 2vh 4vw; flex: 1; min-height: 0; }
-        .feed-container { grid-template-columns: 1fr; /* На телефоне плитки выстраиваются в 1 столбик */ gap: 15px; }
+        .feed-container { grid-template-columns: 1fr; gap: 15px; }
         .post-image { max-height: 200px; }
         .inner-footer { display: none; }
     }
@@ -133,7 +133,7 @@
         <div class="sidebar">
             <div class="user-header">
                 <div class="header-left">
-                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
+                    <button class="icon-btn" onclick="location.href='index.html'" title="Назад">
                         <img src="OPTION.png" alt="Back" style="transform: rotate(-90deg);">
                     </button>
                 </div>
@@ -213,12 +213,13 @@
         };
 
         const db = getFirestore(initializeApp(firebaseConfig));
-        const boardDocRef = doc(db, "board", "main");
+        
+        // ВАЖНО: ИЗМЕНИЛ "main" НА "general" ДЛЯ СИНХРОНИЗАЦИИ С ГЛАВНОЙ СТРАНИЦЕЙ
+        const boardDocRef = doc(db, "board", "general"); 
         
         let postsData = [];
-        let editingPostId = null; // Переменная для хранения ID поста, который редактируют
+        let editingPostId = null;
 
-        // Слушаем изменения
         onSnapshot(boardDocRef, (snapshot) => {
             if (snapshot.exists()) {
                 postsData = snapshot.data().posts || [];
@@ -229,7 +230,6 @@
             }
         });
 
-        // Отрисовка сетки
         window.renderFeed = () => {
             const feed = document.getElementById('feed');
             if (postsData.length === 0) {
@@ -240,10 +240,8 @@
             const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
             
             feed.innerHTML = sortedPosts.map(post => {
-                // Если картинка есть, вешаем на нее onclick для просмотра
                 const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" class="post-image" alt="Прикрепление" onclick="openViewer('${post.imageUrl}')">` : '';
                 
-                // Кнопки управления без confirm, просто крестик и карандаш
                 const controlsHtml = isAdmin ? `
                     <div class="post-actions">
                         <div class="action-mini edit" onclick="editPost(${post.id})">✎</div>
@@ -264,7 +262,6 @@
             }).join('');
         };
 
-        // ПРОСМОТР ФОТО
         window.openViewer = (url) => {
             document.getElementById('viewer-img').src = url;
             document.getElementById('image-viewer').style.display = 'flex';
@@ -273,21 +270,19 @@
             document.getElementById('image-viewer').style.display = 'none';
         };
 
-        // ДОБАВЛЕНИЕ (Очищает форму)
         window.openModal = () => {
-            editingPostId = null; // Сбрасываем ID
+            editingPostId = null; 
             document.getElementById('modal-title').innerText = "НОВОЕ ОБЪЯВЛЕНИЕ";
             document.getElementById('post-text').value = '';
             document.getElementById('post-img').value = '';
             document.getElementById('modal').style.display = 'flex';
         };
 
-        // РЕДАКТИРОВАНИЕ (Заполняет форму)
         window.editPost = (id) => {
             const postToEdit = postsData.find(p => p.id === id);
             if (!postToEdit) return;
             
-            editingPostId = id; // Запоминаем что именно редактируем
+            editingPostId = id; 
             document.getElementById('modal-title').innerText = "РЕДАКТИРОВАТЬ";
             document.getElementById('post-text').value = postToEdit.text;
             document.getElementById('post-img').value = postToEdit.imageUrl || '';
@@ -296,7 +291,6 @@
 
         window.closeModal = () => document.getElementById('modal').style.display = 'none';
 
-        // СОХРАНЕНИЕ / ОБНОВЛЕНИЕ
         window.publishPost = async () => {
             const text = document.getElementById('post-text').value.trim();
             const imgUrl = document.getElementById('post-img').value.trim();
@@ -306,7 +300,6 @@
             let updatedPosts;
 
             if (editingPostId) {
-                // Если редактируем, обновляем нужный объект в массиве
                 updatedPosts = postsData.map(p => {
                     if (p.id === editingPostId) {
                         return { ...p, text: text, imageUrl: imgUrl };
@@ -314,7 +307,6 @@
                     return p;
                 });
             } else {
-                // Если создаем новое, добавляем в массив
                 const newPost = {
                     id: Date.now(),
                     author: userRaw,
@@ -329,7 +321,6 @@
             closeModal();
         };
 
-        // БЫСТРОЕ УДАЛЕНИЕ (Без confirm)
         window.deletePost = async (idToDel) => {
             const updatedPosts = postsData.filter(p => p.id !== idToDel);
             await setDoc(boardDocRef, { posts: updatedPosts }, { merge: true });
