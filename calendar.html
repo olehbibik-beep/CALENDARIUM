@@ -353,7 +353,10 @@
 
         </div>
     </div>
-
+<div id="image-viewer" class="image-viewer" onclick="closeViewer()">
+        <div class="close-viewer">✕</div>
+        <img id="viewer-img" src="" alt="View">
+    </div>
     <div class="inner-footer">
         <div style="display: flex; align-items: center; gap: 10px;">
             <div class="footer-dot"></div>
@@ -563,6 +566,14 @@
         updateDisp();
         initGrid();
         loadData();
+        // ПРОСМОТР ФОТО
+        window.openViewer = (url) => {
+            document.getElementById('viewer-img').src = url;
+            document.getElementById('image-viewer').style.display = 'flex';
+        };
+        window.closeViewer = () => {
+            document.getElementById('image-viewer').style.display = 'none';
+        };
     </script>
 </body>
 </html>
