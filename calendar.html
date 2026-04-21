@@ -288,6 +288,14 @@
         .inner-footer { display: none; }
         .announcements-overlay { padding: 20px; }
     }
+        /* === ПРОСМОТРЩИК КАРТИНОК НА ВЕСЬ ЭКРАН === */
+    .image-viewer {
+        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
+        align-items: center; justify-content: center; backdrop-filter: blur(5px);
+    }
+    .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
+    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
+    .close-viewer:hover { color: var(--ev-memorial); }
     </style>
 </head>
 <body>
