@@ -456,47 +456,44 @@
             }
         };
 
-  async function loadBoardData() {
-            const content = document.getElementById('board-content');
-            // Добавлено grid-column: 1 / -1 чтобы текст был ровно по центру всей сетки
-            content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1;">ОБНОВЛЕНИЕ...</div>';
+async function loadBoardData() {
+    const content = document.getElementById('board-content');
+    content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1;">ОБНОВЛЕНИЕ...</div>';
+    
+    try {
+        // ЗДЕСЬ ТОЖЕ ДОЛЖНО БЫТЬ "main"
+        const snap = await getDoc(doc(db, "board", "main")); 
+        
+        if (snap.exists() && snap.data().posts && snap.data().posts.length > 0) {
+            const postsData = snap.data().posts;
+            let html = '';
             
-            try {
-                // ИСПРАВЛЕНО: Теперь ищем правильный документ "main", куда сохраняет board.html
-                const snap = await getDoc(doc(db, "board", "main")); 
+            const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
+            
+            sortedPosts.forEach(post => {
+                const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto; cursor: zoom-in; transition: 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" alt="Фото" onclick="openViewer('${post.imageUrl}')">` : '';
                 
-                if (snap.exists() && snap.data().posts && snap.data().posts.length > 0) {
-                    const postsData = snap.data().posts;
-                    let html = '';
-                    
-                    // Сортируем посты, чтобы новые были сверху
-                    const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
-                    
-                    sortedPosts.forEach(post => {
-                        // ИСПРАВЛЕНО: Добавлен вывод картинки, если она есть
-                        const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto;" alt="Фото">` : '';
-                        
-                        html += `
-                            <div class="board-card">
-                                <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
-                                    ${post.date} • ${post.author}
-                                </h3>
-                                <p style="margin: 0 0 10px 0; color: #fff; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
-                                    ${post.text}
-                                </p>
-                                ${imageHtml}
-                            </div>
-                        `;
-                    });
-                    content.innerHTML = html;
-                } else {
-                    content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
-                }
-            } catch (e) {
-                console.error("Ошибка при загрузке доски:", e);
-                content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
-            }
+                html += `
+                    <div class="board-card">
+                        <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
+                            ${post.date} • ${post.author}
+                        </h3>
+                        <p style="margin: 0 0 10px 0; color: #fff; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
+                            ${post.text}
+                        </p>
+                        ${imageHtml}
+                    </div>
+                `;
+            });
+            content.innerHTML = html;
+        } else {
+            content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
         }
+    } catch (e) {
+        console.error("Ошибка при загрузке доски:", e);
+        content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
+    }
+}
 
         // ==========================================
         // ЗАГРУЗКА КАЛЕНДАРЯ
