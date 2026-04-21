@@ -214,8 +214,8 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         
-        // ВАЖНО: ИЗМЕНИЛ "main" НА "general" ДЛЯ СИНХРОНИЗАЦИИ С ГЛАВНОЙ СТРАНИЦЕЙ
-        const boardDocRef = doc(db, "board", "general"); 
+       // Меняем обратно на "main" - это будет наша чистая доска!
+const boardDocRef = doc(db, "board", "main");
         
         let postsData = [];
         let editingPostId = null;
