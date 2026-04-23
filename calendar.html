@@ -130,14 +130,19 @@
     }
 
     .months-grid.linear-mode .month-card {
-        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-        background: rgba(46, 82, 86, 0.6);    
-        background-image: var(--bg-img);
-        background-size: cover;
-        background-repeat: no-repeat; 
-        background-position: center;  
-        font-size: 0.6rem;
-    }
+    flex: 1; min-width: 0; height: 100%; border-radius: 12px;
+    background-color: rgba(46, 82, 86, 0.6); /* Этот цвет будет фоном для нижней части с точками */
+    background-image: var(--bg-img);
+    
+    /* Ширина 100%, Высота 80% (оставляем 20% снизу для индикаторов) */
+    background-size: 100% 80%; 
+    background-repeat: no-repeat; 
+    
+    /* Прижимаем картинку к верху по центру */
+    background-position: top center;  
+    
+    font-size: 0.6rem;
+}
 
     .months-grid.linear-mode .month-card::before {
         content: ''; position: absolute; inset: 0; 
