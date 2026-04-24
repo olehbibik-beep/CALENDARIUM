@@ -131,7 +131,7 @@
 
     .months-grid.linear-mode .month-card {
     flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-    background-color: rgba(46, 82, 86, 0.6); /* Этот цвет будет фоном для нижней части с точками */
+    background-color: rgba(46, 82, 86, 0.5); /* Этот цвет будет фоном для нижней части с точками */
     background-image: var(--bg-img);
     
     /* Ширина 100%, Высота 80% (оставляем 20% снизу для индикаторов) */
@@ -147,7 +147,7 @@
     .months-grid.linear-mode .month-card::before {
     content: ''; position: absolute; inset: 0; 
     /* Плавный градиент: прозрачный сверху, почти черный снизу */
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.85) 100%); 
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 100%, rgba(0,0,0,0.85) 100%); 
     z-index: 1;
 }
 
