@@ -53,18 +53,41 @@
         display: flex; align-items: center; justify-content: center; 
         gap: 8px; z-index: 5; max-width: 50%;
     }
- .icon-btn { 
+
+    /* === СТИЛИ КНОПОК === */
+    .icon-btn { 
         background: none; border: none; padding: 5px; cursor: pointer; 
         display: flex; align-items: center; justify-content: center; outline: none;
         flex-shrink: 0; z-index: 50; 
     }
    
-    .icon-btn img { 
-        width: clamp(25px, 3.5vh, 30px); 
-        height: clamp(25px, 3.5vh, 30px); 
-        object-fit: contain; opacity: 0.5; transition: 0.3s; 
+    .ui-icon {
+        font-family: "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+        font-size: clamp(20px, 3vh, 25px); /* Адаптивный размер символа */
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        user-select: none;
+        color: #fff;
+        opacity: 0.5; /* Изначально полупрозрачные */
     }
-    .icon-btn:hover img { opacity: 1; filter: brightness(0) invert(1); }
+
+    .icon-btn:hover .ui-icon { 
+        opacity: 1; 
+        color: var(--accent); /* При наведении подсвечиваются цветом акцента */
+    }
+
+    /* Эффект свечения для акцентных иконок (настройки) */
+    .ui-icon-accent {
+        color: var(--accent);
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(9, 224, 227, 0.5);
+    }
+    .icon-btn:hover .ui-icon-accent {
+        text-shadow: 0 0 15px rgba(9, 224, 227, 0.8);
+    }
 
     .user-name { 
         font-weight: 700; text-transform: uppercase;
@@ -73,21 +96,16 @@
     }
 
     .upcoming-box { margin-top: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
-    /* Обновленный стиль карточки события */
     .event-card-mini { 
-        background: rgba(255, 255, 255, 0); /* Изначально прозрачный фон */
+        background: rgba(255, 255, 255, 0); 
         padding: 10px; 
-        border-radius: 4px; /* Сделаем чуть более скругленными для красоты */
+        border-radius: 4px; 
         margin-bottom: 10px; 
         border-left: 4px solid var(--accent); 
-        transition: background 0.3s ease; /* Плавное появление подсветки */
-        cursor: default; /* Указываем, что это просто информационный элемент */
+        transition: background 0.3s ease; 
+        cursor: default; 
     }
-
-    /* Эффект при наведении или нажатии пальцем */
-    .event-card-mini:hover { 
-        background: rgba(255, 255, 255, 0.08); /* Светлое выделение */
-    }
+    .event-card-mini:hover { background: rgba(255, 255, 255, 0.08); }
 
     .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; }
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
@@ -109,20 +127,16 @@
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
 
+    /* ИСПРАВЛЕНА ОПЕЧАТКА ТУТ (был ##52525C) */
     .month-card.current-active { 
         border: 0px solid var(--accent) !important; 
         z-index: 10; 
-        background: ##52525C; box-shadow: 0 8px 15px rgba(0,0,0,0.4)
+        background: #52525C; box-shadow: 0 8px 15px rgba(0,0,0,0.4)
     }
     .month-card.current-active::before { display: none !important; }
 
-    .months-grid.linear-mode .month-card:hover {
-        z-index: 5; 
-        filter: brightness(0.9); 
-    }
-    .months-grid.linear-mode .month-card:hover::before {
-        background: rgba(255, 255, 255, 0.1); 
-    }
+    .months-grid.linear-mode .month-card:hover { z-index: 5; filter: brightness(0.9); }
+    .months-grid.linear-mode .month-card:hover::before { background: rgba(255, 255, 255, 0.1); }
 
     .months-grid.linear-mode {
         display: flex !important; flex-direction: row !important; gap: 6px; 
@@ -130,33 +144,23 @@
     }
 
     .months-grid.linear-mode .month-card {
-    flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-    background-color: rgba(63, 63, 70, 0.5); /* Этот цвет будет фоном для нижней части с точками */
-    background-image: var(--bg-img);
-    
-    /* Ширина 100%, Высота 80% (оставляем 20% снизу для индикаторов) */
-    background-size: cover; 
-    background-repeat: no-repeat; 
-    
-    /* Прижимаем картинку к верху по центру */
-    background-position: center;  
-    
-    font-size: 0.6rem;
-}
+        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
+        background-color: rgba(63, 63, 70, 0.5); 
+        background-image: var(--bg-img);
+        background-size: cover; 
+        background-repeat: no-repeat; 
+        background-position: center;  
+        font-size: 0.6rem;
+    }
 
     .months-grid.linear-mode .month-card::before {
-    content: ''; position: absolute; inset: 0; 
-    z-index: 1;
-}
+        content: ''; position: absolute; inset: 0; z-index: 1;
+    }
 
     .months-grid.linear-mode .month-card span,
-    .months-grid.linear-mode .month-card .month-indicator {
-        z-index: 2;
-    }
+    .months-grid.linear-mode .month-card .month-indicator { z-index: 2; }
 
-    .months-grid.linear-mode .month-indicator {
-        width: 30%; bottom: 5%; flex-direction: column; gap: 2px;
-    }
+    .months-grid.linear-mode .month-indicator { width: 30%; bottom: 5%; flex-direction: column; gap: 2px; }
 
     .year-switcher { display: flex; align-items: center; justify-content: center; gap: 2vw; margin-bottom: 2vh; flex-shrink: 0; }
     #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
@@ -175,112 +179,46 @@
     .footer-text { font-size: clamp(8px, 0.8vw, 10px); color: #555; text-transform: uppercase; font-weight: 300; letter-spacing: 1px; }
     .footer-dot { width: 4px; height: 4px; background: #555; border-radius: 50%; }
 
-    /* ========================================================= */
-    /* НОВЫЕ СТИЛИ ДЛЯ ПАНЕЛИ ОБЪЯВЛЕНИЙ И КНОПКИ-СТРЕЛКИ        */
-    /* ========================================================= */
-    
     .board-toggle-btn {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255,255,255,0.05);
-        border: none;
-        padding: 20px 5px;
-        border-radius: 15px 0 0 15px;
-        cursor: pointer;
-        z-index: 100;
-        transition: 0.3s;
+        position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+        background: rgba(255,255,255,0.05); border: none; padding: 20px 5px;
+        border-radius: 15px 0 0 15px; cursor: pointer; z-index: 100; transition: 0.3s;
     }
     .board-toggle-btn:hover { background: var(--accent); }
-    /* Простая стрелочка через юникод, чтобы не зависеть от картинок */
-    .board-toggle-btn::before {
-        content: '◀';
-        color: rgba(255,255,255,0.5);
-        font-size: 14px;
-    }
+    .board-toggle-btn::before { content: '◀'; color: rgba(255,255,255,0.5); font-size: 14px; }
     .board-toggle-btn:hover::before { color: #000; }
 
     .announcements-overlay {
-        position: absolute;
-        inset: 0; 
-        background: rgba(15, 17, 18, 0.95);
-        backdrop-filter: blur(10px);
-        z-index: 200;
-        display: flex;
-        flex-direction: column;
-        padding: 40px;
-        transform: translateX(100%); 
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: absolute; inset: 0; background: rgba(15, 17, 18, 0.95); backdrop-filter: blur(10px);
+        z-index: 200; display: flex; flex-direction: column; padding: 40px;
+        transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .announcements-overlay.active { transform: translateX(0); }
 
     .panel-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        padding-bottom: 15px;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
     }
     .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--accent); }
-    
-    .close-panel-btn {
-        background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s;
-    }
+    .close-panel-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; }
     .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
 
-   /* Основной контейнер сетки */
     .board-items { 
-        display: grid;
-        /* Создаем 4 колонки равной ширины */
-        grid-template-columns: repeat(4, 1fr); 
-        gap: 20px; 
-        padding-right: 10px;
-        overflow-y: auto; 
-        flex: 1; 
-        align-content: start; /* Чтобы карточки не растягивались по высоте, если их мало */
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; 
+        padding-right: 10px; overflow-y: auto; flex: 1; align-content: start; 
     }
 
-    /* Стили карточки для плиточного вида */
     .board-card {
-        background: rgba(255,255,255,0.03);
-        padding: 20px;
-        border-radius: 4px;
-        /* Меняем боковую полоску на верхнюю — в сетке так смотрится лучше */
-        border-top: 3px solid var(--accent); 
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        transition: transform 0.2s ease;
+        background: rgba(255,255,255,0.03); padding: 20px; border-radius: 4px;
+        border-top: 3px solid var(--accent); display: flex; flex-direction: column;
+        gap: 10px; transition: transform 0.2s ease;
     }
-
-    .board-card:hover {
-        background: rgba(255,255,255,0.06);
-    }
-
-    /* Адаптивность под разные экраны */
-    
-    /* Ноутбуки и небольшие мониторы: 3 в ряд */
-    @media (max-width: 1200px) {
-        .board-items { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    /* Планшеты: 2 в ряд */
-    @media (max-width: 900px) {
-        .board-items { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* Телефоны (Portrait): 1 в ряд */
-    @media (orientation: portrait) {
-        .board-items { 
-            grid-template-columns: 1fr; 
-            gap: 15px;
-        }
-        .announcements-overlay { padding: 20px; }
-    }
+    .board-card:hover { background: rgba(255,255,255,0.06); }
     .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
     .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+
+    @media (max-width: 1200px) { .board-items { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 900px) { .board-items { grid-template-columns: repeat(2, 1fr); } }
 
     @media (orientation: portrait) {
         body { background: #0f1112; }
@@ -291,9 +229,10 @@
         .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
         .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); }
         .inner-footer { display: none; }
+        .board-items { grid-template-columns: 1fr; gap: 15px; }
         .announcements-overlay { padding: 20px; }
     }
-        /* === ПРОСМОТРЩИК КАРТИНОК НА ВЕСЬ ЭКРАН === */
+
     .image-viewer {
         display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
         align-items: center; justify-content: center; backdrop-filter: blur(5px);
@@ -301,23 +240,6 @@
     .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
     .close-viewer:hover { color: var(--ev-memorial); }
-        
-        .ui-icon {
-    font-family: "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-    font-size: 1.2rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
-    user-select: none; /* Чтобы иконку нельзя было случайно выделить как текст */
-}
-
-/* Эффект свечения для акцентных иконок */
-.ui-icon-accent {
-    color: var(--accent);
-    text-shadow: 0 0 10px rgba(9, 224, 227, 0.5);
-}
     </style>
 </head>
 <body>
@@ -327,7 +249,7 @@
             <div class="user-header">
                 <div class="header-left">
                     <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
-                        <img src="QUIT.png" alt="Quit">
+                        <span class="ui-icon">⏻</span>
                     </button>
                 </div>
                 <div class="header-center">
@@ -347,7 +269,7 @@
         <div class="main-view">
             <div class="year-switcher">
                 <button class="icon-btn" id="board-edit-btn" onclick="location.href='board.html'" title="Редактор Объявлений" style="margin-right: 15px; display: none;">
-                    <img src="BOARD.png" alt="Board">
+                    <span class="ui-icon">✎</span>
                 </button>
 
                 <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
@@ -355,7 +277,7 @@
                 <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
                 
                 <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
-                    <img src="ORG.png" alt="View">
+                    <span class="ui-icon">▦</span>
                 </button>
             </div>
             
@@ -375,10 +297,12 @@
 
         </div>
     </div>
-<div id="image-viewer" class="image-viewer" onclick="closeViewer()">
+    
+    <div id="image-viewer" class="image-viewer" onclick="closeViewer()">
         <div class="close-viewer">✕</div>
         <img id="viewer-img" src="" alt="View">
     </div>
+    
     <div class="inner-footer">
         <div style="display: flex; align-items: center; gap: 10px;">
             <div class="footer-dot"></div>
@@ -414,7 +338,6 @@
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
         document.getElementById('user-display').innerText = user;
         
-        // Показываем кнопки настроек и редактора объявлений ТОЛЬКО если это admin
         if(user.toLowerCase() === 'admin') {
             document.getElementById('admin-btn').style.display = 'flex';
             document.getElementById('board-edit-btn').style.display = 'flex';
@@ -465,61 +388,53 @@
             currentYear += dir; updateDisp(); initGrid(); loadData();
         }
 
-        // ==========================================
-        // ЛОГИКА ПАНЕЛИ ОБЪЯВЛЕНИЙ
-        // ==========================================
         window.toggleBoard = async () => {
             const panel = document.getElementById('announcements-panel');
             panel.classList.toggle('active');
             
-            // Если открыли панель - подгружаем актуальные данные из Firebase
             if(panel.classList.contains('active')) {
                 await loadBoardData();
             }
         };
 
-async function loadBoardData() {
-    const content = document.getElementById('board-content');
-    content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1;">ОБНОВЛЕНИЕ...</div>';
-    
-    try {
-        // ЗДЕСЬ ТОЖЕ ДОЛЖНО БЫТЬ "main"
-        const snap = await getDoc(doc(db, "board", "main")); 
-        
-        if (snap.exists() && snap.data().posts && snap.data().posts.length > 0) {
-            const postsData = snap.data().posts;
-            let html = '';
+        async function loadBoardData() {
+            const content = document.getElementById('board-content');
+            content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1;">ОБНОВЛЕНИЕ...</div>';
             
-            const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
-            
-            sortedPosts.forEach(post => {
-                const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto; cursor: zoom-in; transition: 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" alt="Фото" onclick="openViewer('${post.imageUrl}')">` : '';
+            try {
+                const snap = await getDoc(doc(db, "board", "main")); 
                 
-                html += `
-                    <div class="board-card">
-                        <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
-                            ${post.date} • ${post.author}
-                        </h3>
-                        <p style="margin: 0 0 10px 0; color: #fff; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
-                            ${post.text}
-                        </p>
-                        ${imageHtml}
-                    </div>
-                `;
-            });
-            content.innerHTML = html;
-        } else {
-            content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
+                if (snap.exists() && snap.data().posts && snap.data().posts.length > 0) {
+                    const postsData = snap.data().posts;
+                    let html = '';
+                    
+                    const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
+                    
+                    sortedPosts.forEach(post => {
+                        const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto; cursor: zoom-in; transition: 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" alt="Фото" onclick="openViewer('${post.imageUrl}')">` : '';
+                        
+                        html += `
+                            <div class="board-card">
+                                <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
+                                    ${post.date} • ${post.author}
+                                </h3>
+                                <p style="margin: 0 0 10px 0; color: #fff; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
+                                    ${post.text}
+                                </p>
+                                ${imageHtml}
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                } else {
+                    content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
+                }
+            } catch (e) {
+                console.error("Ошибка при загрузке доски:", e);
+                content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
+            }
         }
-    } catch (e) {
-        console.error("Ошибка при загрузке доски:", e);
-        content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
-    }
-}
 
-        // ==========================================
-        // ЗАГРУЗКА КАЛЕНДАРЯ
-        // ==========================================
         async function loadData() {
             const container = document.getElementById('next-event-container');
             if (!container) return;
@@ -585,7 +500,7 @@ async function loadBoardData() {
         updateDisp();
         initGrid();
         loadData();
-        // ПРОСМОТР ФОТО
+        
         window.openViewer = (url) => {
             document.getElementById('viewer-img').src = url;
             document.getElementById('image-viewer').style.display = 'flex';
