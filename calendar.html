@@ -54,11 +54,7 @@
         gap: 8px; z-index: 5; max-width: 50%;
     }
 
-    .icon-btn { 
-        background: none; border: none; padding: 5px; cursor: pointer; 
-        display: flex; align-items: center; justify-content: center; outline: none;
-        flex-shrink: 0; z-index: 50; 
-    }
+   
     .icon-btn img { 
         width: clamp(25px, 3.5vh, 30px); 
         height: clamp(25px, 3.5vh, 30px); 
@@ -303,6 +299,23 @@
     .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
     .close-viewer:hover { color: var(--ev-memorial); }
+        
+        .ui-icon {
+    font-family: "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+    user-select: none; /* Чтобы иконку нельзя было случайно выделить как текст */
+}
+
+/* Эффект свечения для акцентных иконок */
+.ui-icon-accent {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(9, 224, 227, 0.5);
+}
     </style>
 </head>
 <body>
@@ -317,7 +330,7 @@
                 </div>
                 <div class="header-center">
                     <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
-                        <img src="OPTION.png" alt="Options">⚙
+                        <span class="ui-icon ui-icon-accent">⚙</span>
                     </button>
                 </div>
                 <div class="header-right">
