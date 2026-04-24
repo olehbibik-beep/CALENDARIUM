@@ -146,8 +146,6 @@
 
     .months-grid.linear-mode .month-card::before {
     content: ''; position: absolute; inset: 0; 
-    /* Плавный градиент: прозрачный сверху, почти черный снизу */
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(250,250,250,1.0) 100%); 
     z-index: 1;
 }
 
@@ -248,7 +246,7 @@
     .board-card {
         background: rgba(255,255,255,0.03);
         padding: 20px;
-        border-radius: 15px;
+        border-radius: 4px;
         /* Меняем боковую полоску на верхнюю — в сетке так смотрится лучше */
         border-top: 3px solid var(--accent); 
         display: flex;
