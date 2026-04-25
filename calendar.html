@@ -54,18 +54,10 @@
         gap: 8px; z-index: 5; max-width: 50%;
     }
 
-    /* === СТИЛИ КНОПОК === */
-    .icon-btn { 
-        background: none; border: none; padding: 5px; cursor: pointer; 
-        display: flex; align-items: center; justify-content: center; outline: none;
-        flex-shrink: 0; z-index: 50; 
-    }
-   
-    .ui-icon {
-    /* Добавляем Segoe UI Symbol на первое место — он самый полный в Windows */
-    /* Symbola — отличный запасной шрифт для иконок */
+    /* 1. Базовое состояние любой иконки */
+.ui-icon {
     font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-    font-size: clamp(22px, 3.5vh, 28px); /* Чуть увеличил для читаемости */
+    font-size: clamp(22px, 3.5vh, 28px);
     line-height: 1;
     display: inline-flex;
     align-items: center;
@@ -73,25 +65,33 @@
     transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     color: #fff;
-    opacity: 0.5;
+    opacity: 0.5; /* Изначально тусклые */
 }
 
-/* Сделаем так, чтобы кнопка выхода при наведении горела красным, как кнопка "Off" */
-.icon-btn-exit:hover .ui-icon {
-    color: var(--accent);
+/* 2. ГЛАВНОЕ: Свечение при наведении на ЛЮБУЮ кнопку */
+.icon-btn:hover .ui-icon {
     opacity: 1;
-    text-shadow: 0 0 15px rgba(255, 71, 87, 0.8);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Белое свечение по умолчанию */
+    transform: scale(1.1); /* Легкое увеличение для отклика */
 }
 
-    /* Эффект свечения для акцентных иконок (настройки) */
-    .ui-icon-accent {
-        color: var(--accent);
-        opacity: 1;
-        text-shadow: 0 0 10px rgba(9, 224, 227, 0.5);
-    }
-    .icon-btn:hover .ui-icon-accent {
-        text-shadow: 0 0 15px rgba(9, 224, 227, 0.8);
-    }
+/* 3. Свечение для АКЦЕНТНЫХ кнопок (Настройки и т.д.) */
+.ui-icon-accent {
+    color: var(--accent);
+    opacity: 0.8; /* Акцентные чуть ярче даже без наведения */
+    text-shadow: 0 0 8px rgba(9, 224, 227, 0.3);
+}
+
+.icon-btn:hover .ui-icon-accent {
+    color: var(--accent);
+    text-shadow: 0 0 15px rgba(9, 224, 227, 0.8) !important;
+}
+
+/* 4. Свечение для кнопки ВЫХОДА (Красное) */
+.icon-btn-exit:hover .ui-icon {
+    color: #ff4757 !important; /* Принудительно красный при наведении */
+    text-shadow: 0 0 15px rgba(255, 71, 87, 0.9) !important;
+}
 
     .user-name { 
         font-weight: 700; text-transform: uppercase;
