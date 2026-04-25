@@ -54,44 +54,51 @@
         gap: 8px; z-index: 5; max-width: 50%;
     }
 
-    /* 1. Базовое состояние любой иконки */
-.ui-icon {
-    font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-    font-size: clamp(22px, 3.5vh, 28px);
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    color: #fff;
-    opacity: 0.5; /* Изначально тусклые */
-}
+    /* === СТИЛИ КНОПОК И ИКОНОК === */
+    .icon-btn { 
+        background: none; border: none; padding: 5px; cursor: pointer; 
+        display: flex; align-items: center; justify-content: center; outline: none;
+        flex-shrink: 0; z-index: 50; 
+    }
+    
+    /* Базовое состояние иконки */
+    .ui-icon {
+        font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+        font-size: clamp(22px, 3.5vh, 28px);
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        user-select: none;
+        color: #fff;
+        opacity: 0.5; /* Изначально тусклые */
+    }
 
-/* 2. ГЛАВНОЕ: Свечение при наведении на ЛЮБУЮ кнопку */
-.icon-btn:hover .ui-icon {
-    opacity: 1;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Белое свечение по умолчанию */
-    transform: scale(1.1); /* Легкое увеличение для отклика */
-}
+    /* Свечение при наведении на ЛЮБУЮ кнопку */
+    .icon-btn:hover .ui-icon {
+        opacity: 1;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        transform: scale(1.1); /* Легкое увеличение */
+    }
 
-/* 3. Свечение для АКЦЕНТНЫХ кнопок (Настройки и т.д.) */
-.ui-icon-accent {
-    color: var(--accent);
-    opacity: 0.8; /* Акцентные чуть ярче даже без наведения */
-    text-shadow: 0 0 8px rgba(9, 224, 227, 0.3);
-}
+    /* Свечение для АКЦЕНТНЫХ кнопок (Настройки, Редактор) */
+    .ui-icon-accent {
+        color: var(--accent);
+        opacity: 0.8;
+        text-shadow: 0 0 8px rgba(9, 224, 227, 0.3);
+    }
+    .icon-btn:hover .ui-icon-accent {
+        color: var(--accent);
+        text-shadow: 0 0 15px rgba(9, 224, 227, 0.8) !important;
+    }
 
-.icon-btn:hover .ui-icon-accent {
-    color: var(--accent);
-    text-shadow: 0 0 15px rgba(9, 224, 227, 0.8) !important;
-}
-
-/* 4. Свечение для кнопки ВЫХОДА (Красное) */
-.icon-btn-exit:hover .ui-icon {
-    color: #ff4757 !important; /* Принудительно красный при наведении */
-    text-shadow: 0 0 15px rgba(255, 71, 87, 0.9) !important;
-}
+    /* Свечение для кнопки ВЫХОДА (Красное) */
+    .icon-btn-exit:hover .ui-icon {
+        color: #ff4757 !important;
+        text-shadow: 0 0 15px rgba(255, 71, 87, 0.9) !important;
+    }
+    /* =============================== */
 
     .user-name { 
         font-weight: 700; text-transform: uppercase;
@@ -131,7 +138,6 @@
     }
     .month-card:hover { background: #2b3236; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
 
-    /* ИСПРАВЛЕНА ОПЕЧАТКА ТУТ (был ##52525C) */
     .month-card.current-active { 
         border: 0px solid var(--accent) !important; 
         z-index: 10; 
@@ -252,13 +258,13 @@
         <div class="sidebar">
             <div class="user-header">
                 <div class="header-left">
-                    <button class="icon-btn" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
-                        <span class="ui-icon">❮⭘</span>
+                    <button class="icon-btn icon-btn-exit" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
+                        <span class="ui-icon">⌽</span>
                     </button>
                 </div>
                 <div class="header-center">
                     <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
-                        <span class="ui-icon">⚙</span>
+                        <span class="ui-icon ui-icon-accent">⚙</span>
                     </button>
                 </div>
                 <div class="header-right">
@@ -273,7 +279,7 @@
         <div class="main-view">
             <div class="year-switcher">
                 <button class="icon-btn" id="board-edit-btn" onclick="location.href='board.html'" title="Редактор Объявлений" style="margin-right: 15px; display: none;">
-                    <span class="ui-icon">✎</span>
+                    <span class="ui-icon ui-icon-accent">✏</span>
                 </button>
 
                 <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
@@ -281,7 +287,7 @@
                 <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
                 
                 <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
-                    <span class="ui-icon">⠿</span>
+                    <span class="ui-icon">⌗</span>
                 </button>
             </div>
             
