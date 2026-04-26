@@ -145,8 +145,8 @@
         height: 100%; width: 100%; border: 0px solid transparent; overflow: hidden;
     }
     .month-card:hover { background: #B8FFE8; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
-    .month-card.current-active { 
-        border: 2px solid var(--accent) !important; 
+    
+        .month-card.current-active { 
         z-index: 10; background: #007550; box-shadow: 0 8px 15px rgba(0,0,0,0.4)
     }
     .month-card.current-active::before { display: none !important; }
@@ -163,7 +163,7 @@
         background-size: cover; background-repeat: no-repeat; background-position: center;  
         font-size: 0.6rem;
     }
-    .months-grid.linear-mode .month-card:hover { z-index: 5; filter: brightness(0.9); }
+    .months-grid.linear-mode .month-card:hover { z-index: 5; background: #B8FFE8; filter: brightness(0.9); }
     .months-grid.linear-mode .month-card:hover::before { background: rgba(255, 255, 255, 0.1); }
     .months-grid.linear-mode .month-card::before { content: ''; position: absolute; inset: 0; z-index: 1; }
     .months-grid.linear-mode .month-card span,
