@@ -48,57 +48,43 @@
     }
 
     /* =========================================
-       3. НОВАЯ ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
+       3. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
        ========================================= */
     .nav-bar {
         width: 60px;
         background: rgba(30, 30, 35, 0.3);
         border-right: 1px solid var(--inner-border);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        padding: 3vh 0;
-        flex-shrink: 0;
-        z-index: 20;
+        display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        padding: 3vh 0; flex-shrink: 0; z-index: 20;
     }
-    .nav-group {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-    }
+    .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 
     /* =========================================
        4. БОКОВАЯ ПАНЕЛЬ (АКТУАЛЬНОЕ)
        ========================================= */
     .sidebar { 
-        width: 260px; 
-        background: transparent; 
-        padding: 3vh 1.5vw; 
+        width: 25%; min-width: 220px; max-width: 280px; 
+        background: rgba(80,80,80,0.2); /* ОРИГИНАЛЬНЫЙ ФОН ВОЗВРАЩЕН */
+        padding: 3vh 2vw; 
         display: flex; flex-direction: column; 
         border-right: 1px solid var(--inner-border); 
         flex-shrink: 0;
     }
-
     .section-title {
         font-size: 0.7rem; color: #7f8fa6; 
         margin-bottom: 20px; font-weight: 800; 
-        letter-spacing: 1px; text-transform: uppercase;
+        letter-spacing: 1px; text-transform: uppercase; text-align: center;
     }
 
     /* Блок ближайших событий */
     .upcoming-box { overflow-y: auto; flex: 1; padding-right: 5px; }
     .event-card-mini { 
-        background: transparent; 
-        padding: 10px 0 10px 10px; 
-        border-radius: 4px; 
-        margin-bottom: 15px; 
-        border-left: 3px solid var(--accent); 
-        transition: background 0.3s ease; 
-        cursor: default; 
+        background: rgba(255, 255, 255, 0); 
+        padding: 10px; border-radius: 4px; margin-bottom: 10px; 
+        border-left: 4px solid var(--accent); 
+        transition: background 0.3s ease; cursor: default; 
     }
-    .event-card-mini:hover { background: rgba(255, 255, 255, 0.03); }
+    .event-card-mini:hover { background: rgba(255, 255, 255, 0.08); }
     .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; line-height: 1.3;}
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
 
@@ -112,10 +98,8 @@
     }
     .ui-icon {
         font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-        font-size: 22px;
-        line-height: 1; display: inline-flex; align-items: center; justify-content: center;
-        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        user-select: none; color: #fff; opacity: 0.5;
+        font-size: 22px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; color: #fff; opacity: 0.5;
     }
     .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
     .ui-icon-accent { color: #52525C; opacity: 0.8; }
@@ -130,61 +114,81 @@
         padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw;
     }
 
-    /* Блок для картинки с человеком */
+    /* Блок для картинки с человеком (ровно 50%) */
     .illustration-box {
         flex: 1;
         display: flex; align-items: center; justify-content: center;
         height: 100%; position: relative;
     }
-    /* Заглушка, чтобы было понятно где картинка */
     .illustration-placeholder {
         color: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.1);
         border-radius: 20px; padding: 20px; text-align: center; font-size: 0.8rem;
     }
 
-    /* Блок самого календаря (Компактный) */
+    /* Блок самого календаря (Остальные 50%) */
     .calendar-wrapper {
-        width: 450px; /* Компактная ширина */
-        max-width: 50%;
-        display: flex; flex-direction: column;
-        flex-shrink: 0;
+        flex: 1; display: flex; flex-direction: column; height: 100%; transition: 0.3s;
     }
+
+    /* Скрытие человека при включении линейного вида */
+    .main-view.linear-active .illustration-box { display: none !important; }
 
     /* Переключатель годов */
     .year-switcher { 
         display: flex; align-items: center; justify-content: flex-end; gap: 1.5vw; 
-        margin-bottom: 3vh; flex-shrink: 0; 
+        margin-bottom: 2vh; flex-shrink: 0; 
     }
-    #display-year { font-size: clamp(2rem, 5vh, 4rem); font-weight: 500; letter-spacing: -1px; color: #fff; line-height: 1; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1rem, 2.5vh, 1.5rem); transition: 0.2s; }
+    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
+    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
     .year-side:hover { color: var(--accent); }
 
-    /* Сетка месяцев (Компактный режим) */
+    /* Сетка месяцев (ОРИГИНАЛЬНЫЕ ЦВЕТА ВОЗВРАЩЕНЫ) */
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
-        gap: 12px; width: 100%; aspect-ratio: 4 / 3; /* Квадратные пропорции сетки */
+        gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
     }
     .month-card { 
-        background: #202428; border-radius: 12px; /* Темный фон плиток */
+        background: #00D18F; border-radius: 18px;
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        color: #fff; font-weight: 400; cursor: pointer; position: relative; transition: 0.3s;
-        text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
-        height: 100%; width: 100%; border: 1px solid rgba(255,255,255,0.02); overflow: hidden;
+        color: #000; font-weight: 600; cursor: pointer; position: relative; transition: 0.3s;
+        text-transform: uppercase; font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
+        height: 100%; width: 100%; border: 0px solid transparent; overflow: hidden;
     }
-    .month-card:hover { background: #2a2e33; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .month-card:hover { background: #B8FFE8; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
     
     .month-card.current-active { 
-        z-index: 10; background: #33393f; border: 1px solid var(--accent); box-shadow: 0 8px 15px rgba(9, 224, 227, 0.15)
+        z-index: 10; background: #007550; color: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
     }
+    .month-card.current-active::before { display: none !important; }
+
+    /* Линейный режим календаря (ОРИГИНАЛЬНЫЙ) */
+    .months-grid.linear-mode {
+        display: flex !important; flex-direction: row !important; gap: 6px; 
+        align-items: stretch; overflow: hidden !important; touch-action: none;
+    }
+    .months-grid.linear-mode .month-card {
+        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
+        background-color: #00D18F; 
+        background-image: var(--bg-img);
+        background-size: cover; background-repeat: no-repeat; background-position: center;  
+        font-size: 0.6rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .months-grid.linear-mode .month-card:hover { z-index: 5; background: #B8FFE8; filter: brightness(0.9); }
+    .months-grid.linear-mode .month-card:hover::before { background: rgba(255, 255, 255, 0.1); }
+    .months-grid.linear-mode .month-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: rgba(0,0,0,0.3); }
+    .months-grid.linear-mode .month-card span,
+    .months-grid.linear-mode .month-card .month-indicator { z-index: 2; }
+    .months-grid.linear-mode .month-indicator { width: 30%; bottom: 5%; flex-direction: column; gap: 2px; }
+
+    /* ДОБАВЛЕНО: Номера месяцев для линейного вида */
+    .m-num { display: none; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .months-grid.linear-mode .m-num { display: block; }
 
     /* Индикаторы событий (точки) */
-    .month-indicator { position: absolute; bottom: 12%; display: flex; gap: 6px; width: 100%; justify-content: center; }
-    .dot { height: 3px; width: 12px; border-radius: 4px; }
+    .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
+    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
-
-    /* Скрытие имени пользователя, так как нет места (оставим в консоли или можно добавить в меню) */
-    .user-name { display: none; }
 
     /* =========================================
        7. ПАНЕЛЬ ОБЪЯВЛЕНИЙ (BOARD)
@@ -204,42 +208,52 @@
         transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .announcements-overlay.active { transform: translateX(0); }
-    .panel-header {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
-    }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
     .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--accent); }
     .close-panel-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; }
     .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
-    .board-items { 
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; 
-        padding-right: 10px; overflow-y: auto; flex: 1; align-content: start; 
-    }
-    .board-card {
-        background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px;
-        border-top: 3px solid var(--accent); display: flex; flex-direction: column;
-        gap: 10px; transition: transform 0.2s ease;
-    }
+    .board-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding-right: 10px; overflow-y: auto; flex: 1; align-content: start; }
+    .board-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-top: 3px solid var(--accent); display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s ease; }
     .board-card:hover { background: rgba(255,255,255,0.06); }
     .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
     .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
 
-    /* ПРОСМОТРЩИК ИЗОБРАЖЕНИЙ */
-    .image-viewer {
-        display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
-        align-items: center; justify-content: center; backdrop-filter: blur(5px);
-    }
+    .image-viewer { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
     .close-viewer:hover { color: var(--ev-memorial); }
 
-    /* АДАПТИВНОСТЬ */
+    /* =========================================
+       8. АДАПТИВНОСТЬ (МОБИЛКИ - ОРИГИНАЛЬНАЯ ЛОГИКА)
+       ========================================= */
     @media (max-width: 1200px) { .board-items { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) { 
-        .board-items { grid-template-columns: repeat(2, 1fr); } 
-        .main-view { flex-direction: column; }
-        .calendar-wrapper { width: 100%; max-width: 500px; }
-        .illustration-box { display: none; }
+    @media (max-width: 900px) { .board-items { grid-template-columns: repeat(2, 1fr); } }
+
+    @media (orientation: portrait) {
+        body { background: #0f1112; }
+        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
+        
+        /* Делаем левое меню горизонтальной шапкой */
+        .nav-bar { 
+            width: 100%; height: auto; flex-direction: row; padding: 1vh 4vw; 
+            border-right: none; border-bottom: 1px solid var(--inner-border); 
+        }
+        .nav-group { flex-direction: row; gap: 15px; }
+        
+        /* Оригинальные стили мобилки */
+        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; flex-direction: column; align-items: stretch; justify-content: flex-start; }
+        .upcoming-box .event-card-mini:nth-of-type(n+4) { display: none; }
+        
+        .main-view { padding: 1vh 4vw 2vh; flex: 1; flex-direction: column; justify-content: space-between; min-height: 0; }
+        
+        /* Прячем человека на мобилках */
+        .illustration-box { display: none !important; }
+        .calendar-wrapper { width: 100%; height: 100%; }
+
+        .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
+        .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); }
+        .board-items { grid-template-columns: 1fr; gap: 15px; }
+        .announcements-overlay { padding: 20px; }
     }
     </style>
 </head>
@@ -250,7 +264,8 @@
         <div class="nav-bar">
             <div class="nav-group">
                 <button class="icon-btn icon-btn-exit" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
-                    <span class="ui-icon">✕</span> </button>
+                    <span class="ui-icon">✕</span>
+                </button>
                 
                 <button class="icon-btn" title="Профиль">
                     <span class="ui-icon">👤</span>
@@ -280,13 +295,13 @@
             </div>
         </div>
 
-        <div class="main-view">
+        <div class="main-view" id="main-view">
             
-            <div class="illustration-box">
+            <div class="illustration-box" id="illustration-box">
                 <div class="illustration-placeholder">
                     Здесь будет<br>картинка с человеком
                     </div>
-                </div>
+            </div>
 
             <div class="calendar-wrapper">
                 <div class="year-switcher">
@@ -323,14 +338,12 @@
         <img id="viewer-img" src="" alt="View">
     </div>
 
-    <div id="user-display" class="user-name">...</div>
+    <div id="user-display" style="display:none;">...</div>
 
     <script type="module">
-        // --- 1. Проверка авторизации ---
         const user = localStorage.getItem('currentUser');
         if (!user) { window.location.replace('index.html'); }
 
-        // --- 2. Инициализация Firebase ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -344,26 +357,40 @@
 
         const db = getFirestore(initializeApp(firebaseConfig));
         
-        // --- 3. Глобальные данные и состояния ---
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        // ОРИГИНАЛЬНЫЙ МАССИВ КАРТИНОК ДЛЯ ЛИНЕЙНОГО ВИДА
+        const monthImages = [
+            "Led.png", "Led.png", "Zar.png", "Zar.png", 
+            "Zar.png", "Cer.png", "Cer.png", "Cer.png", 
+            "Bre.png", "Bre.png", "Bre.png", "Led.png"
+        ];
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
 
-        // --- 4. Настройка интерфейса пользователя ---
         document.getElementById('user-display').innerText = user;
         if(user.toLowerCase() === 'admin') {
             document.getElementById('admin-btn').style.display = 'flex';
             document.getElementById('board-edit-btn').style.display = 'flex';
         }
 
-        // --- 5. Функции управления календарем ---
+        // Логика переключения вида (исчезает картинка, растягивается сетка)
         window.toggleCalendarView = () => {
             const grid = document.getElementById('months');
+            const mainView = document.getElementById('main-view');
+            
             grid.classList.toggle('linear-mode');
-            localStorage.setItem('calendarViewMode', grid.classList.contains('linear-mode') ? 'linear' : 'grid');
+            
+            if (grid.classList.contains('linear-mode')) {
+                mainView.classList.add('linear-active');
+                localStorage.setItem('calendarViewMode', 'linear');
+            } else {
+                mainView.classList.remove('linear-active');
+                localStorage.setItem('calendarViewMode', 'grid');
+            }
         };
 
         function initGrid() {
             const grid = document.getElementById('months');
+            const mainView = document.getElementById('main-view');
             const now = new Date();
             const todayMonth = now.getMonth(); 
             const todayYear = now.getFullYear();
@@ -372,14 +399,24 @@
             monthsNames.forEach((m, i) => {
                 const isToday = (i === todayMonth && currentYear === todayYear);
                 const statusClass = isToday ? 'current-active' : '';
+                const mNum = (i + 1).toString().padStart(2, '0'); // Добавлен номер месяца
+                
                 gridHTML += `
                     <div class="month-card ${statusClass}" 
+                         style="--bg-img: url('${monthImages[i]}')" 
                          onclick="goToMonth(${i})">
-                        <span>${m.substring(0, 3)}</span>
+                        <span class="m-num">${mNum}</span>
+                        <span class="m-name">${m.substring(0, 3)}</span>
                         <div class="month-indicator" id="ind-${i}"></div>
                     </div>`;
             });
             grid.innerHTML = gridHTML;
+
+            const savedView = localStorage.getItem('calendarViewMode');
+            if (savedView === 'linear') {
+                grid.classList.add('linear-mode');
+                mainView.classList.add('linear-active');
+            }
         }
 
         window.goToMonth = (i) => {
@@ -393,9 +430,7 @@
             document.startViewTransition(() => applyYearChange(dir));
         };
 
-        function applyYearChange(dir) {
-            currentYear += dir; updateDisp(); initGrid(); loadData();
-        }
+        function applyYearChange(dir) { currentYear += dir; updateDisp(); initGrid(); loadData(); }
 
         function updateDisp() {
             document.getElementById('display-year').innerText = currentYear;
@@ -404,14 +439,10 @@
             localStorage.setItem('selectedYear', currentYear);
         }
 
-        // --- 6. Функции загрузки данных ---
         window.toggleBoard = async () => {
             const panel = document.getElementById('announcements-panel');
             panel.classList.toggle('active');
-            
-            if(panel.classList.contains('active')) {
-                await loadBoardData();
-            }
+            if(panel.classList.contains('active')) { await loadBoardData(); }
         };
 
         async function loadBoardData() {
@@ -420,16 +451,13 @@
             
             try {
                 const snap = await getDoc(doc(db, "board", "main")); 
-                
                 if (snap.exists() && snap.data().posts && snap.data().posts.length > 0) {
                     const postsData = snap.data().posts;
                     let html = '';
-                    
                     const sortedPosts = [...postsData].sort((a, b) => b.id - a.id);
                     
                     sortedPosts.forEach(post => {
                         const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto; cursor: zoom-in; transition: 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" alt="Фото" onclick="openViewer('${post.imageUrl}')">` : '';
-                        
                         html += `
                             <div class="board-card">
                                 <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
@@ -507,7 +535,6 @@
             }
         }
 
-        // --- 7. Просмотрщик изображений ---
         window.openViewer = (url) => {
             document.getElementById('viewer-img').src = url;
             document.getElementById('image-viewer').style.display = 'flex';
@@ -516,7 +543,6 @@
             document.getElementById('image-viewer').style.display = 'none';
         };
 
-        // --- 8. Первичный запуск ---
         updateDisp();
         initGrid();
         loadData();
