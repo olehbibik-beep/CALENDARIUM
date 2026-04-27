@@ -48,53 +48,62 @@
     }
 
     /* =========================================
-       3. БОКОВАЯ ПАНЕЛЬ (SIDEBAR)
+       3. НОВАЯ ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
+       ========================================= */
+    .nav-bar {
+        width: 60px;
+        background: rgba(30, 30, 35, 0.3);
+        border-right: 1px solid var(--inner-border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 3vh 0;
+        flex-shrink: 0;
+        z-index: 20;
+    }
+    .nav-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* =========================================
+       4. БОКОВАЯ ПАНЕЛЬ (АКТУАЛЬНОЕ)
        ========================================= */
     .sidebar { 
-        width: 25%; min-width: 220px; max-width: 320px; 
-        background: rgba(80,80,80,0.2); 
-        padding: 3vh 2vw; 
+        width: 260px; 
+        background: transparent; 
+        padding: 3vh 1.5vw; 
         display: flex; flex-direction: column; 
         border-right: 1px solid var(--inner-border); 
         flex-shrink: 0;
     }
 
-    /* Шапка пользователя в сайдбаре */
-    .user-header { 
-        display: flex; align-items: center; justify-content: space-between; 
-        margin-bottom: 2vh; width: 100%; position: relative;
-    }
-    .header-left, .header-right { 
-        display: flex; align-items: center; gap: clamp(8px, 1.5vw, 15px); z-index: 10; 
-    }
-    .header-center { 
-        position: absolute; left: 50%; transform: translateX(-50%);
-        display: flex; align-items: center; justify-content: center; 
-        gap: 8px; z-index: 5; max-width: 50%;
-    }
-    .user-name { 
-        font-weight: 700; text-transform: uppercase;
-        font-size: clamp(0.75rem, 1.2vw, 1rem); color: #fff; letter-spacing: 1px; 
-        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    .section-title {
+        font-size: 0.7rem; color: #7f8fa6; 
+        margin-bottom: 20px; font-weight: 800; 
+        letter-spacing: 1px; text-transform: uppercase;
     }
 
     /* Блок ближайших событий */
-    .upcoming-box { margin-top: 10px; overflow-y: auto; flex: 1; padding-right: 5px; }
+    .upcoming-box { overflow-y: auto; flex: 1; padding-right: 5px; }
     .event-card-mini { 
-        background: rgba(255, 255, 255, 0); 
-        padding: 10px; 
+        background: transparent; 
+        padding: 10px 0 10px 10px; 
         border-radius: 4px; 
-        margin-bottom: 10px; 
-        border-left: 4px solid var(--accent); 
+        margin-bottom: 15px; 
+        border-left: 3px solid var(--accent); 
         transition: background 0.3s ease; 
         cursor: default; 
     }
-    .event-card-mini:hover { background: rgba(255, 255, 255, 0.08); }
-    .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; }
+    .event-card-mini:hover { background: rgba(255, 255, 255, 0.03); }
+    .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 300; color: #fff; margin-bottom: 4px; line-height: 1.3;}
     .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: #7f8fa6; }
 
     /* =========================================
-       4. УНИВЕРСАЛЬНЫЕ КНОПКИ И ИКОНКИ
+       5. УНИВЕРСАЛЬНЫЕ КНОПКИ И ИКОНКИ
        ========================================= */
     .icon-btn { 
         background: none; border: none; padding: 5px; cursor: pointer; 
@@ -103,103 +112,98 @@
     }
     .ui-icon {
         font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-        font-size: clamp(22px, 3.5vh, 28px);
+        font-size: 22px;
         line-height: 1; display: inline-flex; align-items: center; justify-content: center;
         transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none; color: #fff; opacity: 0.5;
     }
-    .icon-btn:hover .ui-icon {
-        opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
+    .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
     .ui-icon-accent { color: #52525C; opacity: 0.8; }
     .icon-btn:hover .ui-icon-accent { color: var(--accent); }
     .icon-btn-exit:hover .ui-icon { color: #ff4757 !important; }
 
     /* =========================================
-       5. ОСНОВНАЯ ОБЛАСТЬ (КАЛЕНДАРЬ)
+       6. ОСНОВНАЯ ОБЛАСТЬ (КАЛЕНДАРЬ И ИЛЛЮСТРАЦИЯ)
        ========================================= */
     .main-view { 
-        flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; 
-        position: relative; overflow: hidden; 
+        flex: 1; display: flex; flex-direction: row; align-items: center;
+        padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw;
+    }
+
+    /* Блок для картинки с человеком */
+    .illustration-box {
+        flex: 1;
+        display: flex; align-items: center; justify-content: center;
+        height: 100%; position: relative;
+    }
+    /* Заглушка, чтобы было понятно где картинка */
+    .illustration-placeholder {
+        color: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.1);
+        border-radius: 20px; padding: 20px; text-align: center; font-size: 0.8rem;
+    }
+
+    /* Блок самого календаря (Компактный) */
+    .calendar-wrapper {
+        width: 450px; /* Компактная ширина */
+        max-width: 50%;
+        display: flex; flex-direction: column;
+        flex-shrink: 0;
     }
 
     /* Переключатель годов */
     .year-switcher { 
-        display: flex; align-items: center; justify-content: center; gap: 2vw; 
-        margin-bottom: 2vh; flex-shrink: 0; 
+        display: flex; align-items: center; justify-content: flex-end; gap: 1.5vw; 
+        margin-bottom: 3vh; flex-shrink: 0; 
     }
-    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
+    #display-year { font-size: clamp(2rem, 5vh, 4rem); font-weight: 500; letter-spacing: -1px; color: #fff; line-height: 1; }
+    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1rem, 2.5vh, 1.5rem); transition: 0.2s; }
     .year-side:hover { color: var(--accent); }
 
-    /* Сетка месяцев (Обычный режим) */
+    /* Сетка месяцев (Компактный режим) */
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
-        gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
+        gap: 12px; width: 100%; aspect-ratio: 4 / 3; /* Квадратные пропорции сетки */
     }
     .month-card { 
-        background: #00D18F; border-radius: 18px;
+        background: #202428; border-radius: 12px; /* Темный фон плиток */
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        color: #000; font-weight: 300; cursor: pointer; position: relative; transition: 0.3s;
-        text-transform: uppercase; font-size: clamp(0.7rem, 1.5vh + 0.5vw, 1.2rem); 
-        height: 100%; width: 100%; border: 0px solid transparent; overflow: hidden;
+        color: #fff; font-weight: 400; cursor: pointer; position: relative; transition: 0.3s;
+        text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
+        height: 100%; width: 100%; border: 1px solid rgba(255,255,255,0.02); overflow: hidden;
     }
-    .month-card:hover { background: #B8FFE8; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
+    .month-card:hover { background: #2a2e33; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     
-        .month-card.current-active { 
-        z-index: 10; background: #007550; box-shadow: 0 8px 15px rgba(0,0,0,0.4)
+    .month-card.current-active { 
+        z-index: 10; background: #33393f; border: 1px solid var(--accent); box-shadow: 0 8px 15px rgba(9, 224, 227, 0.15)
     }
-    .month-card.current-active::before { display: none !important; }
-
-    /* Линейный режим календаря */
-    .months-grid.linear-mode {
-        display: flex !important; flex-direction: row !important; gap: 6px; 
-        align-items: stretch; overflow: hidden !important; touch-action: none;
-    }
-    .months-grid.linear-mode .month-card {
-        flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-        background-color: #00D18F; 
-        background-image: var(--bg-img);
-        background-size: cover; background-repeat: no-repeat; background-position: center;  
-        font-size: 0.6rem;
-    }
-    .months-grid.linear-mode .month-card:hover { z-index: 5; background: #B8FFE8; filter: brightness(0.9); }
-    .months-grid.linear-mode .month-card:hover::before { background: rgba(255, 255, 255, 0.1); }
-    .months-grid.linear-mode .month-card::before { content: ''; position: absolute; inset: 0; z-index: 1; }
-    .months-grid.linear-mode .month-card span,
-    .months-grid.linear-mode .month-card .month-indicator { z-index: 2; }
-    .months-grid.linear-mode .month-indicator { width: 30%; bottom: 5%; flex-direction: column; gap: 2px; }
 
     /* Индикаторы событий (точки) */
-    .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
-    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
+    .month-indicator { position: absolute; bottom: 12%; display: flex; gap: 6px; width: 100%; justify-content: center; }
+    .dot { height: 3px; width: 12px; border-radius: 4px; }
     .dot.red { background: var(--ev-memorial); }
     .dot.blue { background: var(--ev-meeting); }
 
+    /* Скрытие имени пользователя, так как нет места (оставим в консоли или можно добавить в меню) */
+    .user-name { display: none; }
+
     /* =========================================
-       6. ПАНЕЛЬ ОБЪЯВЛЕНИЙ (BOARD)
+       7. ПАНЕЛЬ ОБЪЯВЛЕНИЙ (BOARD)
        ========================================= */
-    /* Кнопка вызова панели объявлений (Иконка теперь в HTML) */
     .board-toggle-btn {
         position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-        background: rgba(255,255,255,0.05); border: none; padding: 20px 5px;
-        border-radius: 15px 0 0 15px; cursor: pointer; z-index: 100; transition: 0.3s;
+        background: rgba(255,255,255,0.05); border: none; padding: 25px 8px;
+        border-radius: 12px 0 0 12px; cursor: pointer; z-index: 100; transition: 0.3s;
     }
     .board-toggle-btn:hover { background: var(--accent); }
-    .board-toggle-btn .board-icon {
-        color: rgba(255,255,255,0.5); font-size: 14px; transition: 0.3s; line-height: 1;
-    }
+    .board-toggle-btn .board-icon { color: rgba(255,255,255,0.5); font-size: 12px; transition: 0.3s; }
     .board-toggle-btn:hover .board-icon { color: #000; }
 
-    /* Оверлей панели */
     .announcements-overlay {
         position: absolute; inset: 0; background: rgba(15, 17, 18, 0.95); backdrop-filter: blur(10px);
         z-index: 200; display: flex; flex-direction: column; padding: 40px;
         transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .announcements-overlay.active { transform: translateX(0); }
-
-    /* Внутренности панели */
     .panel-header {
         display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;
@@ -207,13 +211,12 @@
     .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--accent); }
     .close-panel-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; }
     .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
-
     .board-items { 
         display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; 
         padding-right: 10px; overflow-y: auto; flex: 1; align-content: start; 
     }
     .board-card {
-        background: rgba(255,255,255,0.03); padding: 20px; border-radius: 4px;
+        background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px;
         border-top: 3px solid var(--accent); display: flex; flex-direction: column;
         gap: 10px; transition: transform 0.2s ease;
     }
@@ -221,9 +224,7 @@
     .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
     .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
 
-    /* =========================================
-       7. ПРОСМОТРЩИК ИЗОБРАЖЕНИЙ (IMAGE VIEWER)
-       ========================================= */
+    /* ПРОСМОТРЩИК ИЗОБРАЖЕНИЙ */
     .image-viewer {
         display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000;
         align-items: center; justify-content: center; backdrop-filter: blur(5px);
@@ -232,66 +233,74 @@
     .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
     .close-viewer:hover { color: var(--ev-memorial); }
 
-    /* =========================================
-       8. АДАПТИВНОСТЬ (МЕДИА-ЗАПРОСЫ)
-       ========================================= */
+    /* АДАПТИВНОСТЬ */
     @media (max-width: 1200px) { .board-items { grid-template-columns: repeat(3, 1fr); } }
-    @media (max-width: 900px) { .board-items { grid-template-columns: repeat(2, 1fr); } }
-
-    @media (orientation: portrait) {
-        body { background: #0f1112; }
-        .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
-        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; flex-direction: column; align-items: stretch; justify-content: flex-start; }
-        .upcoming-box .event-card-mini:nth-of-type(n+4) { display: none; }
-        .main-view { padding: 1vh 4vw 2vh; flex: 1; justify-content: space-between; min-height: 0; }
-        .months-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 8px; }
-        .month-card { border-radius: 12px; font-size: clamp(0.7rem, 2vh, 1rem); }
-        .board-items { grid-template-columns: 1fr; gap: 15px; }
-        .announcements-overlay { padding: 20px; }
+    @media (max-width: 900px) { 
+        .board-items { grid-template-columns: repeat(2, 1fr); } 
+        .main-view { flex-direction: column; }
+        .calendar-wrapper { width: 100%; max-width: 500px; }
+        .illustration-box { display: none; }
     }
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        <div class="sidebar">
-            <div class="user-header">
-                <div class="header-left">
-                    <button class="icon-btn icon-btn-exit" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
-                        <span class="ui-icon">⌽</span>
-                    </button>
+        
+        <div class="nav-bar">
+            <div class="nav-group">
+                <button class="icon-btn icon-btn-exit" onclick="localStorage.clear(); location.href='index.html'" title="Выход">
+                    <span class="ui-icon">✕</span> </button>
+                
+                <button class="icon-btn" title="Профиль">
+                    <span class="ui-icon">👤</span>
+                </button>
+
+                <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
+                    <span class="ui-icon ui-icon-accent">⚙</span>
+                </button>
+
+                <button class="icon-btn" id="board-edit-btn" onclick="location.href='board.html'" title="Редактор Объявлений" style="display: none;">
+                    <span class="ui-icon ui-icon-accent">✏</span>
+                </button>
+
                 </div>
-                <div class="header-center">
-                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
-                        <span class="ui-icon ui-icon-accent">⚙</span>
-                    </button>
-                </div>
-                <div class="header-right">
-                    <div id="user-display" class="user-name">...</div>
-                </div>
+
+            <div class="nav-group">
+                <button class="icon-btn" title="Информация">
+                    <span class="ui-icon">ⓘ</span>
+                </button>
             </div>
-            
+        </div>
+
+        <div class="sidebar">
+            <div class="section-title">АКТУАЛЬНОЕ</div>
             <div class="upcoming-box" id="next-event-container">
                 <div style="font-size:0.6rem; color:#7f8fa6; opacity:0.3; text-align:center;">ЗАГРУЗКА...</div>
             </div>
         </div>
 
         <div class="main-view">
-            <div class="year-switcher">
-                <button class="icon-btn" id="board-edit-btn" onclick="location.href='board.html'" title="Редактор Объявлений" style="margin-right: 15px; display: none;">
-                    <span class="ui-icon ui-icon-accent">✏</span>
-                </button>
-
-                <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
-                <div id="display-year"></div>
-                <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
-                
-                <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-left: 15px;">
-                    <span class="ui-icon">⌗</span>
-                </button>
-            </div>
             
-            <div class="months-grid" id="months"></div>
+            <div class="illustration-box">
+                <div class="illustration-placeholder">
+                    Здесь будет<br>картинка с человеком
+                    </div>
+                </div>
+
+            <div class="calendar-wrapper">
+                <div class="year-switcher">
+                    <button class="icon-btn" onclick="toggleCalendarView()" title="Сменить вид" style="margin-right: auto; opacity: 0.5;">
+                        <span class="ui-icon" style="font-size: 18px;">⌗</span>
+                    </button>
+
+                    <div class="year-side" onclick="changeYear(-1)" id="prev-year"></div>
+                    <div id="display-year"></div>
+                    <div class="year-side" onclick="changeYear(1)" id="next-year"></div>
+                </div>
+                
+                <div class="months-grid" id="months"></div>
+            </div>
 
             <div id="announcements-panel" class="announcements-overlay">
                 <div class="panel-header">
@@ -314,6 +323,8 @@
         <img id="viewer-img" src="" alt="View">
     </div>
 
+    <div id="user-display" class="user-name">...</div>
+
     <script type="module">
         // --- 1. Проверка авторизации ---
         const user = localStorage.getItem('currentUser');
@@ -335,11 +346,6 @@
         
         // --- 3. Глобальные данные и состояния ---
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const monthImages = [
-            "Led.png", "Led.png", "Zar.png", "Zar.png", 
-            "Zar.png", "Cer.png", "Cer.png", "Cer.png", 
-            "Bre.png", "Bre.png", "Bre.png", "Led.png"
-        ];
         let currentYear = parseInt(localStorage.getItem('selectedYear')) || new Date().getFullYear();
 
         // --- 4. Настройка интерфейса пользователя ---
@@ -368,16 +374,12 @@
                 const statusClass = isToday ? 'current-active' : '';
                 gridHTML += `
                     <div class="month-card ${statusClass}" 
-                         style="--bg-img: url('${monthImages[i]}')" 
                          onclick="goToMonth(${i})">
                         <span>${m.substring(0, 3)}</span>
                         <div class="month-indicator" id="ind-${i}"></div>
                     </div>`;
             });
             grid.innerHTML = gridHTML;
-
-            const savedView = localStorage.getItem('calendarViewMode');
-            if (savedView === 'linear') grid.classList.add('linear-mode');
         }
 
         window.goToMonth = (i) => {
@@ -402,7 +404,7 @@
             localStorage.setItem('selectedYear', currentYear);
         }
 
-        // --- 6. Функции загрузки данных (Объявления и События) ---
+        // --- 6. Функции загрузки данных ---
         window.toggleBoard = async () => {
             const panel = document.getElementById('announcements-panel');
             panel.classList.toggle('active');
@@ -494,7 +496,7 @@
 
             upcomingEvents.sort((a, b) => a.stamp - b.stamp);
             if (upcomingEvents.length > 0) {
-                let html = '<div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">АКТУАЛЬНОЕ</div>';
+                let html = '';
                 upcomingEvents.slice(0, 5).forEach(ev => {
                     const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
                     html += `<div class="event-card-mini" style="border-left-color: ${color}"><div class="ev-title">${ev.text}</div><div class="ev-date">${ev.day} ${ev.mName}</div></div>`;
