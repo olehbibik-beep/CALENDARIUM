@@ -59,51 +59,70 @@
     }
     .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 
-    /* =========================================
-       4. БОКОВАЯ ПАНЕЛЬ (АКТУАЛЬНОЕ)
+  /* =========================================
+       ОБНОВЛЕННЫЙ СТИЛЬ БОКОВОЙ ПАНЕЛИ
        ========================================= */
-  .sidebar { 
-        width: 20%; 
-        min-width: 200px; 
-        max-width: 220px; 
+    .sidebar { 
+        width: 20%; min-width: 200px; max-width: 220px; 
         background: rgba(80, 80, 80, 0.2);
-        /* Прижимаем к краям: сверху/снизу оставляем 3vh, по бокам всего 4px */
         padding: 3vh 4px; 
-        display: flex; 
-        flex-direction: column; 
+        display: flex; flex-direction: column; 
         border-right: 0px solid var(--inner-border); 
         flex-shrink: 0;
         box-sizing: border-box;
     }
 
-    .section-title {
-        font-size: 0.7rem; 
-        color: #7f8fa6; 
-        margin-bottom: 20px; 
-        font-weight: 800; 
-        letter-spacing: 1px; 
-        text-transform: uppercase; 
-        text-align: center;
-    }
-
-    /* Блок ближайших событий */
-    .upcoming-box { 
-        overflow-y: auto; 
-        flex: 1; 
-        padding: 0; 
-        width: 100%;
-    }
+    .upcoming-box { overflow-y: auto; flex: 1; padding: 0; width: 100%; }
 
     .event-card-mini { 
-        background: rgba(255, 255, 255, 0.03); /* Едва заметный фон в покое */
-        padding: 12px 10px; 
+        background: transparent; 
+        padding: 10px 8px; 
         border-radius: 4px; 
-        margin-bottom: 8px; 
-        border-left: 4px solid var(--accent); 
-        transition: all 0.2s ease; /* Плавная анимация выделения */
-        cursor: pointer; /* Снова делаем палец при наведении */
+        margin-bottom: 10px; 
+        /* ДОБАВЛЕНО: Прерывистая рамка */
+        border: 1px dashed rgba(255,255,255,0.1); 
+        /* УМЕНЬШЕНО: Полоска стала 2px (была 4px) */
+        border-left: 2px solid var(--accent); 
+        transition: all 0.2s ease; 
+        cursor: pointer;
         width: 100%;
         box-sizing: border-box;
+    }
+
+    /* ЛОГИКА ВЫДЕЛЕНИЯ: Просто становится чуть светлее */
+    .event-card-mini:hover { 
+        background: rgba(255, 255, 255, 0.08); 
+        border-color: rgba(255, 255, 255, 0.2); 
+    }
+
+    .event-card-mini:active {
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    /* =========================================
+       ИНДИКАТОРЫ (ТОЧКИ В КАЛЕНДАРЕ)
+       ========================================= */
+    .dot { 
+        /* УМЕНЬШЕНО: Высота стала 2px (была 4px) */
+        height: 2px; 
+        width: 100%; 
+        max-width: 15px; 
+        border-radius: 4px; 
+    }
+    .dot.red { background: var(--ev-memorial); }
+    .dot.blue { background: var(--ev-meeting); }
+
+    /* Текстовые стили */
+    .ev-title { 
+        font-size: clamp(0.7rem, 1vw, 0.85rem); 
+        font-weight: 300; 
+        color: #fff; 
+        margin-bottom: 4px; 
+        line-height: 1.3;
+    }
+    .ev-date { 
+        font-size: clamp(0.6rem, 0.8vw, 0.75rem); 
+        color: #7f8fa6; 
     }
 
     /* ЛОГИКА ВЫДЕЛЕНИЯ ПРИ НАВЕДЕНИИ */
