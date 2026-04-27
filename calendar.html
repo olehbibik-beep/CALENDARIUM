@@ -14,8 +14,8 @@
         --bg: #71797E; 
         --dark: #1a1d1f;
         --card-bg: #22272a;
-        --ev-memorial: #ff7675; 
-        --ev-meeting: #09e0e3; 
+        --ev-memorial: #FFE6E6; 
+        --ev-meeting: #BAFBFC; 
         --text-main: #e0e6ed;
         --inner-border: rgba(255, 255, 255, 0.05);
     }
@@ -218,7 +218,7 @@
     .month-card:hover { background: #B8FFE8; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
     
     .month-card.current-active { 
-        z-index: 10; background: #007550; color: #fff; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        z-index: 10; background: #B8FFE8; color: #000; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
     }
     .month-card.current-active::before { display: none !important; }
 
@@ -241,7 +241,7 @@
     .months-grid.linear-mode .month-card .month-indicator { z-index: 2; }
     .months-grid.linear-mode .month-indicator { width: 30%; bottom: 5%; flex-direction: column; gap: 2px; }
 
-    /* ДОБАВЛЕНО: Номера месяцев для линейного вида */
+    /* Номера месяцев для линейного вида */
     .m-num { display: none; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
     .months-grid.linear-mode .m-num { display: block; }
 
