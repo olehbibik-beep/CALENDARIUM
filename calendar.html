@@ -70,6 +70,7 @@
         --size-sidebar-width: 20%;
         --size-sidebar-min-width: 200px;
         --size-sidebar-max-width: 220px;
+        --size-dot-height: 4px;
     }
     
     /* =========================================
@@ -170,7 +171,7 @@
        6. ИНДИКАТОРЫ (ТОЧКИ В КАЛЕНДАРЕ)
        ========================================= */
     .dot { 
-        height: 2px; 
+        height: var(--size-dot-height); 
         width: 100%; 
         max-width: 15px; 
         border-radius: 4px; 
@@ -255,7 +256,7 @@
         flex: 1; min-width: 0; height: 100%; border-radius: 12px;
         background-color: var(--color-bg-month); 
         background-image: var(--bg-img);
-        background-size: 20%; background-repeat: no-repeat; background-position: center;  
+        background-size: 50%; background-repeat: no-repeat; background-position: center;  
         font-size: 0.6rem; color: var(--color-text-white);
     }
     .months-grid.linear-mode .month-card:hover { z-index: 5; background: var(--color-bg-month-hover); filter: brightness(0.9); }
