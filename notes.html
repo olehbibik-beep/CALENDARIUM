@@ -274,208 +274,219 @@
     </div>
 
 <script type="module">
-    const currentUserRaw = localStorage.getItem('currentUser');
-    if (!currentUserRaw) {
-        window.location.replace('index.html');
-    }
-    const currentUser = currentUserRaw.toLowerCase();
-    document.getElementById('user-display').innerText = currentUser;
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- ДОБАВИТЬ ЭТОТ БЛОК ---
-    if (currentUser === 'admin') {
-        const adminBtn = document.getElementById('admin-btn');
-        if (adminBtn) adminBtn.style.display = 'flex';
-    }
-    // ---------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    // 1. Проверка авторизации ПЕРЕД запуском логики
+    const currentUserRaw = localStorage.getItem('currentUser');
+    if (!currentUserRaw) {
+        window.location.replace('index.html');
+    }
+    const currentUser = currentUserRaw ? currentUserRaw.toLowerCase() : '';
+    
+    // Элементы интерфейса
+    const userDisplay = document.getElementById('user-display');
+    const adminBtn = document.getElementById('admin-btn');
+    const mNameDisplay = document.getElementById('m-name');
+    const editBtn = document.getElementById('edit-btn');
+    const grid = document.getElementById('grid');
 
-    const cfg = {
-        apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
-        authDomain: "calendarium-1f7d7.firebaseapp.com",
-        projectId: "calendarium-1f7d7",
-        storageBucket: "calendarium-1f7d7.firebasestorage.app",
-        appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
-    };
+    if (userDisplay) userDisplay.innerText = currentUser;
+    if (currentUser === 'admin' && adminBtn) adminBtn.style.display = 'flex';
 
-    const db = getFirestore(initializeApp(cfg));
-    const isAdmin = currentUser === 'admin';
+    // 2. Конфиг Firebase
+    const cfg = {
+        apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
+        authDomain: "calendarium-1f7d7.firebaseapp.com",
+        projectId: "calendarium-1f7d7",
+        storageBucket: "calendarium-1f7d7.firebasestorage.app",
+        appId: "1:204240857105:web:6ece4e6a4031f61a62a9b0"
+    };
 
-    const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
-    const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
-    const docId = `${year}_${mIdx}`;
-    const months = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
-    
-    document.getElementById('m-name').innerText = months[mIdx] + " " + year;
+    const app = initializeApp(cfg);
+    const db = getFirestore(app);
+    const isAdmin = currentUser === 'admin';
 
-    let dbData = {};
-    let selectedDay = null;
+    // Параметры даты
+    const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
+    const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
+    const docId = `${year}_${mIdx}`;
+    const months = ["ЯНВАРЬ", "ФЕВРАЛЬ", "МАРТ", "АПРЕЛЬ", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГУСТ", "СЕНТЯБРЬ", "ОКТЯБРЬ", "НОЯБРЬ", "ДЕКАБРЬ"];
+    
+    if (mNameDisplay) mNameDisplay.innerText = `${months[mIdx]} ${year}`;
 
-    function renderGrid() {
-        const grid = document.getElementById('grid');
-        const firstDay = new Date(year, mIdx, 1).getDay();
-        const shift = firstDay === 0 ? 6 : firstDay - 1;
-        const totalDays = new Date(year, mIdx + 1, 0).getDate();
-        
-        const now = new Date();
-        const tDay = now.getDate();
-        const tMonth = now.getMonth();
-        const tYear = now.getFullYear();
+    let dbData = {};
+    let selectedDay = null;
 
-        grid.innerHTML = '';
-        
-        for (let i = 0; i < shift; i++) {
-            grid.innerHTML += `<div class="day-box" style="visibility:hidden"></div>`;
-        }
+    // Рендер сетки
+    function renderGrid() {
+        if (!grid) return;
+        const firstDay = new Date(year, mIdx, 1).getDay();
+        const shift = firstDay === 0 ? 6 : firstDay - 1;
+        const totalDays = new Date(year, mIdx + 1, 0).getDate();
+        
+        const now = new Date();
+        const tDay = now.getDate();
+        const tMonth = now.getMonth();
+        const tYear = now.getFullYear();
 
-        for (let d = 1; d <= totalDays; d++) {
-            const isWeekend = new Date(year, mIdx, d).getDay() % 6 === 0;
-            const isToday = (d === tDay && mIdx === tMonth && year === tYear);
-            
-            grid.innerHTML += `
-                <div class="day-box ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}" 
-                     id="tile-${d}" onclick="selectDay(${d})">
-                    ${d}
-                    <div class="indicator-row" id="marks-${d}"></div>
-                </div>`;
-        }
-    }
+        grid.innerHTML = '';
+        
+        for (let i = 0; i < shift; i++) {
+            grid.innerHTML += `<div class="day-box" style="visibility:hidden"></div>`;
+        }
 
-    function updateUI() {
-        document.querySelectorAll('.day-box').forEach(b => {
-            b.classList.remove('c-start', 'c-mid', 'c-end', 'c-single', 'has-memorial');
-        });
+        for (let d = 1; d <= totalDays; d++) {
+            const isWeekend = new Date(year, mIdx, d).getDay() % 6 === 0;
+            const isToday = (d === tDay && mIdx === tMonth && year === tYear);
+            
+            grid.innerHTML += `
+                <div class="day-box ${isWeekend ? 'weekend' : ''} ${isToday ? 'today' : ''}" 
+                     id="tile-${d}" onclick="selectDay(${d})">
+                    ${d}
+                    <div class="indicator-row" id="marks-${d}"></div>
+                </div>`;
+        }
+    }
 
-        const hasCongress = (day) => {
-            return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
-        };
+    // Обновление интерфейса на основе данных из БД
+    function updateUI() {
+        document.querySelectorAll('.day-box').forEach(b => {
+            b.classList.remove('c-start', 'c-mid', 'c-end', 'c-single', 'has-memorial');
+        });
 
-        for (let d = 1; d <= 31; d++) {
-            const tile = document.getElementById(`tile-${d}`);
-            const row = document.getElementById(`marks-${d}`);
-            if (!tile || !row) continue;
-            
-            const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
-            row.innerHTML = '';
-            
-            notes.forEach(n => {
-                if (n.category === 'memorial') tile.classList.add('has-memorial');
-                else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
-                else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
-            });
+        const hasCongress = (day) => {
+            return Array.isArray(dbData[day]) && dbData[day].some(n => n.category === 'congress');
+        };
 
-            if (hasCongress(d)) {
-                const prev = hasCongress(d - 1);
-                const next = hasCongress(d + 1);
-                
-                const isSunday = new Date(year, mIdx, d).getDay() === 0;
-                const isMonday = new Date(year, mIdx, d).getDay() === 1;
+        for (let d = 1; d <= 31; d++) {
+            const tile = document.getElementById(`tile-${d}`);
+            const row = document.getElementById(`marks-${d}`);
+            if (!tile || !row) continue;
+            
+            const notes = Array.isArray(dbData[d]) ? dbData[d] : [];
+            row.innerHTML = '';
+            
+            notes.forEach(n => {
+                if (n.category === 'memorial') tile.classList.add('has-memorial');
+                else if (n.category === 'meeting') row.innerHTML += '<div class="mark m-meeting"></div>';
+                else if (n.category === 'personal') row.innerHTML += '<div class="mark m-personal"></div>';
+            });
 
-                if (!prev && next) {
-                    if (isSunday) tile.classList.add('c-single'); 
-                    else tile.classList.add('c-start');
-                } else if (prev && next) {
-                    if (isMonday) tile.classList.add('c-start'); 
-                    else if (isSunday) tile.classList.add('c-end'); 
-                    else tile.classList.add('c-mid');
-                } else if (prev && !next) {
-                    if (isMonday) tile.classList.add('c-single');
-                    else tile.classList.add('c-end');
-                } else {
-                    tile.classList.add('c-single'); 
-                }
-            }
-        }
-        if (selectedDay) selectDay(selectedDay);
-    }
+            if (hasCongress(d)) {
+                const prev = hasCongress(d - 1);
+                const next = hasCongress(d + 1);
+                const isSunday = new Date(year, mIdx, d).getDay() === 0;
+                const isMonday = new Date(year, mIdx, d).getDay() === 1;
 
-    window.selectDay = (d) => {
-        selectedDay = d;
-        document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
-        const activeTile = document.getElementById(`tile-${d}`);
-        if(activeTile) activeTile.classList.add('selected');
-        
-        document.getElementById('edit-btn').style.display = 'block';
-        const notes = Array.isArray(dbData[d]) ? dbData[d] : []; 
-        
-        // ЗДЕСЬ ОБНОВИЛИ ОТРИСОВКУ КАЖДОГО СОБЫТИЯ
-        document.getElementById('preview').innerHTML = `<div style="color:var(--accent); font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">${d} ${months[mIdx]}</div>` + 
-            (notes.map(n => {
-                const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
-                return `<div style="margin-bottom:12px; padding: 10px 12px; border-radius: 4px; border-left: 4px solid ${borderCol};">
-                            ${n.text}
-                        </div>`;
-            }).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
-    };
+                if (!prev && next) tile.classList.add(isSunday ? 'c-single' : 'c-start');
+                else if (prev && next) {
+                    if (isMonday) tile.classList.add('c-start');
+                    else if (isSunday) tile.classList.add('c-end');
+                    else tile.classList.add('c-mid');
+                } 
+                else if (prev && !next) tile.classList.add(isMonday ? 'c-single' : 'c-end');
+                else tile.classList.add('c-single');
+            }
+        }
+        if (selectedDay) selectDay(selectedDay);
+    }
 
-    window.openModal = () => {
-        document.getElementById('modal-title').innerText = selectedDay + " " + months[mIdx];
-        const list = document.getElementById('modal-list');
-        const notes = Array.isArray(dbData[selectedDay]) ? dbData[selectedDay] : []; 
-        
-        document.getElementById('btn-memorial').disabled = !isAdmin;
-        document.getElementById('btn-meeting').disabled = !isAdmin;
+    // Глобальные функции для работы с окнами
+    window.selectDay = (d) => {
+        selectedDay = d;
+        document.querySelectorAll('.day-box').forEach(b => b.classList.remove('selected'));
+        const activeTile = document.getElementById(`tile-${d}`);
+        if (activeTile) activeTile.classList.add('selected');
+        
+        if (editBtn) editBtn.style.display = 'block';
+        const notes = Array.isArray(dbData[d]) ? dbData[d] : []; 
+        
+        const previewEl = document.getElementById('preview');
+        if (previewEl) {
+            previewEl.innerHTML = `<div style="color:var(--accent); font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;">${d} ${months[mIdx]}</div>` + 
+                (notes.map(n => {
+                    const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
+                    return `<div style="margin-bottom:12px; padding: 10px 12px; border-radius: 4px; border-left: 4px solid ${borderCol}; background: rgba(255,255,255,0.03);">
+                                ${n.text}
+                            </div>`;
+                }).join('') || '<span style="color:#555;">Нет запланированных событий</span>');
+        }
+    };
 
-        list.innerHTML = notes.map((n, idx) => {
-            const isOwner = n.author === currentUser;
-            const canDelete = isAdmin || isOwner;
-            const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
+    window.openModal = () => {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const list = document.getElementById('modal-list');
+        
+        if (!modal || !selectedDay) return;
+        
+        modalTitle.innerText = `${selectedDay} ${months[mIdx]}`;
+        const notes = Array.isArray(dbData[selectedDay]) ? dbData[selectedDay] : []; 
+        
+        document.getElementById('btn-memorial').disabled = !isAdmin;
+        document.getElementById('btn-meeting').disabled = !isAdmin;
 
-            return `
-            <div class="note-item" style="border-left: 4px solid ${borderCol}">
-                <div style="font-size:0.85rem; font-weight:500; color:#eee;">${n.text}</div>
-                ${canDelete ? `<div onclick="delNote(${idx})" style="color:#ff7675; cursor:pointer; padding:5px 10px; font-size:1.2rem; font-weight: bold;">✕</div>` : ''}
-            </div>`
-        }).join('');
-        
-        document.getElementById('modal').style.display = 'flex';
-        list.scrollTop = list.scrollHeight;
-    };
+        list.innerHTML = notes.map((n, idx) => {
+            const isOwner = n.author === currentUser;
+            const canDelete = isAdmin || isOwner;
+            const borderCol = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : (n.category === 'congress' ? '#aaa' : '#888'));
 
-    window.closeModal = () => document.getElementById('modal').style.display = 'none';
+            return `
+            <div class="note-item" style="border-left: 4px solid ${borderCol}">
+                <div style="font-size:0.85rem; font-weight:500; color:#eee;">${n.text}</div>
+                ${canDelete ? `<div onclick="delNote(${idx})" style="color:#ff7675; cursor:pointer; padding:5px 10px; font-size:1.2rem;">✕</div>` : ''}
+            </div>`;
+        }).join('');
+        
+        modal.style.display = 'flex';
+        list.scrollTop = list.scrollHeight;
+    };
 
-    window.save = async (cat) => {
-        const val = document.getElementById('note-input').value.trim();
-        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'ВСТРЕЧА' : cat === 'congress' ? 'КОНГРЕСС' : 'ЛИЧНОЕ');
-        const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
-        notes.push({ text, category: cat, author: currentUser });
-        await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
-        document.getElementById('note-input').value = '';
-        openModal();
-    };
+    window.closeModal = () => {
+        const modal = document.getElementById('modal');
+        if (modal) modal.style.display = 'none';
+    };
 
-    window.delNote = async (idx) => {
-        const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
-        const noteAuthor = notes[idx].author ? notes[idx].author.toLowerCase() : '';
-        const isOwner = noteAuthor === currentUser;
+    window.save = async (cat) => {
+        const input = document.getElementById('note-input');
+        const val = input.value.trim();
+        const text = val || (cat === 'memorial' ? 'ВЕЧЕРЯ' : cat === 'meeting' ? 'ВСТРЕЧА' : cat === 'congress' ? 'КОНГРЕСС' : 'ЛИЧНОЕ');
+        
+        const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
+        notes.push({ text, category: cat, author: currentUser });
+        
+        try {
+            await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
+            input.value = '';
+            openModal();
+        } catch (e) {
+            alert("Ошибка сохранения: проверьте права доступа Firebase!");
+        }
+    };
 
-        if (isAdmin || isOwner) {
-            notes.splice(idx, 1);
-            await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
-            openModal();
-        }
-    };
+    window.delNote = async (idx) => {
+        const notes = Array.isArray(dbData[selectedDay]) ? [...dbData[selectedDay]] : [];
+        if (isAdmin || notes[idx].author === currentUser) {
+            notes.splice(idx, 1);
+            await setDoc(doc(db, "calendar", docId), { [selectedDay]: notes }, { merge: true });
+            openModal();
+        }
+    };
 
-    renderGrid();
-    onSnapshot(doc(db, "calendar", docId), (s) => {
-        dbData = s.exists() ? s.data() : {};
-        updateUI();
-    });
-    // === ЛОГИКА СВАЙПА (Возврат на главную) ===
-    let touchStartX = 0;
-    let touchEndX = 0;
+    // Слушаем изменения в реальном времени
+    renderGrid();
+    onSnapshot(doc(db, "calendar", docId), (s) => {
+        dbData = s.exists() ? s.data() : {};
+        updateUI();
+    });
 
-    document.addEventListener('touchstart', e => { 
-        touchStartX = e.changedTouches[0].screenX; 
-    }, {passive: true});
-
-    document.addEventListener('touchend', e => { 
-        touchEndX = e.changedTouches[0].screenX; 
-        // Если пользователь сильно свайпнул вправо (больше 60px)
-        if (touchEndX > touchStartX + 60) {
-            location.href = 'calendar.html';
-        }
-    }, {passive: true});
+    // Свайп
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+    document.addEventListener('touchend', e => { 
+        if (e.changedTouches[0].screenX > touchStartX + 80) location.href = 'calendar.html';
+    }, {passive: true});
 </script>
 </body>
 </html>
