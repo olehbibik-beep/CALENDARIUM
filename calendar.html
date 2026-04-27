@@ -62,52 +62,75 @@
     /* =========================================
        4. БОКОВАЯ ПАНЕЛЬ (АКТУАЛЬНОЕ)
        ========================================= */
-    .sidebar { 
-    width: 20%; 
-    min-width: 200px; 
-    max-width: 220px; 
-    background: rgba(80,80,80,0.2);
-    /* Уменьшаем боковой padding с 2vw до 5px (или даже 2px) */
-    padding: 3vh 5px; 
-    display: flex; 
-    flex-direction: column; 
-    border-right: 0px solid var(--inner-border); 
-    flex-shrink: 0;
-    /* Гарантируем, что padding не распирает ширину */
-    box-sizing: border-box; 
-}
+  .sidebar { 
+        width: 20%; 
+        min-width: 200px; 
+        max-width: 220px; 
+        background: rgba(80, 80, 80, 0.2);
+        /* Прижимаем к краям: сверху/снизу оставляем 3vh, по бокам всего 4px */
+        padding: 3vh 4px; 
+        display: flex; 
+        flex-direction: column; 
+        border-right: 0px solid var(--inner-border); 
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
 
-.section-title {
-    font-size: 0.7rem; 
-    color: #7f8fa6; 
-    margin-bottom: 20px; 
-    font-weight: 800; 
-    letter-spacing: 1px; 
-    text-transform: uppercase; 
-    text-align: center;
-}
+    .section-title {
+        font-size: 0.7rem; 
+        color: #7f8fa6; 
+        margin-bottom: 20px; 
+        font-weight: 800; 
+        letter-spacing: 1px; 
+        text-transform: uppercase; 
+        text-align: center;
+    }
 
-/* Блок ближайших событий */
-.upcoming-box { 
-    overflow-y: auto; 
-    flex: 1; 
-    padding: 0; /* Убираем все лишние отступы здесь */
-    width: 100%;
-}
+    /* Блок ближайших событий */
+    .upcoming-box { 
+        overflow-y: auto; 
+        flex: 1; 
+        padding: 0; 
+        width: 100%;
+    }
 
-.event-card-mini { 
-    background: rgba(255, 255, 255, 0); 
-    /* Немного уменьшим внутренний отступ карточки, чтобы текст не слипался с краем */
-    padding: 10px 8px; 
-    border-radius: 4px; 
-    margin-bottom: 10px; 
-    border-left: 4px solid var(--accent); 
-    transition: background 0.3s ease; 
-    cursor: default;
-    /* Растягиваем карточку на всю доступную ширину */
-    width: 100%;
-    box-sizing: border-box;
-}
+    .event-card-mini { 
+        background: rgba(255, 255, 255, 0.03); /* Едва заметный фон в покое */
+        padding: 12px 10px; 
+        border-radius: 4px; 
+        margin-bottom: 8px; 
+        border-left: 4px solid var(--accent); 
+        transition: all 0.2s ease; /* Плавная анимация выделения */
+        cursor: pointer; /* Снова делаем палец при наведении */
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* ЛОГИКА ВЫДЕЛЕНИЯ ПРИ НАВЕДЕНИИ */
+    .event-card-mini:hover { 
+        background: rgba(255, 255, 255, 0.1); /* Подсвечиваем фон */
+        border-left-width: 6px; /* Делаем полоску жирнее */
+        padding-left: 8px; /* Немного сдвигаем текст для эффекта */
+    }
+
+    /* ЛОГИКА ПРИ КЛИКЕ (выбор) */
+    .event-card-mini:active {
+        background: rgba(255, 255, 255, 0.15);
+        transform: scale(0.98); /* Легкое нажатие */
+    }
+
+    .ev-title { 
+        font-size: clamp(0.7rem, 1vw, 0.85rem); 
+        font-weight: 400; 
+        color: #fff; 
+        margin-bottom: 4px; 
+        line-height: 1.3;
+    }
+
+    .ev-date { 
+        font-size: clamp(0.6rem, 0.8vw, 0.75rem); 
+        color: #7f8fa6; 
+    }
 
     /* =========================================
        5. УНИВЕРСАЛЬНЫЕ КНОПКИ И ИКОНКИ
