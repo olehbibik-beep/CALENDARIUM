@@ -7,19 +7,74 @@
     <title>Главная | CALENDARIUM</title>
     <style>
     /* =========================================
-       1. ПЕРЕМЕННЫЕ И БАЗОВЫЕ НАСТРОЙКИ
+       1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (:root)
        ========================================= */
     :root { 
-        --accent: #09e0e3; 
-        --bg: #71797E; 
-        --dark: #1a1d1f;
-        --card-bg: #22272a;
-        --ev-memorial: #D10000; 
-        --ev-meeting: #056D71; 
-        --text-main: #e0e6ed;
-        --inner-border: rgba(255, 255, 255, 0.05);
+        /* --- ЦВЕТОВАЯ БИБЛИОТЕКА --- */
+        /* Основные цвета бренда и UI */
+        --color-accent: #09e0e3;              /* Главный акцентный цвет (бирюзовый) */
+        --color-bg-main: #71797E;             /* Фон за пределами приложения (серый) */
+        --color-bg-app: #0f1112;              /* Главный фон самого приложения (темный) */
+        --color-bg-nav: rgba(120, 120, 120, 0.3); /* Фон левой панели навигации */
+        --color-bg-sidebar: rgba(80, 80, 80, 0.2);/* Фон боковой панели (актуальное) */
+        --color-bg-card: #22272a;             /* Базовый фон для карточек (если нужно) */
+        --color-bg-board-card: rgba(255,255,255,0.03); /* Карточка объявления */
+        
+        /* Цвета календаря */
+        --color-bg-month: #00D18F;            /* Цвет карточки месяца (зеленый) */
+        --color-bg-month-hover: #B8FFE8;      /* Цвет месяца при наведении (светло-зеленый) */
+        
+        /* Текстовые цвета */
+        --color-text-main: #e0e6ed;           /* Основной текст */
+        --color-text-white: #ffffff;          /* Белый текст */
+        --color-text-black: #000000;          /* Черный текст */
+        --color-text-muted: #7f8fa6;          /* Приглушенный текст (даты, подписи) */
+        --color-text-year: #3d444b;           /* Цвет боковых цифр года */
+        --color-text-transparent: rgba(255, 255, 255, 0.1);      /* Сильно прозрачный текст (плейсхолдеры) */
+        --color-text-transparent-half: rgba(255, 255, 255, 0.5); /* Полупрозрачный текст (иконки доски) */
+        --color-error: #ff7675;               /* Цвет ошибок */
+
+        /* Цвета иконок */
+        --color-icon-accent: #52525C;         /* Приглушенный цвет иконок профиля/настроек */
+        --color-icon-exit: #ff4757;           /* Цвет иконки выхода при наведении (красный) */
+
+        /* Цвета СОБЫТИЙ (Индикаторы и рамки) */
+        --color-ev-memorial: #D10000;         /* Вечеря / Важные мемориалы (Красный) */
+        --color-ev-congress: #8E44AD;         /* Конгрессы (Фиолетовый - НОВЫЙ ЦВЕТ) */
+        --color-ev-meeting: #056D71;          /* Встречи собрания (Темно-бирюзовый) */
+
+        /* Рамки, ховеры (наведения) и эффекты прозрачности */
+        --color-border-inner: rgba(255, 255, 255, 0.05); /* Легкие внутренние разделители */
+        --color-border-dashed: rgba(255, 255, 255, 0.1); /* Цвет прерывистой рамки событий */
+        --color-hover-light: rgba(255, 255, 255, 0.08);  /* Легкая подсветка фона при наведении */
+        --color-hover-medium: rgba(255, 255, 255, 0.12); /* Подсветка фона при клике/выделении */
+        --color-hover-strong: rgba(255, 255, 255, 0.2);  /* Цвет рамок при наведении */
+        --color-hover-board-card: rgba(255,255,255,0.06);/* Подсветка карточки объявления */
+        
+        /* Оверлеи и тени */
+        --color-shadow-app: rgba(0, 0, 0, 0.5);          /* Тень главного контейнера приложения */
+        --color-shadow-month: rgba(0, 0, 0, 0.4);        /* Тень карточки месяца при наведении */
+        --color-shadow-icon: rgba(255, 255, 255, 0.5);   /* Свечение иконок при наведении */
+        --color-overlay-month: rgba(0, 0, 0, 0.3);       /* Затемнение картинки в линейном режиме */
+        --color-overlay-board: rgba(15, 17, 18, 0.95);   /* Фон панели объявлений */
+        --color-overlay-dark: rgba(0, 0, 0, 0.95);       /* Фон просмотрщика картинок */
+
+        /* --- БИБЛИОТЕКА РАЗМЕРОВ И ПОЛОЖЕНИЙ --- */
+        --size-app-width: 95vw;
+        --size-app-height: 90dvh;
+        --size-app-max-width: 1400px;
+        --size-app-max-height: 900px;
+        --size-app-radius: 30px;
+        
+        --size-nav-width: 60px;
+        --size-sidebar-width: 20%;
+        --size-sidebar-min-width: 200px;
+        --size-sidebar-max-width: 220px;
     }
     
+    /* =========================================
+       2. БАЗОВЫЕ НАСТРОЙКИ
+       ========================================= */
     * { 
         box-sizing: border-box; 
         font-family: 'Inter', sans-serif; 
@@ -28,46 +83,46 @@
     
     body { 
         margin: 0; padding: 0; 
-        background: var(--bg); color: var(--text-main); 
+        background: var(--color-bg-main); color: var(--color-text-main); 
         display: flex; align-items: center; justify-content: center; 
         height: 100dvh; width: 100vw; 
         overflow: hidden; 
     }
 
     /* =========================================
-       2. ГЛАВНЫЕ КОНТЕЙНЕРЫ (КАРКАС ПРИЛОЖЕНИЯ)
+       3. ГЛАВНЫЕ КОНТЕЙНЕРЫ (КАРКАС ПРИЛОЖЕНИЯ)
        ========================================= */
     .app-container {
-        width: 95vw; height: 90dvh; 
-        max-width: 1400px; max-height: 900px;
-        background: #0f1112;
-        border-radius: 30px; 
+        width: var(--size-app-width); height: var(--size-app-height); 
+        max-width: var(--size-app-max-width); max-height: var(--size-app-max-height);
+        background: var(--color-bg-app);
+        border-radius: var(--size-app-radius); 
         display: flex; flex-direction: row; 
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        box-shadow: 0 20px 50px var(--color-shadow-app);
     }
 
     /* =========================================
-       3. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
+       4. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
        ========================================= */
     .nav-bar {
-        width: 60px;
-        background: rgba(120, 120, 120, 0.3);
-        border-right: 0px solid var(--inner-border);
+        width: var(--size-nav-width);
+        background: var(--color-bg-nav);
+        border-right: 0px solid var(--color-border-inner);
         display: flex; flex-direction: column; align-items: center; justify-content: space-between;
         padding: 3vh 0; flex-shrink: 0; z-index: 20;
     }
     .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 
-  /* =========================================
-       ОБНОВЛЕННЫЙ СТИЛЬ БОКОВОЙ ПАНЕЛИ
+    /* =========================================
+       5. БОКОВАЯ ПАНЕЛЬ (АКТУАЛЬНОЕ)
        ========================================= */
     .sidebar { 
-        width: 20%; min-width: 200px; max-width: 220px; 
-        background: rgba(80, 80, 80, 0.2);
+        width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
+        background: var(--color-bg-sidebar);
         padding: 3vh 4px; 
         display: flex; flex-direction: column; 
-        border-right: 0px solid var(--inner-border); 
+        border-right: 0px solid var(--color-border-inner); 
         flex-shrink: 0;
         box-sizing: border-box;
     }
@@ -79,79 +134,53 @@
         padding: 10px 8px; 
         border-radius: 4px; 
         margin-bottom: 10px; 
-        /* Прерывистая рамка */
-        border: 1px dashed rgba(255,255,255,0.1); 
-        /* Полоска стала 2px (была 4px) */
-        border-left: 4px solid var(--accent);
+        border: 1px dashed var(--color-border-dashed); 
+        border-left: 4px solid var(--color-accent);
         transition: all 0.2s ease; 
         cursor: pointer;
         width: 100%;
         box-sizing: border-box;
     }
 
-    /* ЛОГИКА ВЫДЕЛЕНИЯ: Просто становится чуть светлее */
     .event-card-mini:hover { 
-        background: rgba(255, 255, 255, 0.08); 
-        border-color: rgba(255, 255, 255, 0.2); 
+        background: var(--color-hover-light); 
+        border-color: var(--color-hover-strong); 
+        padding-left: 8px; 
     }
 
     .event-card-mini:active {
-        background: rgba(255, 255, 255, 0.12);
-    }
-
-    /* =========================================
-       ИНДИКАТОРЫ (ТОЧКИ В КАЛЕНДАРЕ)
-       ========================================= */
-    .dot { 
-        /* УМЕНЬШЕНО: Высота стала 2px (была 4px) */
-        height: 2px; 
-        width: 100%; 
-        max-width: 15px; 
-        border-radius: 4px; 
-    }
-    .dot.red { background: var(--ev-memorial); }
-    .dot.blue { background: var(--ev-meeting); }
-
-    /* Текстовые стили */
-    .ev-title { 
-        font-size: clamp(0.7rem, 1vw, 0.85rem); 
-        font-weight: 300; 
-        color: #fff; 
-        margin-bottom: 4px; 
-        line-height: 1.3;
-    }
-    .ev-date { 
-        font-size: clamp(0.6rem, 0.8vw, 0.75rem); 
-        color: #7f8fa6; 
-    }
-
-    /* ЛОГИКА ВЫДЕЛЕНИЯ ПРИ НАВЕДЕНИИ */
-    .event-card-mini:hover { 
-        background: rgba(255, 255, 255, 0.1); /* Подсвечиваем фон */
-        padding-left: 8px; /* Немного сдвигаем текст для эффекта */
-    }
-
-    /* ЛОГИКА ПРИ КЛИКЕ (выбор) */
-    .event-card-mini:active {
-        background: rgba(255, 255, 255, 0.15);
-        transform: scale(0.98); /* Легкое нажатие */
+        background: var(--color-hover-medium);
+        transform: scale(0.98);
     }
 
     .ev-title { 
         font-size: clamp(0.7rem, 1vw, 0.85rem); 
         font-weight: 400; 
-        color: #fff; 
+        color: var(--color-text-white); 
         margin-bottom: 4px; 
         line-height: 1.3;
     }
 
     .ev-date { 
         font-size: clamp(0.6rem, 0.8vw, 0.75rem); 
-        color: #7f8fa6; 
+        color: var(--color-text-muted); 
     }
 
     /* =========================================
-       5. УНИВЕРСАЛЬНЫЕ КНОПКИ И ИКОНКИ
+       6. ИНДИКАТОРЫ (ТОЧКИ В КАЛЕНДАРЕ)
+       ========================================= */
+    .dot { 
+        height: 2px; 
+        width: 100%; 
+        max-width: 15px; 
+        border-radius: 4px; 
+    }
+    .dot.red { background: var(--color-ev-memorial); }
+    .dot.congress { background: var(--color-ev-congress); } /* Новый цвет конгрессов */
+    .dot.blue { background: var(--color-ev-meeting); }
+
+    /* =========================================
+       7. УНИВЕРСАЛЬНЫЕ КНОПКИ И ИКОНКИ
        ========================================= */
     .icon-btn { 
         background: none; border: none; padding: 5px; cursor: pointer; 
@@ -161,154 +190,139 @@
     .ui-icon {
         font-family: "Segoe UI Symbol", "Symbola", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
         font-size: 22px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;
-        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; color: #fff; opacity: 0.5;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; color: var(--color-text-white); opacity: 0.5;
     }
-    .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-    .ui-icon-accent { color: #52525C; opacity: 0.8; }
-    .icon-btn:hover .ui-icon-accent { color: var(--accent); }
-    .icon-btn-exit:hover .ui-icon { color: #ff4757 !important; }
+    .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px var(--color-shadow-icon); }
+    .ui-icon-accent { color: var(--color-icon-accent); opacity: 0.8; }
+    .icon-btn:hover .ui-icon-accent { color: var(--color-accent); }
+    .icon-btn-exit:hover .ui-icon { color: var(--color-icon-exit) !important; }
 
     /* =========================================
-       6. ОСНОВНАЯ ОБЛАСТЬ (КАЛЕНДАРЬ И ИЛЛЮСТРАЦИЯ)
+       8. ОСНОВНАЯ ОБЛАСТЬ (КАЛЕНДАРЬ И ИЛЛЮСТРАЦИЯ)
        ========================================= */
     .main-view { 
         flex: 1; display: flex; flex-direction: row; align-items: center;
         padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw;
     }
 
-    /* Блок для картинки с человеком (ровно 50%) */
     .illustration-box {
         width: 20%; 
         display: flex; align-items: center; justify-content: center;
     }
     .illustration-placeholder {
-        color: rgba(255,255,255,0.1); border: 2px;
+        color: var(--color-text-transparent); border: 2px;
         border-radius: 20px; padding: 20px; text-align: center; font-size: 0.8rem;
     }
 
-    /* Блок самого календаря (Остальные 50%) */
     .calendar-wrapper {
         flex: 1; display: flex; flex-direction: column; height: 80%; transition: 0.3s;
     }
 
-    /* Скрытие человека при включении линейного вида */
     .main-view.linear-active .illustration-box { display: none !important; }
 
-    /* Переключатель годов */
     .year-switcher { 
         display: flex; align-items: center; justify-content: flex-end; gap: 1.5vw; 
         margin-bottom: 2vh; flex-shrink: 0; 
     }
-    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: #fff; line-height: 1; }
-    .year-side { cursor: pointer; color: #3d444b; font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
-    .year-side:hover { color: var(--accent); }
+    #display-year { font-size: clamp(2.5rem, 6vh, 5rem); font-weight: 300; letter-spacing: -2px; color: var(--color-text-white); line-height: 1; }
+    .year-side { cursor: pointer; color: var(--color-text-year); font-weight: 300; font-size: clamp(1.2rem, 3vh, 2rem); transition: 0.2s; }
+    .year-side:hover { color: var(--color-accent); }
 
-    /* Сетка месяцев (ОРИГИНАЛЬНЫЕ ЦВЕТА ВОЗВРАЩЕНЫ) */
     .months-grid { 
         display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); 
         gap: clamp(8px, 1.5vh, 20px); width: 100%; height: 100%; flex: 1; min-height: 0; 
     }
     .month-card { 
-        background: #00D18F; border-radius: 18px;
+        background: var(--color-bg-month); border-radius: 18px;
         display: flex; flex-direction: column; align-items: center; justify-content: center; 
-        color: #000; font-weight: 600; cursor: pointer; position: relative; transition: 0.3s;
+        color: var(--color-text-black); font-weight: 600; cursor: pointer; position: relative; transition: 0.3s;
         text-transform: uppercase; font-size: clamp(0.6rem, 1.2vh + 0.4vw, 1.1rem);
         white-space: nowrap; padding: 0 5px;
         height: 100%; width: 100%; border: 0px solid transparent; overflow: hidden;
     }
-    .month-card:hover { background: #B8FFE8; box-shadow: 0 8px 15px rgba(0,0,0,0.4); }
+    .month-card:hover { background: var(--color-bg-month-hover); box-shadow: 0 8px 15px var(--color-shadow-month); }
     
     .month-card.current-active { 
-        z-index: 10; background: #B8FFE8; color: #000; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        z-index: 10; background: var(--color-bg-month-hover); color: var(--color-text-black); box-shadow: 0 8px 15px var(--color-shadow-month);
     }
     .month-card.current-active::before { display: none !important; }
 
-    /* Линейный режим календаря (ОРИГИНАЛЬНЫЙ) */
     .months-grid.linear-mode {
         display: flex !important; flex-direction: row !important; gap: 6px; 
         align-items: stretch; overflow: hidden !important; touch-action: none;
     }
     .months-grid.linear-mode .month-card {
         flex: 1; min-width: 0; height: 100%; border-radius: 12px;
-        background-color: #00D18F; 
+        background-color: var(--color-bg-month); 
         background-image: var(--bg-img);
         background-size: cover; background-repeat: no-repeat; background-position: center;  
-        font-size: 0.6rem; color: #fff;
+        font-size: 0.6rem; color: var(--color-text-white);
     }
-    .months-grid.linear-mode .month-card:hover { z-index: 5; background: #B8FFE8; filter: brightness(0.9); }
-    .months-grid.linear-mode .month-card:hover::before { background: rgba(255, 255, 255, 0.1); }
-    .months-grid.linear-mode .month-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: rgba(0,0,0,0.3); }
+    .months-grid.linear-mode .month-card:hover { z-index: 5; background: var(--color-bg-month-hover); filter: brightness(0.9); }
+    .months-grid.linear-mode .month-card:hover::before { background: var(--color-hover-light); }
+    .months-grid.linear-mode .month-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: var(--color-overlay-month); }
     .months-grid.linear-mode .month-card span,
     .months-grid.linear-mode .month-card .month-indicator { z-index: 2; }
     .months-grid.linear-mode .month-indicator { width: 30%; bottom: 5%; flex-direction: column; gap: 2px; }
 
-    /* Номера месяцев для линейного вида */
     .m-num { display: none; font-size: 0.6rem; font-weight: 700; margin-bottom: 4px; }
     .months-grid.linear-mode .m-num { display: block; }
 
-    /* Индикаторы событий (точки) */
     .month-indicator { position: absolute; bottom: 10%; display: flex; gap: 4px; width: 20%; justify-content: center; }
-    .dot { height: 4px; width: 100%; max-width: 15px; border-radius: 8px; }
-    .dot.red { background: var(--ev-memorial); }
-    .dot.blue { background: var(--ev-meeting); }
 
     /* =========================================
-       7. ПАНЕЛЬ ОБЪЯВЛЕНИЙ (BOARD)
+       9. ПАНЕЛЬ ОБЪЯВЛЕНИЙ (BOARD)
        ========================================= */
     .board-toggle-btn {
         position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-        background: rgba(255,255,255,0.05); border: none; padding: 25px 8px;
+        background: var(--color-border-inner); border: none; padding: 25px 8px;
         border-radius: 12px 0 0 12px; cursor: pointer; z-index: 100; transition: 0.3s;
     }
-    .board-toggle-btn:hover { background: var(--accent); }
-    .board-toggle-btn .board-icon { color: rgba(255,255,255,0.5); font-size: 12px; transition: 0.3s; }
-    .board-toggle-btn:hover .board-icon { color: #000; }
+    .board-toggle-btn:hover { background: var(--color-accent); }
+    .board-toggle-btn .board-icon { color: var(--color-text-transparent-half); font-size: 12px; transition: 0.3s; }
+    .board-toggle-btn:hover .board-icon { color: var(--color-text-black); }
 
     .announcements-overlay {
-        position: absolute; inset: 0; background: rgba(15, 17, 18, 0.95); backdrop-filter: blur(10px);
+        position: absolute; inset: 0; background: var(--color-overlay-board); backdrop-filter: blur(10px);
         z-index: 200; display: flex; flex-direction: column; padding: 40px;
         transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .announcements-overlay.active { transform: translateX(0); }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-    .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--accent); }
-    .close-panel-btn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; }
-    .close-panel-btn:hover { color: var(--accent); transform: scale(1.1); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--color-border-inner); padding-bottom: 15px; }
+    .panel-header h2 { margin: 0; font-weight: 300; letter-spacing: 2px; color: var(--color-accent); }
+    .close-panel-btn { background: none; border: none; color: var(--color-text-white); font-size: 24px; cursor: pointer; transition: 0.2s; }
+    .close-panel-btn:hover { color: var(--color-accent); transform: scale(1.1); }
     .board-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding-right: 10px; overflow-y: auto; flex: 1; align-content: start; }
-    .board-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border-top: 3px solid var(--accent); display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s ease; }
-    .board-card:hover { background: rgba(255,255,255,0.06); }
-    .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: #fff; font-weight: 600; }
-    .board-card p { margin: 0; color: #7f8fa6; font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+    .board-card { background: var(--color-bg-board-card); padding: 20px; border-radius: 8px; border-top: 3px solid var(--color-accent); display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s ease; }
+    .board-card:hover { background: var(--color-hover-board-card); }
+    .board-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--color-text-white); font-weight: 600; }
+    .board-card p { margin: 0; color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
 
-    .image-viewer { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .image-viewer { display: none; position: fixed; inset: 0; background: var(--color-overlay-dark); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
     .image-viewer img { max-width: 95vw; max-height: 95vh; object-fit: contain; border-radius: 8px; }
-    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: #fff; font-weight: 300; cursor: pointer; transition: 0.2s; }
-    .close-viewer:hover { color: var(--ev-memorial); }
+    .close-viewer { position: absolute; top: 20px; right: 30px; font-size: 2.5rem; color: var(--color-text-white); font-weight: 300; cursor: pointer; transition: 0.2s; }
+    .close-viewer:hover { color: var(--color-ev-memorial); }
 
     /* =========================================
-       8. АДАПТИВНОСТЬ (МОБИЛКИ - ОРИГИНАЛЬНАЯ ЛОГИКА)
+       10. АДАПТИВНОСТЬ (МОБИЛКИ)
        ========================================= */
     @media (max-width: 1200px) { .board-items { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 900px) { .board-items { grid-template-columns: repeat(2, 1fr); } }
 
     @media (orientation: portrait) {
-        body { background: #0f1112; }
+        body { background: var(--color-bg-app); }
         .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
         
-        /* Делаем левое меню горизонтальной шапкой */
         .nav-bar { 
             width: 100%; height: auto; flex-direction: row; padding: 1vh 4vw; 
-            border-right: none; border-bottom: 1px solid var(--inner-border); 
+            border-right: none; border-bottom: 1px solid var(--color-border-inner); 
         }
         .nav-group { flex-direction: row; gap: 15px; }
         
-        /* Оригинальные стили мобилки */
-        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--inner-border); background: #0f1112; flex-direction: column; align-items: stretch; justify-content: flex-start; }
+        .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--color-border-inner); background: var(--color-bg-app); flex-direction: column; align-items: stretch; justify-content: flex-start; }
         .upcoming-box .event-card-mini:nth-of-type(n+4) { display: none; }
         
         .main-view { padding: 1vh 4vw 2vh; flex: 1; flex-direction: column; justify-content: space-between; min-height: 0; }
-        
-        /* Прячем человека на мобилках */
         .illustration-box { display: none !important; }
         .calendar-wrapper { width: 100%; height: 100%; }
 
@@ -353,7 +367,7 @@
         <div class="sidebar">
             <div class="section-title">АКТУАЛЬНОЕ</div>
             <div class="upcoming-box" id="next-event-container">
-                <div style="font-size:0.6rem; color:#7f8fa6; opacity:0.3; text-align:center;">ЗАГРУЗКА...</div>
+                <div style="font-size:0.6rem; color:var(--color-text-muted); opacity:0.3; text-align:center;">ЗАГРУЗКА...</div>
             </div>
         </div>
 
@@ -385,7 +399,7 @@
                     <button class="close-panel-btn" onclick="toggleBoard()" title="Закрыть">✕</button>
                 </div>
                 <div id="board-content" class="board-items">
-                    <div style="text-align:center; opacity:0.3; margin-top:50px;">ЗАГРУЗКА...</div>
+                    <div style="text-align:center; opacity:0.3; margin-top:50px; color:var(--color-text-white);">ЗАГРУЗКА...</div>
                 </div>
             </div>
 
@@ -420,7 +434,6 @@
         const db = getFirestore(initializeApp(firebaseConfig));
         
         const monthsNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        // ОРИГИНАЛЬНЫЙ МАССИВ КАРТИНОК ДЛЯ ЛИНЕЙНОГО ВИДА
         const monthImages = [
             "Led.png", "Led.png", "Zar.png", "Zar.png", 
             "Zar.png", "Cer.png", "Cer.png", "Cer.png", 
@@ -434,7 +447,6 @@
             document.getElementById('board-edit-btn').style.display = 'flex';
         }
 
-        // Логика переключения вида (исчезает картинка, растягивается сетка)
         window.toggleCalendarView = () => {
             const grid = document.getElementById('months');
             const mainView = document.getElementById('main-view');
@@ -461,7 +473,7 @@
             monthsNames.forEach((m, i) => {
                 const isToday = (i === todayMonth && currentYear === todayYear);
                 const statusClass = isToday ? 'current-active' : '';
-                const mNum = (i + 1).toString().padStart(2, '0'); // Добавлен номер месяца
+                const mNum = (i + 1).toString().padStart(2, '0'); 
                 
                 gridHTML += `
                     <div class="month-card ${statusClass}" 
@@ -509,7 +521,7 @@
 
         async function loadBoardData() {
             const content = document.getElementById('board-content');
-            content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1;">ОБНОВЛЕНИЕ...</div>';
+            content.innerHTML = '<div style="text-align:center; opacity:0.3; margin-top:50px; grid-column: 1 / -1; color: var(--color-text-white);">ОБНОВЛЕНИЕ...</div>';
             
             try {
                 const snap = await getDoc(doc(db, "board", "main")); 
@@ -522,10 +534,10 @@
                         const imageHtml = post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin-top:auto; cursor: zoom-in; transition: 0.2s;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" alt="Фото" onclick="openViewer('${post.imageUrl}')">` : '';
                         html += `
                             <div class="board-card">
-                                <h3 style="font-size: 0.75rem; color: #7f8fa6; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
+                                <h3 style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase;">
                                     ${post.date} • ${post.author}
                                 </h3>
-                                <p style="margin: 0 0 10px 0; color: #fff; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
+                                <p style="margin: 0 0 10px 0; color: var(--color-text-white); font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word;">
                                     ${post.text}
                                 </p>
                                 ${imageHtml}
@@ -534,18 +546,18 @@
                     });
                     content.innerHTML = html;
                 } else {
-                    content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1;">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
+                    content.innerHTML = '<div style="text-align:center; opacity:0.2; margin-top:50px; grid-column: 1 / -1; color: var(--color-text-white);">ОБЪЯВЛЕНИЙ ПОКА НЕТ</div>';
                 }
             } catch (e) {
                 console.error("Ошибка при загрузке доски:", e);
-                content.innerHTML = '<div style="color:#ff7675; text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
+                content.innerHTML = '<div style="color:var(--color-error); text-align:center; margin-top:50px; grid-column: 1 / -1;">ОШИБКА ЗАГРУЗКИ</div>';
             }
         }
 
         async function loadData() {
             const container = document.getElementById('next-event-container');
             if (!container) return;
-            container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px;">ПОИСК...</div>';
+            container.innerHTML = '<div style="font-size:0.6rem; opacity:0.3; text-align:center; margin-top:20px; color: var(--color-text-white);">ПОИСК...</div>';
             
             const now = new Date();
             const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -563,13 +575,17 @@
                 if (snap.exists()) {
                     const data = snap.data();
                     const ind = document.getElementById(`ind-${i}`);
-                    let hasRed = false, hasBlue = false;
+                    
+                    // Обновленная логика для разделения memorial и congress
+                    let hasRed = false, hasCongress = false, hasBlue = false;
 
                     Object.entries(data).forEach(([day, notes]) => {
                         if (!Array.isArray(notes)) return;
                         notes.forEach(n => {
-                            if (n.category === 'memorial' || n.category === 'congress') hasRed = true;
+                            if (n.category === 'memorial') hasRed = true;
+                            else if (n.category === 'congress') hasCongress = true;
                             else hasBlue = true;
+                            
                             const eventDate = new Date(currentYear, i, parseInt(day)).getTime();
                             if (eventDate >= todayStart) {
                                 upcomingEvents.push({ text: n.text, day: day, mName: monthsNames[i], stamp: eventDate, cat: n.category });
@@ -579,6 +595,7 @@
 
                     if (ind) {
                         if (hasRed) ind.innerHTML += '<div class="dot red"></div>';
+                        if (hasCongress) ind.innerHTML += '<div class="dot congress"></div>';
                         if (hasBlue) ind.innerHTML += '<div class="dot blue"></div>';
                     }
                 }
@@ -588,12 +605,16 @@
             if (upcomingEvents.length > 0) {
                 let html = '';
                 upcomingEvents.slice(0, 5).forEach(ev => {
-                    const color = (ev.cat === 'memorial' || ev.cat === 'congress') ? 'var(--ev-memorial)' : 'var(--ev-meeting)';
-                    html += `<div class="event-card-mini" style="border-left-color: ${color}"><div class="ev-title">${ev.text}</div><div class="ev-date">${ev.day} ${ev.mName}</div></div>`;
+                    // Разделяем цвета боковой полоски по категориям
+                    let dotColor = 'var(--color-ev-meeting)';
+                    if (ev.cat === 'memorial') dotColor = 'var(--color-ev-memorial)';
+                    if (ev.cat === 'congress') dotColor = 'var(--color-ev-congress)';
+
+                    html += `<div class="event-card-mini" style="border-left-color: ${dotColor}"><div class="ev-title">${ev.text}</div><div class="ev-date">${ev.day} ${ev.mName}</div></div>`;
                 });
                 container.innerHTML = html;
             } else {
-                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center; margin-top:20px;">СОБЫТИЙ НЕТ</div>';
+                container.innerHTML = '<div style="font-size:0.6rem; opacity:0.2; text-align:center; margin-top:20px; color: var(--color-text-white);">СОБЫТИЙ НЕТ</div>';
             }
         }
 
