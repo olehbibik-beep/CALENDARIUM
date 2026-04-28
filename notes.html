@@ -20,7 +20,7 @@
             --color-text-white: #ffffff;          
             --color-text-black: #000000;          
             --color-text-muted: #7f8fa6;          
-            --color-text-transparent: rgba(255, 255, 255, 0.1);      
+            --color-text-transparent: rgba(255, 255, 255, 0.1);     
             --color-error: #ff7675;               
 
             --color-icon-accent: #52525C;         
@@ -69,7 +69,7 @@
             height: 100dvh; width: 100vw; overflow: hidden; 
         }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР (1-в-1 с calendar.html) */
+        /* ГЛАВНЫЙ КОНТЕЙНЕР */
         .app-container { 
             width: var(--size-app-width); height: var(--size-app-height); 
             max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); 
@@ -117,31 +117,29 @@
         .action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .action-btn:active { transform: translateY(0); }
 
-    .event-card-mini { 
-    background: transparent; 
-    padding: 10px 8px; 
-    border-radius: 4px; 
-    margin-bottom: 10px; 
-    border: 1px dashed var(--color-border-dashed); 
-    border-left: 4px solid var(--color-accent);
-    transition: all 0.2s ease; 
-    cursor: pointer;
-    width: 100%;
-}
-.event-card-mini:hover { 
-    background: var(--color-hover-light); 
-    border-color: var(--color-hover-strong); 
-    padding-left: 8px; 
-}
-.ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 400; color: var(--color-text-white); margin-bottom: 4px; line-height: 1.3; }
-.ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: var(--color-text-muted); }
+        /* КРАСИВЫЕ КАРТОЧКИ СОБЫТИЙ В БОКОВОЙ ПАНЕЛИ */
+        .event-card-mini { 
+            background: var(--color-bg-card); 
+            padding: 12px 10px; 
+            border-radius: 6px; 
+            margin-bottom: 10px; 
+            border: none;
+            border-left: 4px solid var(--color-accent); /* Цвет будет меняться через JS */
+            transition: all 0.2s ease; 
+            cursor: pointer;
+            width: 100%;
+        }
+        .event-card-mini:hover { 
+            background: var(--color-hover-light); 
+            transform: translateX(3px);
+        }
+        .ev-title { font-size: clamp(0.75rem, 1vw, 0.9rem); font-weight: 500; color: var(--color-text-white); margin-bottom: 2px; line-height: 1.3; }
         
         /* =========================================
-           5. ОСНОВНАЯ ОБЛАСТЬ (КАРТИНКА + СЕТКА ДНЕЙ)
+           5. ОСНОВНАЯ ОБЛАСТЬ
            ========================================= */
         .main-view { flex: 1; display: flex; flex-direction: row; align-items: center; padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw; }
         
-        /* Блок с картинкой как на главной */
         .illustration-box { width: 20%; display: flex; align-items: center; justify-content: center; }
         .illustration-placeholder { color: var(--color-text-transparent); border-radius: 20px; padding: 20px; text-align: center; }
 
@@ -150,59 +148,65 @@
         #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: var(--color-text-white); text-transform: uppercase; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: var(--color-text-muted); }
         .grid { 
-    display: grid; 
-    grid-template-columns: repeat(7, 1fr); 
-    grid-auto-rows: 1fr; /* <- Заставит строки тянуться равномерно по высоте */
-    gap: clamp(4px, 1vh, 8px); /* Резиновый отступ */
-    flex: 1; /* Занимает всё оставшееся место */
-    min-height: 0; /* Обязательно для флекс-контейнеров, чтобы не вылезало за края */
-}
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            grid-auto-rows: 1fr; 
+            gap: clamp(4px, 1vh, 8px); 
+            flex: 1; 
+            min-height: 0; 
+        }
 
-.day-box { 
-    /* Убрали aspect-ratio! */
-    background: var(--color-bg-day); 
-    border-radius: 12px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    font-size: clamp(0.9rem, 2vh, 1.2rem); /* Резиновый шрифт */
-    cursor: pointer; 
-    position: relative; 
-    transition: 0.2s; 
-    border: 2px solid transparent; 
-    overflow: hidden; 
-}
+        .day-box { 
+            background: var(--color-bg-day); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(0.9rem, 2vh, 1.2rem); 
+            cursor: pointer; 
+            position: relative; 
+            transition: 0.2s; 
+            border: 2px solid transparent; 
+            overflow: hidden; 
+        }
         .day-box:hover { background: var(--color-bg-day-hover); }
         .day-box.weekend { background: var(--color-bg-weekend); color: var(--color-weekend-text); }
+        
+        /* ИСПРАВЛЕНО: Стили выбранного и текущего дня */
         .day-box.selected { 
-    border-color: var(--color-accent) !important; 
-    background: rgba(9, 224, 227, 0.1) !important; /* Легкая подсветка фона */
-    z-index: 2; 
-    transform: scale(1.05); /* Слегка увеличиваем выбранный день */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-        .day-box.today { color: var(--color-accent); font-weight: 700; border: 1px solid rgba(9, 224, 227, 0.2); }
+            border-color: var(--color-accent) !important; 
+            background: rgba(9, 224, 227, 0.15) !important; 
+            z-index: 2; 
+            transform: scale(1.05); 
+            box-shadow: 0 4px 15px rgba(9, 224, 227, 0.2);
+        }
+        .day-box.today { 
+            color: var(--color-accent); 
+            font-weight: 800; 
+            border: 2px solid rgba(9, 224, 227, 0.3); 
+        }
         .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; }
         
-        /* Индикаторы (Точки как на главной) */
+        /* ИСПРАВЛЕНО: Индикаторы событий */
         .indicator-row { 
-    position: absolute; 
-    bottom: 5%; /* Чуть приподняли от дна */
-    display: flex; 
-    gap: 4px; 
-    justify-content: center; 
-    width: 100%; 
-    padding: 0 4px; 
-}
-.dot { 
-    height: 4px; 
-    width: 12px; /* Фиксированная ширина лучше для маленьких ячеек */
-    border-radius: 4px; 
-}
-        .dot.blue { background: var(--color-ev-meeting); }
-        .dot.personal { background: var(--color-ev-personal); }
+            position: absolute; 
+            bottom: 8%; /* Сдвинули чуть выше от края */
+            display: flex; 
+            gap: 4px; 
+            justify-content: center; 
+            width: 100%; 
+            padding: 0 4px; 
+        }
+        .dot { 
+            height: 6px; 
+            width: 6px; 
+            border-radius: 50%; /* Круглые точки более эстетичны */
+            display: block; /* Важно: чтобы не "схлопывались" внутри Flex */
+        }
+        .dot.blue { background: var(--color-ev-meeting); box-shadow: 0 0 5px var(--color-ev-meeting); }
+        .dot.personal { background: var(--color-ev-personal); box-shadow: 0 0 5px var(--color-ev-personal); }
         
-        /* Линии конгресса (Сплошная полоса внизу) */
+        /* Линии конгресса */
         .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { 
             content: ''; position: absolute; bottom: 0; height: 4px; background: var(--color-ev-congress); width: 100%; 
         }
@@ -222,7 +226,7 @@
         .note-item { display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-card); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
 
         /* =========================================
-           7. АДАПТИВНОСТЬ (МОБИЛКИ) - как на главной
+           7. АДАПТИВНОСТЬ (МОБИЛКИ)
            ========================================= */
         @media (orientation: portrait) {
             body { background: var(--color-bg-app); }
@@ -238,13 +242,9 @@
             .calendar-wrapper { width: 100%; height: 100%; }
 
             .grid { gap: 4px; }
-.day-box { 
-    font-size: 0.9rem; /* Чуть мельче для мобилок */
-    border-radius: 6px; 
-    border-width: 1px; /* Тоньше рамка, чтобы экономить место */
-}
-.indicator-row { bottom: 3px; gap: 2px; }
-.dot { height: 3px; width: 8px; } /* Точки тоже делаем меньше на мобилке */
+            .day-box { font-size: 0.9rem; border-radius: 6px; border-width: 1px; }
+            .indicator-row { bottom: 5px; gap: 2px; }
+            .dot { height: 4px; width: 4px; } /* На мобилках точки чуть меньше */
             #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
         }
     </style>
@@ -359,15 +359,20 @@
         const notes = dbData[d] || [];
         
         const preview = document.getElementById('preview');
-        preview.innerHTML = `<div style="color:var(--color-accent); font-weight:800; margin-bottom:10px; font-size:1rem;">${d} ${months[mIdx]}</div>` +
+        
+        // ИСПРАВЛЕНО: Интеграция красивых карточек .event-card-mini
+        preview.innerHTML = `<div style="color:var(--color-text-white); font-weight:800; margin-bottom:15px; font-size:1.1rem; text-align:center; letter-spacing: 1px;">${d} ${months[mIdx]}</div>` +
             (notes.map(n => {
                 let col = 'var(--color-ev-personal)';
                 if (n.category === 'memorial') col = 'var(--color-ev-memorial)';
                 if (n.category === 'meeting') col = 'var(--color-ev-meeting)';
                 if (n.category === 'congress') col = 'var(--color-ev-congress)';
                 
-                return `<div style="border-left: 3px solid ${col}; padding-left: 8px; margin-bottom: 8px; color: var(--color-text-white); background: rgba(255,255,255,0.02); padding: 8px; border-radius: 0 4px 4px 0;">${n.text}</div>`;
-            }).join('') || '<div style="color:var(--color-text-muted);">Планов нет</div>');
+                return `
+                <div class="event-card-mini" style="border-left-color: ${col};">
+                    <div class="ev-title">${n.text}</div>
+                </div>`;
+            }).join('') || '<div style="color:var(--color-text-muted); text-align:center; font-size: 0.85rem; margin-top:20px;">ПЛАНОВ НЕТ</div>');
     };
 
     window.openModal = () => {
@@ -377,8 +382,6 @@
         
         document.getElementById('btn-memorial').disabled = !isAdmin;
         document.getElementById('btn-meeting').disabled = !isAdmin;
-        // Кнопка конгресса может быть доступна всем или только админу, при желании добавьте:
-        // document.getElementById('btn-congress').disabled = !isAdmin;
 
         list.innerHTML = notes.map((n, idx) => `
             <div class="note-item">
@@ -414,7 +417,6 @@
     function updateUI() {
         document.querySelectorAll('.day-box').forEach(tile => {
             const d = tile.id.split('-')[1];
-            // Очищаем классы перед перерисовкой
             tile.className = tile.className.split(' ').filter(c => ['day-box', 'weekend', 'today', 'selected'].includes(c)).join(' ');
             
             const marks = document.getElementById(`marks-${d}`);
@@ -425,12 +427,10 @@
 
             notes.forEach(n => {
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
-                // Добавляем точки встреч и личных дел
                 if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="dot blue"></div>';
                 if (n.category === 'personal' && marks) marks.innerHTML += '<div class="dot personal"></div>';
             });
 
-            // Логика полоски конгресса
             if (hasCongress) {
                 const hasPrev = (dbData[d-1] || []).some(n => n.category === 'congress');
                 const hasNext = (dbData[parseInt(d)+1] || []).some(n => n.category === 'congress');
