@@ -12,6 +12,7 @@
             --color-accent: #09e0e3;              
             --color-bg-main: #71797E;             
             --color-bg-app: #0f1112;              
+            --color-bg-nav: rgba(120, 120, 120, 0.3); 
             --color-bg-sidebar: rgba(80, 80, 80, 0.2);
             --color-bg-card: rgba(255, 255, 255, 0.03); 
             
@@ -37,20 +38,23 @@
             --color-shadow-app: rgba(0, 0, 0, 0.5);          
             --color-overlay-dark: rgba(0, 0, 0, 0.85);       
 
-            /* Специфичные для календаря */
+            /* Специфичные для сетки дней */
             --color-bg-day: #1a1d1f;
             --color-bg-day-hover: #2b3236;
             --color-bg-weekend: #14161A;
             --color-weekend-text: #636e72;
             
+            /* Единые размеры каркаса */
             --size-app-width: 95vw;
             --size-app-height: 90dvh;
             --size-app-max-width: 1400px;
             --size-app-max-height: 900px;
             --size-app-radius: 30px;
-            --size-sidebar-width: 25%;
-            --size-sidebar-min-width: 220px;
-            --size-sidebar-max-width: 320px;
+            
+            --size-nav-width: 60px;
+            --size-sidebar-width: 20%;
+            --size-sidebar-min-width: 200px;
+            --size-sidebar-max-width: 220px;
         }
 
         /* =========================================
@@ -65,6 +69,7 @@
             height: 100dvh; width: 100vw; overflow: hidden; 
         }
 
+        /* ГЛАВНЫЙ КОНТЕЙНЕР (1-в-1 с calendar.html) */
         .app-container { 
             width: var(--size-app-width); height: var(--size-app-height); 
             max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); 
@@ -74,29 +79,36 @@
         }
 
         /* =========================================
-           3. БОКОВАЯ ПАНЕЛЬ (ПРЕВЬЮ И УПРАВЛЕНИЕ)
+           3. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
            ========================================= */
-        .sidebar { 
-            width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
-            background: var(--color-bg-sidebar); padding: 3vh 2vw; 
-            display: flex; flex-direction: column; border-right: 1px solid var(--color-border-inner); flex-shrink: 0; 
+        .nav-bar {
+            width: var(--size-nav-width);
+            background: var(--color-bg-nav);
+            border-right: 0px solid var(--color-border-inner);
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            padding: 3vh 0; flex-shrink: 0; z-index: 20;
         }
+        .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
 
-        .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2vh; width: 100%; position: relative; }
-        .header-left, .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; }
-        .header-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; z-index: 5; }
-        
-        /* Иконки в стиле главной страницы */
+        /* Иконки UI */
         .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; }
         .ui-icon { font-family: "Segoe UI Symbol", "Symbola", sans-serif; font-size: 22px; line-height: 1; transition: 0.3s; color: var(--color-text-white); opacity: 0.5; }
         .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .ui-icon-accent { color: var(--color-icon-accent); opacity: 0.8; }
         .icon-btn:hover .ui-icon-accent { color: var(--color-accent); }
 
-        .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--color-text-white); letter-spacing: 1px; }
+        /* =========================================
+           4. БОКОВАЯ ПАНЕЛЬ (ДЕТАЛИ ДНЯ)
+           ========================================= */
+        .sidebar { 
+            width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
+            background: var(--color-bg-sidebar); padding: 3vh 2vw; 
+            display: flex; flex-direction: column; border-right: 0px solid var(--color-border-inner); flex-shrink: 0; 
+        }
+        .section-title { font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); letter-spacing: 1px; margin-bottom: 2vh; text-align: center; }
         
-        .preview-box { display: flex; flex-direction: column; margin-top: 1vh; flex: 1; overflow: hidden; }
-        .preview { background: transparent; width: 100%; padding: 1vh 0; border-radius: 4px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.4; }
+        .preview-box { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .preview { background: transparent; width: 100%; border-radius: 4px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.4; padding-right: 5px; }
         
         .action-btn { 
             width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 2vh; cursor: pointer; 
@@ -106,10 +118,15 @@
         .action-btn:active { transform: translateY(0); }
 
         /* =========================================
-           4. ОСНОВНАЯ ОБЛАСТЬ (СЕТКА ДНЕЙ)
+           5. ОСНОВНАЯ ОБЛАСТЬ (КАРТИНКА + СЕТКА ДНЕЙ)
            ========================================= */
-        .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; overflow: hidden; }
-        .calendar-wrapper { max-width: 800px; width: 100%; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+        .main-view { flex: 1; display: flex; flex-direction: row; align-items: center; padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw; }
+        
+        /* Блок с картинкой как на главной */
+        .illustration-box { width: 20%; display: flex; align-items: center; justify-content: center; }
+        .illustration-placeholder { color: var(--color-text-transparent); border-radius: 20px; padding: 20px; text-align: center; }
+
+        .calendar-wrapper { flex: 1; display: flex; flex-direction: column; height: 90%; transition: 0.3s; max-width: 800px; margin: 0 auto; }
         
         #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: var(--color-text-white); text-transform: uppercase; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: var(--color-text-muted); }
@@ -118,29 +135,30 @@
         .day-box { 
             aspect-ratio: 1/1; background: var(--color-bg-day); border-radius: 12px; display: flex; align-items: center; justify-content: center; 
             font-size: 1.2rem; cursor: pointer; position: relative; transition: 0.2s; border: 2px solid transparent; 
+            overflow: hidden; /* Чтобы нижняя линия конгресса не вылезала за углы */
         }
         .day-box:hover { background: var(--color-bg-day-hover); }
         .day-box.weekend { background: var(--color-bg-weekend); color: var(--color-weekend-text); }
-        .day-box.selected { border-color: var(--color-accent) !important; }
+        .day-box.selected { border-color: var(--color-accent) !important; z-index: 2; }
         .day-box.today { color: var(--color-accent); font-weight: 700; border: 1px solid rgba(9, 224, 227, 0.2); }
         .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; }
         
-        /* Индикаторы */
-        .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 3px; justify-content: center; width: 80%; }
-        .mark { height: 3px; flex: 1; border-radius: 2px; }
-        .m-meeting { background: var(--color-ev-meeting); }
-        .m-personal { background: var(--color-ev-personal); }
+        /* Индикаторы (Точки как на главной) */
+        .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 4px; justify-content: center; width: 100%; padding: 0 4px; }
+        .dot { height: 4px; width: 100%; max-width: 12px; border-radius: 4px; }
+        .dot.blue { background: var(--color-ev-meeting); }
+        .dot.personal { background: var(--color-ev-personal); }
         
-        /* Конгресс линии (обновлено на фиолетовый) */
+        /* Линии конгресса (Сплошная полоса внизу) */
         .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { 
-            content: ''; position: absolute; bottom: 0; height: 3px; background: var(--color-ev-congress); width: 100%; 
+            content: ''; position: absolute; bottom: 0; height: 4px; background: var(--color-ev-congress); width: 100%; 
         }
         .day-box.c-start::after { left: 50%; width: 50%; }
         .day-box.c-end::after { left: 0; width: 50%; }
         .day-box.c-single::after { left: 25%; width: 50%; border-radius: 2px; }
 
         /* =========================================
-           5. МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ
+           6. МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ
            ========================================= */
         .modal { display: none; position: fixed; inset: 0; background: var(--color-overlay-dark); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-box { background: var(--color-bg-app); border: 1px solid var(--color-border-inner); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -151,12 +169,21 @@
         .note-item { display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-card); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
 
         /* =========================================
-           6. АДАПТИВНОСТЬ (МОБИЛКИ)
+           7. АДАПТИВНОСТЬ (МОБИЛКИ) - как на главной
            ========================================= */
         @media (orientation: portrait) {
-            .app-container { flex-direction: column; border-radius: 0; width: 100vw; height: 100dvh; box-shadow: none; }
-            .sidebar { width: 100%; max-width: 100%; border-right: none; border-bottom: 1px solid var(--color-border-inner); height: 35%; padding: 2vh 4vw; }
-            .main-view { padding: 2vh 4vw; flex: 1; min-height: 0; }
+            body { background: var(--color-bg-app); }
+            .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
+            
+            .nav-bar { width: 100%; height: auto; flex-direction: row; padding: 1vh 4vw; border-right: none; border-bottom: 1px solid var(--color-border-inner); }
+            .nav-group { flex-direction: row; gap: 15px; }
+            
+            .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--color-border-inner); background: var(--color-bg-app); flex-direction: column; align-items: stretch; justify-content: flex-start; }
+            
+            .main-view { padding: 1vh 4vw 2vh; flex: 1; flex-direction: column; justify-content: space-between; min-height: 0; }
+            .illustration-box { display: none !important; }
+            .calendar-wrapper { width: 100%; height: 100%; }
+
             .grid { gap: 4px; }
             .day-box { font-size: 1rem; border-radius: 6px; }
             #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
@@ -166,35 +193,50 @@
 <body>
 
     <div class="app-container">
-        <div class="sidebar">
-            <div class="user-header">
-                <div class="header-left">
-                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
-                        <span class="ui-icon">◀</span>
-                    </button>
-                </div>
-                <div class="header-center">
-                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
-                        <span class="ui-icon ui-icon-accent">⚙</span>
-                    </button>
-                </div>
-                <div class="header-right">
-                    <div id="user-display" class="user-name">...</div>
-                </div>
+        
+        <div class="nav-bar">
+            <div class="nav-group">
+                <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад в календарь">
+                    <span class="ui-icon">◀</span>
+                </button>
+                <button class="icon-btn" title="Профиль">
+                    <span class="ui-icon">👤</span>
+                </button>
+                <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
+                    <span class="ui-icon ui-icon-accent">⚙</span>
+                </button>
             </div>
+            <div class="nav-group">
+                <button class="icon-btn" title="Информация">
+                    <span class="ui-icon">ⓘ</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="section-title">ДЕТАЛИ ДНЯ</div>
             <div class="preview-box">
-                <div style="font-size:0.6rem; color:var(--color-text-muted); margin-bottom:10px; font-weight:800; letter-spacing:1px;">ДЕТАЛИ ДНЯ</div>
-                <div id="preview" class="preview">Выберите день.</div>
+                <div id="preview" class="preview">
+                    <div style="color:var(--color-text-muted); text-align:center; margin-top:20px;">Выберите день</div>
+                </div>
                 <button class="action-btn" id="edit-btn" style="display:none;" onclick="openModal()">+ ДОБАВИТЬ ПЛАН</button>
             </div>
         </div>
 
         <div class="main-view">
+            
+            <div class="illustration-box">
+                <div class="illustration-placeholder">
+                    <img src="TABL.png" alt="Illustration" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+            </div>
+
             <div class="calendar-wrapper">
                 <div id="m-name">...</div>
                 <div class="weekdays"><div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div></div>
                 <div id="grid" class="grid"></div>
             </div>
+            
         </div>
     </div>
 
@@ -223,7 +265,6 @@
     const currentUser = currentUserRaw.toLowerCase();
     const isAdmin = currentUser === 'admin';
 
-    document.getElementById('user-display').innerText = currentUser;
     if (isAdmin) document.getElementById('admin-btn').style.display = 'flex';
 
     // 2. Firebase
@@ -247,7 +288,7 @@
     let dbData = {};
     let selectedDay = null;
 
-    // 4. Функции (привязываем к window для доступа из HTML)
+    // 4. Функции
     window.selectDay = (d) => {
         if (!d) return;
         selectedDay = d;
@@ -259,15 +300,14 @@
         const notes = dbData[d] || [];
         
         const preview = document.getElementById('preview');
-        preview.innerHTML = `<div style="color:var(--color-accent); font-weight:800; margin-bottom:10px;">${d} ${months[mIdx]}</div>` +
+        preview.innerHTML = `<div style="color:var(--color-accent); font-weight:800; margin-bottom:10px; font-size:1rem;">${d} ${months[mIdx]}</div>` +
             (notes.map(n => {
-                // Обновлена логика вывода цвета линии в превью
                 let col = 'var(--color-ev-personal)';
                 if (n.category === 'memorial') col = 'var(--color-ev-memorial)';
                 if (n.category === 'meeting') col = 'var(--color-ev-meeting)';
                 if (n.category === 'congress') col = 'var(--color-ev-congress)';
                 
-                return `<div style="border-left: 3px solid ${col}; padding-left: 8px; margin-bottom: 8px; color: var(--color-text-white);">${n.text}</div>`;
+                return `<div style="border-left: 3px solid ${col}; padding-left: 8px; margin-bottom: 8px; color: var(--color-text-white); background: rgba(255,255,255,0.02); padding: 8px; border-radius: 0 4px 4px 0;">${n.text}</div>`;
             }).join('') || '<div style="color:var(--color-text-muted);">Планов нет</div>');
     };
 
@@ -278,6 +318,8 @@
         
         document.getElementById('btn-memorial').disabled = !isAdmin;
         document.getElementById('btn-meeting').disabled = !isAdmin;
+        // Кнопка конгресса может быть доступна всем или только админу, при желании добавьте:
+        // document.getElementById('btn-congress').disabled = !isAdmin;
 
         list.innerHTML = notes.map((n, idx) => `
             <div class="note-item">
@@ -313,6 +355,7 @@
     function updateUI() {
         document.querySelectorAll('.day-box').forEach(tile => {
             const d = tile.id.split('-')[1];
+            // Очищаем классы перед перерисовкой
             tile.className = tile.className.split(' ').filter(c => ['day-box', 'weekend', 'today', 'selected'].includes(c)).join(' ');
             
             const marks = document.getElementById(`marks-${d}`);
@@ -323,10 +366,12 @@
 
             notes.forEach(n => {
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
-                if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="mark m-meeting"></div>';
-                if (n.category === 'personal' && marks) marks.innerHTML += '<div class="mark m-personal"></div>';
+                // Добавляем точки встреч и личных дел
+                if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="dot blue"></div>';
+                if (n.category === 'personal' && marks) marks.innerHTML += '<div class="dot personal"></div>';
             });
 
+            // Логика полоски конгресса
             if (hasCongress) {
                 const hasPrev = (dbData[d-1] || []).some(n => n.category === 'congress');
                 const hasNext = (dbData[parseInt(d)+1] || []).some(n => n.category === 'congress');
