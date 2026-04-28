@@ -5,59 +5,161 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
     <style>
+        /* =========================================
+           1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (:root)
+           ========================================= */
         :root { 
-            --accent: #09e0e3; --bg: #71797E; --dark: #1a1d1f; --card-bg: #22272a;
-            --ev-memorial: #ff7675; --ev-memorial-bg: #3b1e22; 
-            --ev-meeting: #87CEEB; --weekend: #14161A; --text-main: #e0e6ed;
-            --inner-border: rgba(255, 255, 255, 0.05);
+            --color-accent: #09e0e3;              
+            --color-bg-main: #71797E;             
+            --color-bg-app: #0f1112;              
+            --color-bg-sidebar: rgba(80, 80, 80, 0.2);
+            --color-bg-card: rgba(255, 255, 255, 0.03); 
+            
+            --color-text-main: #e0e6ed;           
+            --color-text-white: #ffffff;          
+            --color-text-black: #000000;          
+            --color-text-muted: #7f8fa6;          
+            --color-text-transparent: rgba(255, 255, 255, 0.1);      
+            --color-error: #ff7675;               
+
+            --color-icon-accent: #52525C;         
+
+            /* Цвета СОБЫТИЙ */
+            --color-ev-memorial: #D10000;         
+            --color-ev-memorial-bg: #3b1e22;      
+            --color-ev-congress: #8E44AD;         
+            --color-ev-meeting: #056D71;          
+            --color-ev-personal: #888888;
+
+            /* Рамки и эффекты */
+            --color-border-inner: rgba(255, 255, 255, 0.05); 
+            --color-hover-light: rgba(255, 255, 255, 0.08);  
+            --color-shadow-app: rgba(0, 0, 0, 0.5);          
+            --color-overlay-dark: rgba(0, 0, 0, 0.85);       
+
+            /* Специфичные для календаря */
+            --color-bg-day: #1a1d1f;
+            --color-bg-day-hover: #2b3236;
+            --color-bg-weekend: #14161A;
+            --color-weekend-text: #636e72;
+            
+            --size-app-width: 95vw;
+            --size-app-height: 90dvh;
+            --size-app-max-width: 1400px;
+            --size-app-max-height: 900px;
+            --size-app-radius: 30px;
+            --size-sidebar-width: 25%;
+            --size-sidebar-min-width: 220px;
+            --size-sidebar-max-width: 320px;
         }
+
+        /* =========================================
+           2. БАЗОВЫЕ НАСТРОЙКИ
+           ========================================= */
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; padding: 0; background: var(--bg); color: var(--text-main); display: flex; align-items: center; justify-content: center; height: 100dvh; width: 100vw; overflow: hidden; }
-        .app-container { width: 95vw; height: 90dvh; max-width: 1400px; max-height: 900px; background: #0f1112; border-radius: 30px; display: flex; flex-direction: row; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .sidebar { width: 25%; min-width: 220px; max-width: 320px; background: rgba(80,80,80,0.2); padding: 3vh 2vw; display: flex; flex-direction: column; border-right: 1px solid var(--inner-border); flex-shrink: 0; }
+        
+        body { 
+            margin: 0; padding: 0; 
+            background: var(--color-bg-main); color: var(--color-text-main); 
+            display: flex; align-items: center; justify-content: center; 
+            height: 100dvh; width: 100vw; overflow: hidden; 
+        }
+
+        .app-container { 
+            width: var(--size-app-width); height: var(--size-app-height); 
+            max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); 
+            background: var(--color-bg-app); border-radius: var(--size-app-radius); 
+            display: flex; flex-direction: row; position: relative; overflow: hidden; 
+            box-shadow: 0 20px 50px var(--color-shadow-app); 
+        }
+
+        /* =========================================
+           3. БОКОВАЯ ПАНЕЛЬ (ПРЕВЬЮ И УПРАВЛЕНИЕ)
+           ========================================= */
+        .sidebar { 
+            width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
+            background: var(--color-bg-sidebar); padding: 3vh 2vw; 
+            display: flex; flex-direction: column; border-right: 1px solid var(--color-border-inner); flex-shrink: 0; 
+        }
+
         .user-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2vh; width: 100%; position: relative; }
         .header-left, .header-right { display: flex; align-items: center; gap: 15px; z-index: 10; }
         .header-center { position: absolute; left: 50%; transform: translateX(-50%); display: flex; align-items: center; justify-content: center; z-index: 5; }
-        .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; }
-        .icon-btn img { width: 25px; height: 25px; opacity: 0.5; transition: 0.3s; }
-        .icon-btn:hover img { opacity: 1; filter: brightness(0) invert(1); }
-        .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: #fff; letter-spacing: 1px; }
+        
+        /* Иконки в стиле главной страницы */
+        .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; }
+        .ui-icon { font-family: "Segoe UI Symbol", "Symbola", sans-serif; font-size: 22px; line-height: 1; transition: 0.3s; color: var(--color-text-white); opacity: 0.5; }
+        .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .ui-icon-accent { color: var(--color-icon-accent); opacity: 0.8; }
+        .icon-btn:hover .ui-icon-accent { color: var(--color-accent); }
+
+        .user-name { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--color-text-white); letter-spacing: 1px; }
+        
         .preview-box { display: flex; flex-direction: column; margin-top: 1vh; flex: 1; overflow: hidden; }
         .preview { background: transparent; width: 100%; padding: 1vh 0; border-radius: 4px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.4; }
-        .action-btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 2vh; cursor: pointer; color: #fff; background: var(--accent); text-transform: uppercase; }
+        
+        .action-btn { 
+            width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 2vh; cursor: pointer; 
+            color: var(--color-bg-app); background: var(--color-accent); text-transform: uppercase; transition: 0.2s;
+        }
+        .action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .action-btn:active { transform: translateY(0); }
+
+        /* =========================================
+           4. ОСНОВНАЯ ОБЛАСТЬ (СЕТКА ДНЕЙ)
+           ========================================= */
         .main-view { flex: 1; display: flex; flex-direction: column; padding: 3vh 3vw; position: relative; overflow: hidden; }
         .calendar-wrapper { max-width: 800px; width: 100%; height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
-        #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
-        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: #7f8fa6; }
+        
+        #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: var(--color-text-white); text-transform: uppercase; }
+        .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: var(--color-text-muted); }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; flex: 1; align-content: start; }
-        .day-box { aspect-ratio: 1/1; background: var(--dark); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; position: relative; transition: 0.2s; border: 2px solid transparent; }
-        .day-box:hover { background: #2b3236; }
-        .day-box.weekend { background: var(--weekend); color: #636e72; }
-        .day-box.selected { border-color: var(--accent) !important; }
-        .day-box.today { color: var(--accent); font-weight: 700; border: 1px solid rgba(9, 224, 227, 0.2); }
-        .day-box.has-memorial { background: var(--ev-memorial-bg) !important; color: var(--ev-memorial) !important; }
+        
+        .day-box { 
+            aspect-ratio: 1/1; background: var(--color-bg-day); border-radius: 12px; display: flex; align-items: center; justify-content: center; 
+            font-size: 1.2rem; cursor: pointer; position: relative; transition: 0.2s; border: 2px solid transparent; 
+        }
+        .day-box:hover { background: var(--color-bg-day-hover); }
+        .day-box.weekend { background: var(--color-bg-weekend); color: var(--color-weekend-text); }
+        .day-box.selected { border-color: var(--color-accent) !important; }
+        .day-box.today { color: var(--color-accent); font-weight: 700; border: 1px solid rgba(9, 224, 227, 0.2); }
+        .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; }
+        
+        /* Индикаторы */
         .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 3px; justify-content: center; width: 80%; }
         .mark { height: 3px; flex: 1; border-radius: 2px; }
-        .m-meeting { background: var(--ev-meeting); }
-        .m-personal { background: #888; }
+        .m-meeting { background: var(--color-ev-meeting); }
+        .m-personal { background: var(--color-ev-personal); }
         
-        /* Конгресс линии */
-        .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { content: ''; position: absolute; bottom: 0; height: 3px; background: #C0C0C0; width: 100%; }
+        /* Конгресс линии (обновлено на фиолетовый) */
+        .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { 
+            content: ''; position: absolute; bottom: 0; height: 3px; background: var(--color-ev-congress); width: 100%; 
+        }
         .day-box.c-start::after { left: 50%; width: 50%; }
         .day-box.c-end::after { left: 0; width: 50%; }
         .day-box.c-single::after { left: 25%; width: 50%; border-radius: 2px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-box { background: var(--card-bg); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; }
-        .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: white; text-transform: uppercase; font-size: 0.7rem; }
-        textarea { width: 100%; height: 80px; margin-bottom: 15px; padding: 12px; border-radius: 6px; border: 1px solid var(--inner-border); background: var(--dark); color: white; resize: none; }
-        .note-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
+        /* =========================================
+           5. МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ
+           ========================================= */
+        .modal { display: none; position: fixed; inset: 0; background: var(--color-overlay-dark); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-box { background: var(--color-bg-app); border: 1px solid var(--color-border-inner); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; font-weight: 800; margin-bottom: 8px; cursor: pointer; color: var(--color-text-white); text-transform: uppercase; font-size: 0.7rem; transition: 0.2s; }
+        .modal-btn:hover { filter: brightness(1.1); }
+        textarea { width: 100%; height: 80px; margin-bottom: 15px; padding: 12px; border-radius: 6px; border: 1px solid var(--color-border-inner); background: var(--color-bg-day); color: var(--color-text-white); resize: none; outline: none; }
+        textarea:focus { border-color: var(--color-accent); }
+        .note-item { display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-card); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
 
+        /* =========================================
+           6. АДАПТИВНОСТЬ (МОБИЛКИ)
+           ========================================= */
         @media (orientation: portrait) {
-            .app-container { flex-direction: column; border-radius: 0; width: 100vw; height: 100dvh; }
-            .sidebar { width: 100%; max-width: 100%; border-right: none; border-bottom: 1px solid var(--inner-border); height: 30%; }
+            .app-container { flex-direction: column; border-radius: 0; width: 100vw; height: 100dvh; box-shadow: none; }
+            .sidebar { width: 100%; max-width: 100%; border-right: none; border-bottom: 1px solid var(--color-border-inner); height: 35%; padding: 2vh 4vw; }
+            .main-view { padding: 2vh 4vw; flex: 1; min-height: 0; }
             .grid { gap: 4px; }
             .day-box { font-size: 1rem; border-radius: 6px; }
+            #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
         }
     </style>
 </head>
@@ -67,17 +169,21 @@
         <div class="sidebar">
             <div class="user-header">
                 <div class="header-left">
-                    <button class="icon-btn" onclick="location.href='calendar.html'"><img src="BACK.png" alt="<"></button>
+                    <button class="icon-btn" onclick="location.href='calendar.html'" title="Назад">
+                        <span class="ui-icon">◀</span>
+                    </button>
                 </div>
                 <div class="header-center">
-                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;"><img src="OPTION.png" alt="⚙"></button>
+                    <button id="admin-btn" class="icon-btn" onclick="location.href='admin.html'" style="display:none;" title="Настройки">
+                        <span class="ui-icon ui-icon-accent">⚙</span>
+                    </button>
                 </div>
                 <div class="header-right">
                     <div id="user-display" class="user-name">...</div>
                 </div>
             </div>
             <div class="preview-box">
-                <div style="font-size:0.6rem; color:#7f8fa6; margin-bottom:10px; font-weight:800; letter-spacing:1px;">ДЕТАЛИ ДНЯ</div>
+                <div style="font-size:0.6rem; color:var(--color-text-muted); margin-bottom:10px; font-weight:800; letter-spacing:1px;">ДЕТАЛИ ДНЯ</div>
                 <div id="preview" class="preview">Выберите день.</div>
                 <button class="action-btn" id="edit-btn" style="display:none;" onclick="openModal()">+ ДОБАВИТЬ ПЛАН</button>
             </div>
@@ -94,16 +200,16 @@
 
     <div id="modal" class="modal">
         <div class="modal-box">
-            <h3 id="modal-title" style="margin:0 0 20px 0; text-align:center; color: var(--accent); text-transform: uppercase;"></h3>
+            <h3 id="modal-title" style="margin:0 0 20px 0; text-align:center; color: var(--color-accent); text-transform: uppercase;"></h3>
             <div id="modal-list" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px;"></div>
             <textarea id="note-input" placeholder="Текст заметки..."></textarea>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-                <button id="btn-memorial" class="modal-btn" style="background:var(--ev-memorial);" onclick="save('memorial')">ВЕЧЕРЯ</button>
-                <button id="btn-meeting" class="modal-btn" style="background:var(--ev-meeting); color:#000;" onclick="save('meeting')">ВСТРЕЧА</button>
-                <button id="btn-congress" class="modal-btn" style="background:#555;" onclick="save('congress')">КОНГРЕСС</button>
-                <button class="modal-btn" style="background:#333;" onclick="save('personal')">ЛИЧНОЕ</button>
+                <button id="btn-memorial" class="modal-btn" style="background:var(--color-ev-memorial);" onclick="save('memorial')">ВЕЧЕРЯ</button>
+                <button id="btn-meeting" class="modal-btn" style="background:var(--color-ev-meeting); color:#fff;" onclick="save('meeting')">ВСТРЕЧА</button>
+                <button id="btn-congress" class="modal-btn" style="background:var(--color-ev-congress);" onclick="save('congress')">КОНГРЕСС</button>
+                <button class="modal-btn" style="background:var(--color-ev-personal);" onclick="save('personal')">ЛИЧНОЕ</button>
             </div>
-            <button class="modal-btn" style="background:none; border:1px solid #444; color:#888;" onclick="closeModal()">ЗАКРЫТЬ</button>
+            <button class="modal-btn" style="background:none; border:1px solid var(--color-border-inner); color:var(--color-text-muted);" onclick="closeModal()">ЗАКРЫТЬ</button>
         </div>
     </div>
 
@@ -153,11 +259,16 @@
         const notes = dbData[d] || [];
         
         const preview = document.getElementById('preview');
-        preview.innerHTML = `<div style="color:var(--accent); font-weight:800; margin-bottom:10px;">${d} ${months[mIdx]}</div>` +
+        preview.innerHTML = `<div style="color:var(--color-accent); font-weight:800; margin-bottom:10px;">${d} ${months[mIdx]}</div>` +
             (notes.map(n => {
-                const col = n.category === 'memorial' ? 'var(--ev-memorial)' : (n.category === 'meeting' ? 'var(--ev-meeting)' : '#888');
-                return `<div style="border-left: 3px solid ${col}; padding-left: 8px; margin-bottom: 8px;">${n.text}</div>`;
-            }).join('') || '<div style="color:#555;">Планов нет</div>');
+                // Обновлена логика вывода цвета линии в превью
+                let col = 'var(--color-ev-personal)';
+                if (n.category === 'memorial') col = 'var(--color-ev-memorial)';
+                if (n.category === 'meeting') col = 'var(--color-ev-meeting)';
+                if (n.category === 'congress') col = 'var(--color-ev-congress)';
+                
+                return `<div style="border-left: 3px solid ${col}; padding-left: 8px; margin-bottom: 8px; color: var(--color-text-white);">${n.text}</div>`;
+            }).join('') || '<div style="color:var(--color-text-muted);">Планов нет</div>');
     };
 
     window.openModal = () => {
@@ -170,8 +281,8 @@
 
         list.innerHTML = notes.map((n, idx) => `
             <div class="note-item">
-                <span style="font-size:0.8rem;">${n.text}</span>
-                ${(isAdmin || n.author === currentUser) ? `<b onclick="delNote(${idx})" style="color:red; cursor:pointer; padding:5px;">✕</b>` : ''}
+                <span style="font-size:0.8rem; color:var(--color-text-white);">${n.text}</span>
+                ${(isAdmin || n.author === currentUser) ? `<b onclick="delNote(${idx})" style="color:var(--color-error); cursor:pointer; padding:5px;">✕</b>` : ''}
             </div>
         `).join('');
         document.getElementById('modal').style.display = 'flex';
