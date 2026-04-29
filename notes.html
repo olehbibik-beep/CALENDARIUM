@@ -134,6 +134,7 @@
         /* Индикаторы (Точки и Линии) */
         .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 4px; justify-content: center; width: 100%; padding: 0 4px; }
         .dot { height: var(--size-dot-height); width: 100%; max-width: 15px; border-radius: 4px; }
+        .dot.red { background: var(--color-ev-memorial); } /* Добавили красную точку */
         .dot.blue { background: var(--color-ev-meeting); }
         .dot.personal { background: var(--color-ev-personal); }
         
@@ -351,7 +352,11 @@
             const hasCongress = notes.some(n => n.category === 'congress');
 
             notes.forEach(n => {
-                if (n.category === 'memorial') tile.classList.add('has-memorial');
+                if (n.category === 'memorial') {
+                    tile.classList.add('has-memorial');
+                    // Добавляем красную точку
+                    if (marks) marks.innerHTML += '<div class="dot red"></div>'; 
+                }
                 // Добавляем стилизованные точки
                 if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="dot blue"></div>';
                 if (n.category === 'personal' && marks) marks.innerHTML += '<div class="dot personal"></div>';
