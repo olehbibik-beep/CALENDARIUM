@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
-    /* =========================================
+    <style>/* =========================================
            1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (:root)
            ========================================= */
         :root { 
@@ -170,6 +170,7 @@
             .day-box { font-size: 1rem; border-radius: 6px; }
             #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
         }
+        </style>
 </head>
 <body>
 
@@ -282,19 +283,21 @@
         
         const preview = document.getElementById('preview');
         
-        // ИСПРАВЛЕНО: Интеграция красивых карточек .event-card-mini
-        preview.innerHTML = `<div style="color:var(--color-text-white); font-weight:800; margin-bottom:15px; font-size:1.1rem; text-align:center; letter-spacing: 1px;">${d} ${months[mIdx]}</div>` +
+        // Рендерим заголовок и карточки 1-в-1 как в боковом меню главной страницы
+        preview.innerHTML = `<div style="font-size:0.6rem; color:var(--color-text-muted); margin-bottom:10px; font-weight:800; letter-spacing:1px; text-align:center;">ВЫБРАНО: ${d} ${months[mIdx]}</div>` +
             (notes.map(n => {
-                let col = 'var(--color-ev-personal)';
-                if (n.category === 'memorial') col = 'var(--color-ev-memorial)';
-                if (n.category === 'meeting') col = 'var(--color-ev-meeting)';
-                if (n.category === 'congress') col = 'var(--color-ev-congress)';
+                let dotColor = 'var(--color-ev-personal)';
+                if (n.category === 'memorial') dotColor = 'var(--color-ev-memorial)';
+                if (n.category === 'meeting') dotColor = 'var(--color-ev-meeting)';
+                if (n.category === 'congress') dotColor = 'var(--color-ev-congress)';
                 
                 return `
-                <div class="event-card-mini" style="border-left-color: ${col};">
-                    <div class="ev-title">${n.text}</div>
-                </div>`;
-            }).join('') || '<div style="color:var(--color-text-muted); text-align:center; font-size: 0.85rem; margin-top:20px;">ПЛАНОВ НЕТ</div>');
+                    <div class="event-card-mini" style="border-left-color: ${dotColor}">
+                        <div class="ev-title">${n.text}</div>
+                        <div class="ev-date">${d} ${months[mIdx]}</div>
+                    </div>
+                `;
+            }).join('') || '<div style="color:var(--color-text-muted); text-align:center; padding-top:20px;">Планов нет</div>');
     };
 
     window.openModal = () => {
@@ -349,6 +352,7 @@
 
             notes.forEach(n => {
                 if (n.category === 'memorial') tile.classList.add('has-memorial');
+                // Добавляем стилизованные точки
                 if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="dot blue"></div>';
                 if (n.category === 'personal' && marks) marks.innerHTML += '<div class="dot personal"></div>';
             });
@@ -362,6 +366,7 @@
                 else tile.classList.add('c-single');
             }
         });
+        // Перерисовываем превью выбранного дня, если данные изменились
         if (selectedDay) selectDay(selectedDay);
     }
 
