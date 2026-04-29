@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
-    <style>
-        /* =========================================
+    /* =========================================
            1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (:root)
            ========================================= */
         :root { 
@@ -20,7 +19,7 @@
             --color-text-white: #ffffff;          
             --color-text-black: #000000;          
             --color-text-muted: #7f8fa6;          
-            --color-text-transparent: rgba(255, 255, 255, 0.1);     
+            --color-text-transparent: rgba(255, 255, 255, 0.1);      
             --color-error: #ff7675;               
 
             --color-icon-accent: #52525C;         
@@ -34,7 +33,10 @@
 
             /* Рамки и эффекты */
             --color-border-inner: rgba(255, 255, 255, 0.05); 
+            --color-border-dashed: rgba(255, 255, 255, 0.1);
             --color-hover-light: rgba(255, 255, 255, 0.08);  
+            --color-hover-medium: rgba(255, 255, 255, 0.12);
+            --color-hover-strong: rgba(255, 255, 255, 0.2);
             --color-shadow-app: rgba(0, 0, 0, 0.5);          
             --color-overlay-dark: rgba(0, 0, 0, 0.85);       
 
@@ -55,42 +57,21 @@
             --size-sidebar-width: 20%;
             --size-sidebar-min-width: 200px;
             --size-sidebar-max-width: 220px;
+            --size-dot-height: 4px;
         }
 
         /* =========================================
-           2. БАЗОВЫЕ НАСТРОЙКИ
+           2. БАЗОВЫЕ НАСТРОЙКИ И КАРКАС
            ========================================= */
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            margin: 0; padding: 0; 
-            background: var(--color-bg-main); color: var(--color-text-main); 
-            display: flex; align-items: center; justify-content: center; 
-            height: 100dvh; width: 100vw; overflow: hidden; 
-        }
-
-        /* ГЛАВНЫЙ КОНТЕЙНЕР */
-        .app-container { 
-            width: var(--size-app-width); height: var(--size-app-height); 
-            max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); 
-            background: var(--color-bg-app); border-radius: var(--size-app-radius); 
-            display: flex; flex-direction: row; position: relative; overflow: hidden; 
-            box-shadow: 0 20px 50px var(--color-shadow-app); 
-        }
+        body { margin: 0; padding: 0; background: var(--color-bg-main); color: var(--color-text-main); display: flex; align-items: center; justify-content: center; height: 100dvh; width: 100vw; overflow: hidden; }
+        .app-container { width: var(--size-app-width); height: var(--size-app-height); max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); background: var(--color-bg-app); border-radius: var(--size-app-radius); display: flex; flex-direction: row; position: relative; overflow: hidden; box-shadow: 0 20px 50px var(--color-shadow-app); }
 
         /* =========================================
-           3. ЛЕВАЯ ПАНЕЛЬ НАВИГАЦИИ (МЕНЮ)
+           3. НАВИГАЦИЯ И ИКОНКИ
            ========================================= */
-        .nav-bar {
-            width: var(--size-nav-width);
-            background: var(--color-bg-nav);
-            border-right: 0px solid var(--color-border-inner);
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            padding: 3vh 0; flex-shrink: 0; z-index: 20;
-        }
+        .nav-bar { width: var(--size-nav-width); background: var(--color-bg-nav); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3vh 0; flex-shrink: 0; z-index: 20; }
         .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-
-        /* Иконки UI */
         .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; }
         .ui-icon { font-family: "Segoe UI Symbol", "Symbola", sans-serif; font-size: 22px; line-height: 1; transition: 0.3s; color: var(--color-text-white); opacity: 0.5; }
         .icon-btn:hover .ui-icon { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
@@ -98,48 +79,27 @@
         .icon-btn:hover .ui-icon-accent { color: var(--color-accent); }
 
         /* =========================================
-           4. БОКОВАЯ ПАНЕЛЬ (ДЕТАЛИ ДНЯ)
+           4. БОКОВАЯ ПАНЕЛЬ (ПРЕВЬЮ С КАРТОЧКАМИ)
            ========================================= */
-        .sidebar { 
-            width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
-            background: var(--color-bg-sidebar); padding: 3vh 2vw; 
-            display: flex; flex-direction: column; border-right: 0px solid var(--color-border-inner); flex-shrink: 0; 
-        }
+        .sidebar { width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); background: var(--color-bg-sidebar); padding: 3vh 4px; display: flex; flex-direction: column; flex-shrink: 0; box-sizing: border-box; }
         .section-title { font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); letter-spacing: 1px; margin-bottom: 2vh; text-align: center; }
         
-        .preview-box { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        .preview { background: transparent; width: 100%; border-radius: 4px; flex: 1; overflow-y: auto; font-size: 0.9rem; line-height: 1.4; padding-right: 5px; }
+        .preview-box { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0 10px; }
+        .preview { background: transparent; width: 100%; flex: 1; overflow-y: auto; padding-right: 5px; }
         
-        .action-btn { 
-            width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 2vh; cursor: pointer; 
-            color: var(--color-bg-app); background: var(--color-accent); text-transform: uppercase; transition: 0.2s;
-        }
+        /* Стили карточек 1-в-1 как в календаре */
+        .event-card-mini { background: transparent; padding: 10px 8px; border-radius: 4px; margin-bottom: 10px; border: 1px dashed var(--color-border-dashed); border-left: 4px solid var(--color-accent); transition: all 0.2s ease; width: 100%; box-sizing: border-box; }
+        .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 400; color: var(--color-text-white); margin-bottom: 4px; line-height: 1.3; }
+        .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: var(--color-text-muted); }
+
+        .action-btn { width: 100%; padding: 15px; border: none; border-radius: 4px; font-weight: 700; margin-top: 2vh; cursor: pointer; color: var(--color-bg-app); background: var(--color-accent); text-transform: uppercase; transition: 0.2s; }
         .action-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .action-btn:active { transform: translateY(0); }
 
-        /* КРАСИВЫЕ КАРТОЧКИ СОБЫТИЙ В БОКОВОЙ ПАНЕЛИ */
-        .event-card-mini { 
-            background: var(--color-bg-card); 
-            padding: 12px 10px; 
-            border-radius: 6px; 
-            margin-bottom: 10px; 
-            border: none;
-            border-left: 4px solid var(--color-accent); /* Цвет будет меняться через JS */
-            transition: all 0.2s ease; 
-            cursor: pointer;
-            width: 100%;
-        }
-        .event-card-mini:hover { 
-            background: var(--color-hover-light); 
-            transform: translateX(3px);
-        }
-        .ev-title { font-size: clamp(0.75rem, 1vw, 0.9rem); font-weight: 500; color: var(--color-text-white); margin-bottom: 2px; line-height: 1.3; }
-        
         /* =========================================
-           5. ОСНОВНАЯ ОБЛАСТЬ
+           5. ОСНОВНАЯ ОБЛАСТЬ (КАРТИНКА + СЕТКА ДНЕЙ)
            ========================================= */
         .main-view { flex: 1; display: flex; flex-direction: row; align-items: center; padding: 3vh 3vw; position: relative; overflow: hidden; gap: 2vw; }
-        
         .illustration-box { width: 20%; display: flex; align-items: center; justify-content: center; }
         .illustration-placeholder { color: var(--color-text-transparent); border-radius: 20px; padding: 20px; text-align: center; }
 
@@ -147,75 +107,44 @@
         
         #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: var(--color-text-white); text-transform: uppercase; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: var(--color-text-muted); }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            grid-auto-rows: 1fr; 
-            gap: clamp(4px, 1vh, 8px); 
-            flex: 1; 
-            min-height: 0; 
-        }
-
-        .day-box { 
-            background: var(--color-bg-day); 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: clamp(0.9rem, 2vh, 1.2rem); 
-            cursor: pointer; 
-            position: relative; 
-            transition: 0.2s; 
-            border: 2px solid transparent; 
-            overflow: hidden; 
-        }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; flex: 1; align-content: start; }
+        
+        /* Стили дней и красивое свечение */
+        .day-box { aspect-ratio: 1/1; background: var(--color-bg-day); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; position: relative; transition: 0.2s; border: 2px solid transparent; overflow: hidden; }
         .day-box:hover { background: var(--color-bg-day-hover); }
         .day-box.weekend { background: var(--color-bg-weekend); color: var(--color-weekend-text); }
         
-        /* ИСПРАВЛЕНО: Стили выбранного и текущего дня */
+        /* Эффект выбранного дня */
         .day-box.selected { 
             border-color: var(--color-accent) !important; 
-            background: rgba(9, 224, 227, 0.15) !important; 
+            background: rgba(9, 224, 227, 0.1) !important; 
+            box-shadow: 0 0 15px rgba(9, 224, 227, 0.3);
+            color: var(--color-text-white);
             z-index: 2; 
-            transform: scale(1.05); 
-            box-shadow: 0 4px 15px rgba(9, 224, 227, 0.2);
         }
+        
+        /* Эффект сегодняшнего дня */
         .day-box.today { 
-            color: var(--color-accent); 
-            font-weight: 800; 
-            border: 2px solid rgba(9, 224, 227, 0.3); 
+            color: var(--color-accent); font-weight: 700; 
+            border: 1px solid rgba(9, 224, 227, 0.3); 
+            box-shadow: inset 0 0 10px rgba(9, 224, 227, 0.1);
         }
         .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; }
         
-        /* ИСПРАВЛЕНО: Индикаторы событий */
-        .indicator-row { 
-            position: absolute; 
-            bottom: 8%; /* Сдвинули чуть выше от края */
-            display: flex; 
-            gap: 4px; 
-            justify-content: center; 
-            width: 100%; 
-            padding: 0 4px; 
-        }
-        .dot { 
-            height: 6px; 
-            width: 6px; 
-            border-radius: 50%; /* Круглые точки более эстетичны */
-            display: block; /* Важно: чтобы не "схлопывались" внутри Flex */
-        }
-        .dot.blue { background: var(--color-ev-meeting); box-shadow: 0 0 5px var(--color-ev-meeting); }
-        .dot.personal { background: var(--color-ev-personal); box-shadow: 0 0 5px var(--color-ev-personal); }
+        /* Индикаторы (Точки и Линии) */
+        .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 4px; justify-content: center; width: 100%; padding: 0 4px; }
+        .dot { height: var(--size-dot-height); width: 100%; max-width: 15px; border-radius: 4px; }
+        .dot.blue { background: var(--color-ev-meeting); }
+        .dot.personal { background: var(--color-ev-personal); }
         
         /* Линии конгресса */
-        .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { 
-            content: ''; position: absolute; bottom: 0; height: 4px; background: var(--color-ev-congress); width: 100%; 
-        }
+        .day-box.c-start::after, .day-box.c-mid::after, .day-box.c-end::after, .day-box.c-single::after { content: ''; position: absolute; bottom: 0; height: 4px; background: var(--color-ev-congress); width: 100%; }
         .day-box.c-start::after { left: 50%; width: 50%; }
         .day-box.c-end::after { left: 0; width: 50%; }
         .day-box.c-single::after { left: 25%; width: 50%; border-radius: 2px; }
 
         /* =========================================
-           6. МОДАЛЬНОЕ ОКНО ДОБАВЛЕНИЯ
+           6. МОДАЛЬНОЕ ОКНО
            ========================================= */
         .modal { display: none; position: fixed; inset: 0; background: var(--color-overlay-dark); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-box { background: var(--color-bg-app); border: 1px solid var(--color-border-inner); padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
@@ -231,23 +160,16 @@
         @media (orientation: portrait) {
             body { background: var(--color-bg-app); }
             .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
-            
             .nav-bar { width: 100%; height: auto; flex-direction: row; padding: 1vh 4vw; border-right: none; border-bottom: 1px solid var(--color-border-inner); }
             .nav-group { flex-direction: row; gap: 15px; }
-            
             .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--color-border-inner); background: var(--color-bg-app); flex-direction: column; align-items: stretch; justify-content: flex-start; }
-            
             .main-view { padding: 1vh 4vw 2vh; flex: 1; flex-direction: column; justify-content: space-between; min-height: 0; }
             .illustration-box { display: none !important; }
             .calendar-wrapper { width: 100%; height: 100%; }
-
             .grid { gap: 4px; }
-            .day-box { font-size: 0.9rem; border-radius: 6px; border-width: 1px; }
-            .indicator-row { bottom: 5px; gap: 2px; }
-            .dot { height: 4px; width: 4px; } /* На мобилках точки чуть меньше */
+            .day-box { font-size: 1rem; border-radius: 6px; }
             #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
         }
-    </style>
 </head>
 <body>
 
