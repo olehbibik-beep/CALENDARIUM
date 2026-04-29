@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CALENDARIUM | Заметки</title>
-    <style>/* =========================================
+    <style>
+        /* =========================================
            1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (:root)
            ========================================= */
         :root { 
@@ -17,7 +18,6 @@
             
             --color-text-main: #e0e6ed;           
             --color-text-white: #ffffff;          
-            --color-text-black: #000000;          
             --color-text-muted: #7f8fa6;          
             --color-text-transparent: rgba(255, 255, 255, 0.1);      
             --color-error: #ff7675;               
@@ -65,12 +65,19 @@
            ========================================= */
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; padding: 0; background: var(--color-bg-main); color: var(--color-text-main); display: flex; align-items: center; justify-content: center; height: 100dvh; width: 100vw; overflow: hidden; }
-        .app-container { width: var(--size-app-width); height: var(--size-app-height); max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); background: var(--color-bg-app); border-radius: var(--size-app-radius); display: flex; flex-direction: row; position: relative; overflow: hidden; box-shadow: 0 20px 50px var(--color-shadow-app); }
+        
+        .app-container { 
+            width: var(--size-app-width); height: var(--size-app-height); 
+            max-width: var(--size-app-max-width); max-height: var(--size-app-max-height); 
+            background: var(--color-bg-app); border-radius: var(--size-app-radius); 
+            display: flex; flex-direction: row; position: relative; overflow: hidden; 
+            box-shadow: 0 20px 50px var(--color-shadow-app); 
+        }
 
         /* =========================================
            3. НАВИГАЦИЯ И ИКОНКИ
            ========================================= */
-        .nav-bar { width: var(--size-nav-width); background: var(--color-bg-nav); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3vh 0; flex-shrink: 0; z-index: 20; }
+        .nav-bar { width: var(--size-nav-width); background: var(--color-bg-nav); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3vh 0; flex-shrink: 0; z-index: 20; border-right: 0px solid var(--color-border-inner); }
         .nav-group { display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .icon-btn { background: none; border: none; padding: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; outline: none; }
         .ui-icon { font-family: "Segoe UI Symbol", "Symbola", sans-serif; font-size: 22px; line-height: 1; transition: 0.3s; color: var(--color-text-white); opacity: 0.5; }
@@ -81,14 +88,18 @@
         /* =========================================
            4. БОКОВАЯ ПАНЕЛЬ (ПРЕВЬЮ С КАРТОЧКАМИ)
            ========================================= */
-        .sidebar { width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); background: var(--color-bg-sidebar); padding: 3vh 4px; display: flex; flex-direction: column; flex-shrink: 0; box-sizing: border-box; }
+        .sidebar { 
+            width: var(--size-sidebar-width); min-width: var(--size-sidebar-min-width); max-width: var(--size-sidebar-max-width); 
+            background: var(--color-bg-sidebar); padding: 3vh 4px; display: flex; flex-direction: column; flex-shrink: 0; box-sizing: border-box; 
+        }
         .section-title { font-size: 0.8rem; font-weight: 800; color: var(--color-text-muted); letter-spacing: 1px; margin-bottom: 2vh; text-align: center; }
         
         .preview-box { display: flex; flex-direction: column; flex: 1; overflow: hidden; padding: 0 10px; }
         .preview { background: transparent; width: 100%; flex: 1; overflow-y: auto; padding-right: 5px; }
         
-        /* Стили карточек 1-в-1 как в календаре */
+        /* КАРТОЧКИ: 1-в-1 с главной страницей */
         .event-card-mini { background: transparent; padding: 10px 8px; border-radius: 4px; margin-bottom: 10px; border: 1px dashed var(--color-border-dashed); border-left: 4px solid var(--color-accent); transition: all 0.2s ease; width: 100%; box-sizing: border-box; }
+        .event-card-mini:hover { background: var(--color-hover-light); border-color: var(--color-hover-strong); padding-left: 8px; }
         .ev-title { font-size: clamp(0.7rem, 1vw, 0.85rem); font-weight: 400; color: var(--color-text-white); margin-bottom: 4px; line-height: 1.3; }
         .ev-date { font-size: clamp(0.6rem, 0.8vw, 0.75rem); color: var(--color-text-muted); }
 
@@ -107,14 +118,21 @@
         
         #m-name { font-size: clamp(1.5rem, 4vh, 2.5rem); text-align: center; margin-bottom: 2vh; font-weight: 300; letter-spacing: 2px; color: var(--color-text-white); text-transform: uppercase; }
         .weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 900; margin-bottom: 1vh; color: var(--color-text-muted); }
+        
+        /* Сетка с зазором как у месяцев */
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; flex: 1; align-content: start; }
         
-        /* Стили дней и красивое свечение */
-        .day-box { aspect-ratio: 1/1; background: var(--color-bg-day); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; position: relative; transition: 0.2s; border: 2px solid transparent; overflow: hidden; }
+        /* Плитки дней (унифицировано) */
+        .day-box { 
+            aspect-ratio: 1/1; background: var(--color-bg-day); border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; font-size: clamp(0.9rem, 2vw, 1.2rem); 
+            cursor: pointer; position: relative; transition: 0.2s; 
+            border: 2px solid transparent; overflow: hidden; 
+        }
         .day-box:hover { background: var(--color-bg-day-hover); }
         .day-box.weekend { background: var(--color-bg-weekend); color: var(--color-weekend-text); }
         
-        /* Эффект выбранного дня */
+        /* Эффекты: больше не прыгает рамка */
         .day-box.selected { 
             border-color: var(--color-accent) !important; 
             background: rgba(9, 224, 227, 0.1) !important; 
@@ -122,19 +140,17 @@
             color: var(--color-text-white);
             z-index: 2; 
         }
-        
-        /* Эффект сегодняшнего дня */
         .day-box.today { 
             color: var(--color-accent); font-weight: 700; 
             border: 1px solid rgba(9, 224, 227, 0.3); 
             box-shadow: inset 0 0 10px rgba(9, 224, 227, 0.1);
         }
-        .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; }
+        .day-box.has-memorial { background: var(--color-ev-memorial-bg) !important; color: var(--color-ev-memorial) !important; border: 1px solid rgba(209, 0, 0, 0.3); }
         
-        /* Индикаторы (Точки и Линии) */
-        .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 4px; justify-content: center; width: 100%; padding: 0 4px; }
-        .dot { height: var(--size-dot-height); width: 100%; max-width: 15px; border-radius: 4px; }
-        .dot.red { background: var(--color-ev-memorial); } /* Добавили красную точку */
+        /* ИНДИКАТОРЫ ТОЧКИ (Адаптивные для маленькой клетки) */
+        .indicator-row { position: absolute; bottom: 8%; display: flex; gap: 4px; justify-content: center; width: 100%; padding: 0 4px; box-sizing: border-box; }
+        .dot { height: var(--size-dot-height); flex: 1; max-width: 10px; border-radius: 4px; }
+        .dot.red { background: var(--color-ev-memorial); }
         .dot.blue { background: var(--color-ev-meeting); }
         .dot.personal { background: var(--color-ev-personal); }
         
@@ -156,22 +172,27 @@
         .note-item { display: flex; justify-content: space-between; align-items: center; background: var(--color-bg-card); padding: 10px; margin-bottom: 8px; border-radius: 4px; }
 
         /* =========================================
-           7. АДАПТИВНОСТЬ (МОБИЛКИ)
+           7. АДАПТИВНОСТЬ (МОБИЛКИ) - 1 в 1 с календарем
            ========================================= */
         @media (orientation: portrait) {
             body { background: var(--color-bg-app); }
             .app-container { width: 100vw; height: 100dvh; max-height: none; max-width: none; border-radius: 0; flex-direction: column; box-shadow: none; }
+            
             .nav-bar { width: 100%; height: auto; flex-direction: row; padding: 1vh 4vw; border-right: none; border-bottom: 1px solid var(--color-border-inner); }
             .nav-group { flex-direction: row; gap: 15px; }
+            
             .sidebar { width: 100%; max-width: 100%; height: auto; max-height: 35dvh; padding: 2vh 4vw 1vh; border-right: none; border-bottom: 1px solid var(--color-border-inner); background: var(--color-bg-app); flex-direction: column; align-items: stretch; justify-content: flex-start; }
+            
             .main-view { padding: 1vh 4vw 2vh; flex: 1; flex-direction: column; justify-content: space-between; min-height: 0; }
             .illustration-box { display: none !important; }
             .calendar-wrapper { width: 100%; height: 100%; }
-            .grid { gap: 4px; }
-            .day-box { font-size: 1rem; border-radius: 6px; }
+
+            /* Единые размеры сетки */
+            .grid { gap: 6px; }
+            .day-box { border-radius: 8px; }
             #m-name { font-size: 1.5rem; margin-bottom: 1vh; }
         }
-        </style>
+    </style>
 </head>
 <body>
 
@@ -242,7 +263,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // 1. Авторизация
     const currentUserRaw = localStorage.getItem('currentUser');
     if (!currentUserRaw) window.location.replace('index.html');
     const currentUser = currentUserRaw.toLowerCase();
@@ -250,7 +270,6 @@
 
     if (isAdmin) document.getElementById('admin-btn').style.display = 'flex';
 
-    // 2. Firebase
     const cfg = {
         apiKey: "AIzaSyBHtxnILGvSyWfrBDkp-ye4yNKACVVdDAE",
         authDomain: "calendarium-1f7d7.firebaseapp.com",
@@ -261,7 +280,6 @@
 
     const db = getFirestore(initializeApp(cfg));
 
-    // 3. Состояние
     const mIdx = parseInt(localStorage.getItem('selectedMonth')) || 0;
     const year = parseInt(localStorage.getItem('selectedYear')) || 2026;
     const docId = `${year}_${mIdx}`;
@@ -271,7 +289,6 @@
     let dbData = {};
     let selectedDay = null;
 
-    // 4. Функции
     window.selectDay = (d) => {
         if (!d) return;
         selectedDay = d;
@@ -284,7 +301,7 @@
         
         const preview = document.getElementById('preview');
         
-        // Рендерим заголовок и карточки 1-в-1 как в боковом меню главной страницы
+        // Рендер карточек
         preview.innerHTML = `<div style="font-size:0.6rem; color:var(--color-text-muted); margin-bottom:10px; font-weight:800; letter-spacing:1px; text-align:center;">ВЫБРАНО: ${d} ${months[mIdx]}</div>` +
             (notes.map(n => {
                 let dotColor = 'var(--color-ev-personal)';
@@ -354,10 +371,8 @@
             notes.forEach(n => {
                 if (n.category === 'memorial') {
                     tile.classList.add('has-memorial');
-                    // Добавляем красную точку
                     if (marks) marks.innerHTML += '<div class="dot red"></div>'; 
                 }
-                // Добавляем стилизованные точки
                 if (n.category === 'meeting' && marks) marks.innerHTML += '<div class="dot blue"></div>';
                 if (n.category === 'personal' && marks) marks.innerHTML += '<div class="dot personal"></div>';
             });
@@ -371,11 +386,9 @@
                 else tile.classList.add('c-single');
             }
         });
-        // Перерисовываем превью выбранного дня, если данные изменились
         if (selectedDay) selectDay(selectedDay);
     }
 
-    // 5. Запуск
     const gridEl = document.getElementById('grid');
     const firstDay = new Date(year, mIdx, 1).getDay();
     const shift = firstDay === 0 ? 6 : firstDay - 1;
